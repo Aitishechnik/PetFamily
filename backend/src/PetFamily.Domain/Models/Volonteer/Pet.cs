@@ -4,10 +4,24 @@ namespace PetFamily.Domain.Models.Volonteer
 {
     public class Pet : Entity
     {
-        public Pet(long id, string name, string species, string description, string breed, string color,
-            string healthInfo, string address, double weight, double height, string ownerPhoneNumber,
-            bool isNeutered, DateTime dateOfBirth, bool isVaccinated, HelpStatus helpStatus,
-            DonationDetails donationDetails, PetType petType
+        public Pet(
+            long id, 
+            string name, 
+            string species, 
+            string description, 
+            string breed, 
+            string color,
+            string healthInfo, 
+            string address, 
+            double weight, 
+            double height, 
+            string ownerPhoneNumber,
+            bool isNeutered, 
+            DateTime dateOfBirth, 
+            bool isVaccinated, 
+            HelpStatus helpStatus,
+            DonationDetails donationDetails, 
+            PetType petType
         )
         {
             Id = id;

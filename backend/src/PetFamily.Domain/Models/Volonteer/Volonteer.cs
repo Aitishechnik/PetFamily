@@ -4,8 +4,16 @@ namespace PetFamily.Domain.Models.Volonteer
 {
     public class Volonteer : Entity
     {
-        public Volonteer(long id, string fullName, string email, string description, int experienceInYears,
-            List<Pet> pets, string phoneNumber, List<SocialNetwork> socialNetworks,
+        public Volonteer(
+            long id, 
+            string fullName, 
+            string email, 
+            string description, 
+            int experienceInYears,
+            List<Pet> pets, 
+            string phoneNumber, 
+            List<SocialNetwork> 
+            socialNetworks,
             List<DonationDetails> donationDetails)
         {
             Id = id;

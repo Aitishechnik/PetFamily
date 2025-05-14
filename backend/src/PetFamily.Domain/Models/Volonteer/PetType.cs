@@ -16,10 +16,12 @@ namespace PetFamily.Domain.Models.Volonteer
         public static Result<PetType> Create(long speciesID, long breedID)
         {
             if (speciesID <= 0)
-                Result.Failure("Species ID cannot be less than or equal to 0");
+                return Result.Failure<PetType>("Species ID cannot be less than or equal to 0");
             if (breedID <= 0)
-                Result.Failure("Breed ID cannot be less than or equal to 0");
+                return Result.Failure<PetType>("Breed ID cannot be less than or equal to 0");
+
             var result = new PetType(speciesID, breedID);
+
             return Result.Success(result);
         }
     }
