@@ -18,7 +18,7 @@ namespace PetFamily.Domain.Models.Volonteer
             if (string.IsNullOrWhiteSpace(name))
                 return Result.Failure<SocialNetwork>("Name cannot be empty");
             if (string.IsNullOrWhiteSpace(link))
-                Result.Failure<SocialNetwork>("Name cannot be empty");
+                return Result.Failure<SocialNetwork>("Name cannot be empty");
 
             var result = new SocialNetwork(name, link);
 
