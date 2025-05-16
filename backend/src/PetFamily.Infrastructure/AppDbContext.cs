@@ -1,0 +1,23 @@
+﻿using Microsoft.EntityFrameworkCore;
+using PetFamily.Domain.Models.Volonteer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+namespace PetFamily.Infrastructure
+{
+    public class AppDbContext(IConfiguration configuration) : DbContext
+    {
+        private const string DATABASE = "Database";
+        public DbSet<Pet> Pets => Set<Pet>();
+        public DbSet<Volonteer> Volonteers => Set<Volonteer>();
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseNpgsql(configuration.GetConnectionString(DATABASE));
+            optionsBuilder.UseSnakeCaseNamingConvention();
+            optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
+        }
+
+        private ILoggerFactory CreateLoggerFactory() =>
+            LoggerFactory.Create(builder => { builder.AddConsole(); });
+    }
+}
