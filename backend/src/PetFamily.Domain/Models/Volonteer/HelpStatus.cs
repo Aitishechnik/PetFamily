@@ -2,6 +2,7 @@
 {
     public enum HelpStatus
     {
+        Undefined = 0,
         NeedsHelp,
         LookingForHome,
         FoundHome

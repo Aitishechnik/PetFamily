@@ -2,9 +2,9 @@
 
 namespace PetFamily.Domain.Models.Species
 {
-    public class Breed : Entity
+    public class Breed : Entity<Guid>
     {
-        public Breed(long id, string name)
+        public Breed(Guid id, string name)
         {
             Id = id;
             Name = name;

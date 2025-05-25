@@ -2,10 +2,11 @@
 
 namespace PetFamily.Domain.Models.Volonteer
 {
-    public class Pet : Entity
+    public class Pet : Entity<Guid>
     {
+        protected Pet() { }
         public Pet(
-            long id, 
+            Guid id, 
             string name, 
             string species, 
             string description, 
@@ -20,11 +21,10 @@ namespace PetFamily.Domain.Models.Volonteer
             DateTime dateOfBirth, 
             bool isVaccinated, 
             HelpStatus helpStatus,
-            DonationDetails donationDetails, 
+            DonationDetailsWrapper donationDetails,
             PetType petType
-        )
+        ) : base(id)
         {
-            Id = id;
             Name = name;
             Species = species;
             Description = description;
@@ -43,6 +43,7 @@ namespace PetFamily.Domain.Models.Volonteer
             PetType = petType;
             CreatedAt = DateTime.Now;
         }
+
         public string Name { get; private set; } = default!;
         public string Species { get; private set; } = default!;
         public string Description { get; private set; } = default!;
@@ -57,8 +58,8 @@ namespace PetFamily.Domain.Models.Volonteer
         public DateTime DateOfBirth { get; private set; }
         public bool IsVaccinated { get; private set; }
         public HelpStatus HelpStatus { get; private set; }
-        public DonationDetails DonationDetails { get; private set; }
-        public PetType PetType { get; private set; }
+        public DonationDetailsWrapper DonationDetails { get; private set; } = default!;
+        public PetType PetType { get; private set; } = default!;
         public DateTime CreatedAt { get; private set; } = DateTime.Now;
     }
 }

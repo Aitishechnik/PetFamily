@@ -13,7 +13,7 @@ namespace PetFamily.Domain.Models.Volonteer
         public string Name { get; }
         public string Link { get; }
 
-        public Result<SocialNetwork> Create(string name, string link)
+        public static Result<SocialNetwork> Create(string name, string link)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return Result.Failure<SocialNetwork>("Name cannot be empty");
