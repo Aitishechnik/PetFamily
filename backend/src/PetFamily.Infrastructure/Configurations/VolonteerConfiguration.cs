@@ -40,7 +40,7 @@ namespace PetFamily.Infrastructure.Configurations
 
             builder.OwnsOne(v => v.SocialNetworks, sns =>
             {
-                sns.ToJson();
+                sns.ToJson("social_networks");
 
                 sns.OwnsMany(sns => sns.SocialNetworks, snb =>
                 {
@@ -56,7 +56,7 @@ namespace PetFamily.Infrastructure.Configurations
 
             builder.OwnsOne(v => v.DonationDetails, dd =>
             {
-                dd.ToJson();
+                dd.ToJson("donation_details");
 
                 dd.OwnsMany(dd => dd.DonationDetails, ddb =>
                 {

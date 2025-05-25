@@ -5,9 +5,9 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Infrastructure.Configurations
 {
-    public class PetConfiguration : IEntityTypeConfiguration<Pet>
+    public class PetConfiguration : IEntityTypeConfiguration<Spicies>
     {
-        public void Configure(EntityTypeBuilder<Pet> builder)
+        public void Configure(EntityTypeBuilder<Spicies> builder)
         {
             builder.ToTable("pets");
 
@@ -72,7 +72,7 @@ namespace PetFamily.Infrastructure.Configurations
 
             builder.OwnsOne(v => v.DonationDetails, dd =>
             {
-                dd.ToJson();
+                dd.ToJson("donation_details");
 
                 dd.OwnsMany(dd => dd.DonationDetails, ddb =>
                 {

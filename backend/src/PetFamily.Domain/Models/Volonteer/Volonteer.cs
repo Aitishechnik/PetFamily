@@ -11,7 +11,7 @@ namespace PetFamily.Domain.Models.Volonteer
             string email, 
             string description, 
             int experienceInYears,
-            List<Pet> pets, 
+            List<Spicies> pets, 
             string phoneNumber,
             SocialNetwokrsWrapper socialNetwokrs,
             DonationDetailsWrapper donationDetails)
@@ -31,7 +31,7 @@ namespace PetFamily.Domain.Models.Volonteer
         public string Email { get; private set; } = default!;
         public string Description { get; private set; } = default!;
         public int ExperienceInYears { get; private set; }
-        public List<Pet> Pets { get; private set; } = new();
+        public List<Spicies> Pets { get; private set; } = new();
         public string PhoneNumber { get; private set; } = default!;
 
         public SocialNetwokrsWrapper SocialNetworks { get; private set; } = default!;
