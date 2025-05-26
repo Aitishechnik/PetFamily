@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Models.Volonteer
 {
@@ -13,16 +14,14 @@ namespace PetFamily.Domain.Models.Volonteer
         public long SpeciesID { get; }
         public long BreedID { get; }
 
-        public static Result<PetType> Create(long speciesID, long breedID)
+        public static Result<PetType, Error> Create(long speciesID, long breedID)
         {
             if (speciesID <= 0)
-                return Result.Failure<PetType>("Species ID cannot be less than or equal to 0");
+                return Errors.General.ValueIsInvalid("SpeciedID");
             if (breedID <= 0)
-                return Result.Failure<PetType>("Breed ID cannot be less than or equal to 0");
+                return Errors.General.ValueIsInvalid("BreedID");
 
-            var result = new PetType(speciesID, breedID);
-
-            return Result.Success(result);
+            return new PetType(speciesID, breedID);
         }
     }
 }
