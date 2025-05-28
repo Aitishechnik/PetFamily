@@ -5,9 +5,9 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Infrastructure.Configurations
 {
-    public class PetConfiguration : IEntityTypeConfiguration<Spicies>
+    public class PetConfiguration : IEntityTypeConfiguration<Pet>
     {
-        public void Configure(EntityTypeBuilder<Spicies> builder)
+        public void Configure(EntityTypeBuilder<Pet> builder)
         {
             builder.ToTable("pets");
 

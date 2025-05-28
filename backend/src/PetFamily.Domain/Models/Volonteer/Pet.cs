@@ -2,10 +2,10 @@
 
 namespace PetFamily.Domain.Models.Volonteer
 {
-    public class Spicies : Entity<Guid>
+    public class Pet : Entity<Guid>
     {
-        protected Spicies() { }
-        public Spicies(
+        protected Pet() { }
+        public Pet(
             Guid id, 
             string name, 
             string species, 

@@ -7,32 +7,38 @@ namespace PetFamily.Domain.Models.Volonteer
         protected Volonteer() { }
         public Volonteer(
             Guid id, 
-            string fullName, 
-            string email, 
-            string description, 
-            int experienceInYears,
-            List<Spicies> pets, 
-            string phoneNumber,
+            //string fullName, 
+            //string email, 
+            //string description, 
+            //int experienceInYears,
+            PersonalData personalData,
+            ProfessionalData professionalData,
+            List<Pet> pets, 
+            //string phoneNumber,
             SocialNetwokrsWrapper socialNetwokrs,
             DonationDetailsWrapper donationDetails)
         {
             Id = id;
-            FullName = fullName;
-            Email = email;
-            Description = description;
-            ExperienceInYears = experienceInYears;
+            PersonalData = personalData;
+            ProfessionalData = professionalData;
+            //FullName = fullName;
+            //Email = email;
+            //Description = description;
+            //ExperienceInYears = experienceInYears;
             Pets = pets;
-            PhoneNumber = phoneNumber;
+            //PhoneNumber = phoneNumber;
             SocialNetworks = socialNetwokrs;
             DonationDetails = donationDetails;
         }
 
-        public string FullName { get; private set; } = default!;
-        public string Email { get; private set; } = default!;
-        public string Description { get; private set; } = default!;
-        public int ExperienceInYears { get; private set; }
-        public List<Spicies> Pets { get; private set; } = new();
-        public string PhoneNumber { get; private set; } = default!;
+        //public string FullName { get; private set; } = default!;
+        //public string Email { get; private set; } = default!;
+        public PersonalData PersonalData { get; private set; } = default!;
+        public ProfessionalData ProfessionalData { get; private set; } = default!;
+        //public string Description { get; private set; } = default!;
+        //public int ExperienceInYears { get; private set; }
+        public List<Pet> Pets { get; private set; } = new();
+        //public string PhoneNumber { get; private set; } = default!;
 
         public SocialNetwokrsWrapper SocialNetworks { get; private set; } = default!;
         public DonationDetailsWrapper DonationDetails { get; private set; } = default!;

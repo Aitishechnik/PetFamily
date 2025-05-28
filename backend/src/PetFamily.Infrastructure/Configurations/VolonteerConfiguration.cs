@@ -14,29 +14,59 @@ namespace PetFamily.Infrastructure.Configurations
             builder.HasKey(v => v.Id)
                 .HasName("pk_volonteers");
 
-            builder.Property(v => v.FullName)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_NAME_LENGTH);
+            builder.ComplexProperty(v => v.PersonalData, pdb =>
+            {
+                pdb.Property(pd => pd.FullName)
+                    .HasColumnName("full_name")
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_NAME_LENGTH);
 
-            builder.Property(v => v.Email)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_EMAIL_LENGTH);
+                pdb.Property(pd => pd.Email)
+                    .HasColumnName("email")
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_EMAIL_LENGTH);
 
-            builder.Property(v => v.Description)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
+                pdb.Property(pd => pd.PhoneNumber)
+                    .HasColumnName("phone_number")
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_PHONE_NUMBER_LENGTH);
+            });
 
-            builder.Property(v => v.ExperienceInYears)
-                .IsRequired();
+            builder.ComplexProperty(v => v.ProfessionalData, pdb =>
+            {
+                pdb.Property(pd => pd.Description)
+                    .HasColumnName("description")
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
+
+                pdb.Property(pd => pd.ExperienceInYears)
+                    .HasColumnName("experience_in_years")
+                    .IsRequired();
+            });
+
+            //builder.Property(v => v.FullName)
+            //    .IsRequired()
+            //    .HasMaxLength(Constants.MAX_NAME_LENGTH);
+
+            //builder.Property(v => v.Email)
+            //    .IsRequired()
+            //    .HasMaxLength(Constants.MAX_EMAIL_LENGTH);
+
+            //builder.Property(v => v.Description)
+            //    .IsRequired()
+            //    .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
+
+            //builder.Property(v => v.ExperienceInYears)
+            //    .IsRequired();
 
             builder.HasMany(v => v.Pets)
                 .WithOne()
                 .HasForeignKey("volonteer_id")
                 .OnDelete(DeleteBehavior.NoAction);
 
-            builder.Property(v => v.PhoneNumber)
-                .IsRequired()
-                .HasMaxLength(Constants.MAX_PHONE_NUMBER_LENGTH);
+            //builder.Property(v => v.PhoneNumber)
+            //    .IsRequired()
+            //    .HasMaxLength(Constants.MAX_PHONE_NUMBER_LENGTH);
 
             builder.OwnsOne(v => v.SocialNetworks, sns =>
             {
