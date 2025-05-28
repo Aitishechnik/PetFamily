@@ -22,5 +22,11 @@
                 return Error.Validation("length.is.invalid", $"invalid {lable} length");
             }
         }
+
+        public static class Volonteer
+        {
+            public static Error AlreadyExists() => 
+                Error.Validation("record.already.exists", "Volonteer already exists");
+        }
     }
 }

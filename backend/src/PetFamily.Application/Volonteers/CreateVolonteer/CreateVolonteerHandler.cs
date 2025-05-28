@@ -21,6 +21,10 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
             if(personalData.IsFailure)
                 return personalData.Error;
 
+            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.email);
+            if (volonteerByEmail.IsSuccess)
+                return Errors.Volonteer.AlreadyExists();
+
             var professionalData = ProfessionalData.Create(request.description, request.experienceInYears);
             if(professionalData.IsFailure)
                 return professionalData.Error;

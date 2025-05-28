@@ -1,5 +1,8 @@
-﻿using PetFamily.Application.Volonteers;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.EntityFrameworkCore;
+using PetFamily.Application.Volonteers;
 using PetFamily.Domain.Models.Volonteer;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Infrastructure.Repositories
 {
@@ -18,6 +21,28 @@ namespace PetFamily.Infrastructure.Repositories
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
             return volonteer.Id;
+        }
+
+        public async Task<Result<Volonteer, Error>> GetByEmail(string email)
+        {
+            var result = await _appDbContext.Volonteers
+                .FirstOrDefaultAsync(v => v.PersonalData.Email == email);
+
+            if (result is null)
+                return Errors.General.NotFound();
+
+            return result;
+        }
+
+        public async Task<Result<Volonteer, Error>> GetById(Guid id)
+        {
+            var result = await _appDbContext.Volonteers
+                .FirstOrDefaultAsync(v => v.Id == id);
+
+            if (result is null)
+                return Errors.General.NotFound(id);
+
+            return result;
         }
     }
 }
