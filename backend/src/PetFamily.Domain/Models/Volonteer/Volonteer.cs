@@ -7,42 +7,26 @@ namespace PetFamily.Domain.Models.Volonteer
         protected Volonteer() { }
         public Volonteer(
             Guid id, 
-            //string fullName, 
-            //string email, 
-            //string description, 
-            //int experienceInYears,
             PersonalData personalData,
             ProfessionalData professionalData,
             List<Pet> pets, 
-            //string phoneNumber,
             SocialNetwokrsWrapper socialNetwokrs,
             DonationDetailsWrapper donationDetails)
         {
             Id = id;
             PersonalData = personalData;
             ProfessionalData = professionalData;
-            //FullName = fullName;
-            //Email = email;
-            //Description = description;
-            //ExperienceInYears = experienceInYears;
             Pets = pets;
-            //PhoneNumber = phoneNumber;
             SocialNetworks = socialNetwokrs;
             DonationDetails = donationDetails;
         }
 
-        //public string FullName { get; private set; } = default!;
-        //public string Email { get; private set; } = default!;
         public PersonalData PersonalData { get; private set; } = default!;
         public ProfessionalData ProfessionalData { get; private set; } = default!;
-        //public string Description { get; private set; } = default!;
-        //public int ExperienceInYears { get; private set; }
         public List<Pet> Pets { get; private set; } = new();
-        //public string PhoneNumber { get; private set; } = default!;
-
         public SocialNetwokrsWrapper SocialNetworks { get; private set; } = default!;
         public DonationDetailsWrapper DonationDetails { get; private set; } = default!;
-        private int GetPetsCountByStatus(HelpStatus status) => Pets.Count(p => p.HelpStatus == status);
+        private int GetPetsCountByStatus(HelpStatus status) => Pets.Count(p => p.PetGeneralInfo.HelpStatus == status);
 
         public int PetsFoundHome()
         {

@@ -44,29 +44,10 @@ namespace PetFamily.Infrastructure.Configurations
                     .IsRequired();
             });
 
-            //builder.Property(v => v.FullName)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_NAME_LENGTH);
-
-            //builder.Property(v => v.Email)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_EMAIL_LENGTH);
-
-            //builder.Property(v => v.Description)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
-
-            //builder.Property(v => v.ExperienceInYears)
-            //    .IsRequired();
-
             builder.HasMany(v => v.Pets)
                 .WithOne()
                 .HasForeignKey("volonteer_id")
                 .OnDelete(DeleteBehavior.NoAction);
-
-            //builder.Property(v => v.PhoneNumber)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_PHONE_NUMBER_LENGTH);
 
             builder.OwnsOne(v => v.SocialNetworks, sns =>
             {
