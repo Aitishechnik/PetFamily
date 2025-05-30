@@ -2,19 +2,19 @@
 
 namespace PetFamily.Domain.Models.Volonteer
 {
-    public class Volonteer : Entity
+    public class Volonteer : Entity<Guid>
     {
+        protected Volonteer() { }
         public Volonteer(
-            long id, 
+            Guid id, 
             string fullName, 
             string email, 
             string description, 
             int experienceInYears,
-            List<Pet> pets, 
-            string phoneNumber, 
-            List<SocialNetwork> 
-            socialNetworks,
-            List<DonationDetails> donationDetails)
+            List<Spicies> pets, 
+            string phoneNumber,
+            SocialNetwokrsWrapper socialNetwokrs,
+            DonationDetailsWrapper donationDetails)
         {
             Id = id;
             FullName = fullName;
@@ -23,7 +23,7 @@ namespace PetFamily.Domain.Models.Volonteer
             ExperienceInYears = experienceInYears;
             Pets = pets;
             PhoneNumber = phoneNumber;
-            SocialNetworks = socialNetworks;
+            SocialNetworks = socialNetwokrs;
             DonationDetails = donationDetails;
         }
 
@@ -31,10 +31,11 @@ namespace PetFamily.Domain.Models.Volonteer
         public string Email { get; private set; } = default!;
         public string Description { get; private set; } = default!;
         public int ExperienceInYears { get; private set; }
-        public List<Pet> Pets { get; private set; } = new();
+        public List<Spicies> Pets { get; private set; } = new();
         public string PhoneNumber { get; private set; } = default!;
-        public List<SocialNetwork> SocialNetworks { get; private set; } = new();
-        public List<DonationDetails> DonationDetails { get; private set; } = new();
+
+        public SocialNetwokrsWrapper SocialNetworks { get; private set; } = default!;
+        public DonationDetailsWrapper DonationDetails { get; private set; } = default!;
         private int GetPetsCountByStatus(HelpStatus status) => Pets.Count(p => p.HelpStatus == status);
 
         public int PetsFoundHome()

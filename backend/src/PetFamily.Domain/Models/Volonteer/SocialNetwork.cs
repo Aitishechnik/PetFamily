@@ -13,12 +13,12 @@ namespace PetFamily.Domain.Models.Volonteer
         public string Name { get; }
         public string Link { get; }
 
-        public Result<SocialNetwork> Create(string name, string link)
+        public static Result<SocialNetwork> Create(string name, string link)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return Result.Failure<SocialNetwork>("Name cannot be empty");
             if (string.IsNullOrWhiteSpace(link))
-                Result.Failure<SocialNetwork>("Name cannot be empty");
+                return Result.Failure<SocialNetwork>("Name cannot be empty");
 
             var result = new SocialNetwork(name, link);
 
