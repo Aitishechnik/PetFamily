@@ -4,8 +4,6 @@ using PetFamily.Application.Volonteers.CreateVolonteer;
 
 namespace PetFamily.API.Controllers
 {
-    //[ApiController]
-    //[Route("[controller]")]
     public class VolonteersController : ApplicationController
     {
         [HttpPost]
