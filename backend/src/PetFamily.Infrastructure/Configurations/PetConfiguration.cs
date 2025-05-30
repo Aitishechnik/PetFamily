@@ -85,62 +85,6 @@ namespace PetFamily.Infrastructure.Configurations
                     .IsRequired();
 
             });
-            //builder.Property(pet => pet.Name)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_NAME_LENGTH);
-
-            //builder.Property(pet => pet.Species)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_NAME_LENGTH);
-
-            //builder.Property(pet => pet.Description)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
-
-            //builder.Property(pet => pet.Breed)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_NAME_LENGTH);
-
-            //builder.Property(pet => pet.Color)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_NAME_LENGTH);
-
-            //builder.Property(pet => pet.HealthInfo)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
-
-            //builder.Property(pet => pet.Address)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
-
-            //builder.Property(pet => pet.Weight)
-            //    .IsRequired();
-
-            //builder.Property(pet => pet.Height)
-            //    .IsRequired();
-
-            //builder.Property(pet => pet.OwnerPhoneNumber)
-            //    .IsRequired()
-            //    .HasMaxLength(Constants.MAX_PHONE_NUMBER_LENGTH);
-
-            //builder.Property(pet => pet.IsNeutered)
-            //    .IsRequired();
-
-            //builder.Property(pet => pet.DateOfBirth)
-            //    .HasConversion(
-            //    dt => dt.Date,
-            //    dt => dt.Date)
-            //    .IsRequired();
-
-            //builder.Property(pet => pet.IsVaccinated)
-            //    .IsRequired();
-
-            //builder.Property(pet => pet.HelpStatus)
-            //    .IsRequired()
-            //    .HasConversion(
-            //    helpStatus => helpStatus.ToString(),
-            //    value => Utilities.ParseHelpStatus(value)
-            //    );
 
             builder.OwnsOne(v => v.DonationDetails, dd =>
             {

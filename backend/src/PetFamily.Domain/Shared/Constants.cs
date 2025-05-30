@@ -13,5 +13,14 @@
         public const int MAX_DOMASTIC_PET_HEIGHT_SM = 200;
         public const int MAX_EXOTIC_PET_AGE = 200;
 
+        public const string REGEX_FULLNAME_PATTERN =
+            @"^(?:(?:[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?\s){1,2}[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?|(?:[A-Z][a-z]+(?:-[A-Z][a-z]+)?\s){1,2}[A-Z][a-z]+(?:-[A-Z][a-z]+)?)$";
+
+        public const string REGEX_EMAIL_PATTERN =
+            @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$";
+
+        public const string REGEX_PHONE_NUMBER_PATTERN =
+            @"^\+?[0-9\s\-\(\)]{7,20}$";
+
     }
 }
