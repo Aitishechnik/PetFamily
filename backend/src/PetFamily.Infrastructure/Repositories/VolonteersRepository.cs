@@ -23,7 +23,7 @@ namespace PetFamily.Infrastructure.Repositories
             return volonteer.Id;
         }
 
-        public async Task<Result<Volonteer, Error>> GetByEmail(string email)
+        public async Task<Result<Volonteer, Error>> GetByEmail(string email, CancellationToken cancellationToken = default)
         {
             var result = await _appDbContext.Volonteers
                 .FirstOrDefaultAsync(v => v.PersonalData.Email == email);
@@ -34,7 +34,7 @@ namespace PetFamily.Infrastructure.Repositories
             return result;
         }
 
-        public async Task<Result<Volonteer, Error>> GetById(Guid id)
+        public async Task<Result<Volonteer, Error>> GetById(Guid id, CancellationToken cancellationToken = default)
         {
             var result = await _appDbContext.Volonteers
                 .FirstOrDefaultAsync(v => v.Id == id);
