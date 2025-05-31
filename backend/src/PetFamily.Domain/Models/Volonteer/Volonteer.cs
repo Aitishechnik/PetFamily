@@ -7,36 +7,26 @@ namespace PetFamily.Domain.Models.Volonteer
         protected Volonteer() { }
         public Volonteer(
             Guid id, 
-            string fullName, 
-            string email, 
-            string description, 
-            int experienceInYears,
-            List<Spicies> pets, 
-            string phoneNumber,
+            PersonalData personalData,
+            ProfessionalData professionalData,
+            List<Pet> pets, 
             SocialNetwokrsWrapper socialNetwokrs,
             DonationDetailsWrapper donationDetails)
         {
             Id = id;
-            FullName = fullName;
-            Email = email;
-            Description = description;
-            ExperienceInYears = experienceInYears;
+            PersonalData = personalData;
+            ProfessionalData = professionalData;
             Pets = pets;
-            PhoneNumber = phoneNumber;
             SocialNetworks = socialNetwokrs;
             DonationDetails = donationDetails;
         }
 
-        public string FullName { get; private set; } = default!;
-        public string Email { get; private set; } = default!;
-        public string Description { get; private set; } = default!;
-        public int ExperienceInYears { get; private set; }
-        public List<Spicies> Pets { get; private set; } = new();
-        public string PhoneNumber { get; private set; } = default!;
-
+        public PersonalData PersonalData { get; private set; } = default!;
+        public ProfessionalData ProfessionalData { get; private set; } = default!;
+        public List<Pet> Pets { get; private set; } = new();
         public SocialNetwokrsWrapper SocialNetworks { get; private set; } = default!;
         public DonationDetailsWrapper DonationDetails { get; private set; } = default!;
-        private int GetPetsCountByStatus(HelpStatus status) => Pets.Count(p => p.HelpStatus == status);
+        private int GetPetsCountByStatus(HelpStatus status) => Pets.Count(p => p.PetGeneralInfo.HelpStatus == status);
 
         public int PetsFoundHome()
         {

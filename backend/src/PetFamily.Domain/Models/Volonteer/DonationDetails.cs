@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Models.Volonteer
 {
@@ -13,16 +14,16 @@ namespace PetFamily.Domain.Models.Volonteer
         public string Name { get; }
         public string Description { get; }
 
-        public static Result<DonationDetails> Create(string name, string description)
+        public static Result<DonationDetails, Error> Create(string name, string description)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return Result.Failure<DonationDetails>("Name cannot be empty");
-            if (string.IsNullOrWhiteSpace(description))
-                return Result.Failure<DonationDetails>("Name cannot be empty");
+            if (string.IsNullOrWhiteSpace(name) || 
+                name.Length > Constants.MAX_NAME_LENGTH)
+                return Errors.General.ValueIsInvalid("Name");
+            if (string.IsNullOrWhiteSpace(description) || 
+                description.Length > Constants.MAX_TEXT_DESCRIPTION_LENGTH)
+                return Errors.General.ValueIsInvalid("Description");
 
-            var result = new DonationDetails(name, description);
-
-            return Result.Success(result);
+            return new DonationDetails(name, description);
         }
     }
 }

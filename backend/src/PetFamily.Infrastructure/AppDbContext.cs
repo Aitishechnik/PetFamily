@@ -8,7 +8,7 @@ namespace PetFamily.Infrastructure
     public class AppDbContext(IConfiguration configuration) : DbContext
     {
         private const string DATABASE = "Database";
-        public DbSet<Spicies> Pets => Set<Spicies>();
+        public DbSet<Pet> Pets => Set<Pet>();
         public DbSet<Volonteer> Volonteers => Set<Volonteer>();
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
