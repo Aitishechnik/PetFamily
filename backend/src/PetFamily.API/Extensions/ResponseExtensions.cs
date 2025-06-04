@@ -7,12 +7,10 @@ namespace PetFamily.API.Extensions
 {
     public static class ResponseExtensions
     {
-        public static ActionResult ToResponse(this UnitResult<Error> result)
+        public static ActionResult ToResponse(this Error error)
         {
-            if (result.IsSuccess)
-                return new OkResult();
 
-            var statusCode = result.Error.Type switch
+            var statusCode = error.Type switch
             {
                 ErrorType.Validation => StatusCodes.Status400BadRequest,
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
@@ -21,7 +19,7 @@ namespace PetFamily.API.Extensions
                 _ => StatusCodes.Status500InternalServerError
             };
 
-            var envelope = Envelope.Error(result.Error);
+            var envelope = Envelope.Error(error);
 
             return new ObjectResult(envelope)
             {

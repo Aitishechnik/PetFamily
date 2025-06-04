@@ -1,6 +1,7 @@
 ﻿namespace PetFamily.Application.Volonteers.CreateVolonteer
 {
-    public record CreateVolonteerRequest(string fullName,
+    public record CreateVolonteerRequest(
+        string fullName,
         string email,
         string description,
         int experienceInYears,
