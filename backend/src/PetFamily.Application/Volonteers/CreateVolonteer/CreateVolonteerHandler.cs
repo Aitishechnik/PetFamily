@@ -1,5 +1,5 @@
-﻿using CSharpFunctionalExtensions;
-using FluentValidation;
+﻿using System.Text.Json;
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
@@ -8,28 +8,15 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
     public class CreateVolonteerHandler
     {
         private readonly IVolonteersRepository _volonteersRepository;
-        private readonly IValidator<CreateVolonteerRequest> _validator;
 
         public CreateVolonteerHandler(
-            IVolonteersRepository volonteersRepository,
-            IValidator<CreateVolonteerRequest> validator)
+            IVolonteersRepository volonteersRepository)
         {
             _volonteersRepository = volonteersRepository;
-            _validator = validator;
         }
 
         public async Task<Result<Guid, Error>> Handle(CreateVolonteerRequest request, CancellationToken cancellationToken = default)
         {
-            var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                var error = Error.Validation(
-                    validationResult.Errors[0].ErrorCode,
-                    validationResult.Errors[0].ErrorMessage);
-
-                return error;
-            }
 
             var volonteerId = Guid.NewGuid();
 
@@ -46,28 +33,39 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
                 request.experienceInYears)
                 .Value;
 
-            var socialNetworks = SocialNetwork.Create(
-                request.socialNetworkName, 
-                request.socialNetworkLink)
-                .Value;
+            var socialNetworks = new List<SocialNetwork>();
+            
+            foreach (var sn in request.socialNetworks)
+            {
+                var jsonDoc = JsonDocument.Parse(sn);
+                var root = jsonDoc.RootElement;
+                var name = root.GetProperty("name").GetString();
+                var link = root.GetProperty("link").GetString();
 
-            var donationDetails = DonationDetails.Create(
-                request.donationDetailsName, 
-                request.donationDetailsDescription)
-                .Value;
+                var socialNetworkResult = SocialNetwork.Create(name!, link!);
+                if (socialNetworkResult.IsSuccess)
+                    socialNetworks.Add(socialNetworkResult.Value);
+            }
 
-            var socialNetworksCollection = new List<SocialNetwork>();
-            socialNetworksCollection!.Add(socialNetworks);
+            var donationDetails = new List<DonationDetails>();
 
-            var donationDetailsCollection = new List<DonationDetails>();
-            donationDetailsCollection!.Add(donationDetails);
+            foreach (var dd in request.donationDetails)
+            {
+                var jsonDoc = JsonDocument.Parse(dd);
+                var root = jsonDoc.RootElement;
+                var name = root.GetProperty("name").GetString();
+                var description = root.GetProperty("description").GetString();
+                var donationDetailsResult = DonationDetails.Create(name!, description!);
+                if (donationDetailsResult.IsSuccess)
+                    donationDetails.Add(donationDetailsResult.Value);
+            }
 
             var volonteer = new Volonteer(volonteerId,
                 personalData,
                 professionalData,
                 new List<Pet>(),
-                new SocialNetwokrsWrapper(socialNetworksCollection),
-                new DonationDetailsWrapper(donationDetailsCollection));
+                new SocialNetwokrsWrapper(socialNetworks),
+                new DonationDetailsWrapper(donationDetails));
 
             await _volonteersRepository.Add(volonteer);
 
