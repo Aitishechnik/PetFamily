@@ -8,7 +8,7 @@ namespace PetFamily.Infrastructure.Extensions
     {
         public static PropertyBuilder<IReadOnlyList<TVO>> ConvertVOCollectionToJSON<TVO>(this PropertyBuilder<IReadOnlyList<TVO>> builder)
         {
-            return builder.HasConversion<string>(
+            return builder.HasConversion(
                 v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
                 v => JsonSerializer.Deserialize<IReadOnlyList<TVO>>(v, JsonSerializerOptions.Default)!,
                 new ValueComparer<IReadOnlyList<TVO>>(
