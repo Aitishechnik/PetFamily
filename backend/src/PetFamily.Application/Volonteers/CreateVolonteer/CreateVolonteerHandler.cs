@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
@@ -15,50 +14,33 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
             _volonteersRepository = volonteersRepository;
         }
 
-        public async Task<Result<Guid, Error>> Handle(CreateVolonteerRequest request, CancellationToken cancellationToken = default)
+        public async Task<Result<Guid, Error>> Handle(CreateVolonteerDTO request, CancellationToken cancellationToken = default)
         {
 
             var volonteerId = Guid.NewGuid();
 
             var personalData = PersonalData.Create(
-                request.fullName, 
-                request.email, 
-                request.phoneNumber)
+                request.FullName, 
+                request.Email, 
+                request.PhoneNumber)
                 .Value;
 
-            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.email);
+            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.Email);
 
             var professionalData = ProfessionalData.Create(
-                request.description, 
-                request.experienceInYears)
+                request.Description, 
+                request.ExperienceInYears)
                 .Value;
 
             var socialNetworks = new List<SocialNetwork>();
             
-            foreach (var sn in request.socialNetworks)
-            {
-                var jsonDoc = JsonDocument.Parse(sn);
-                var root = jsonDoc.RootElement;
-                var name = root.GetProperty("name").GetString();
-                var link = root.GetProperty("link").GetString();
-
-                var socialNetworkResult = SocialNetwork.Create(name!, link!);
-                if (socialNetworkResult.IsSuccess)
-                    socialNetworks.Add(socialNetworkResult.Value);
-            }
+            foreach (var sn in request.SocialNetworks)
+                socialNetworks.Add(SocialNetwork.Create(sn.Name, sn.Link).Value);
 
             var donationDetails = new List<DonationDetails>();
 
-            foreach (var dd in request.donationDetails)
-            {
-                var jsonDoc = JsonDocument.Parse(dd);
-                var root = jsonDoc.RootElement;
-                var name = root.GetProperty("name").GetString();
-                var description = root.GetProperty("description").GetString();
-                var donationDetailsResult = DonationDetails.Create(name!, description!);
-                if (donationDetailsResult.IsSuccess)
-                    donationDetails.Add(donationDetailsResult.Value);
-            }
+            foreach (var dd in request.DonationDetails)
+                donationDetails.Add(DonationDetails.Create(dd.Name, dd.Description).Value);
 
             var volonteer = new Volonteer(volonteerId,
                 personalData,

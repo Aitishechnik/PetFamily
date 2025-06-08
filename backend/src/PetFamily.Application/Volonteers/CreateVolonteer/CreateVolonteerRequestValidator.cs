@@ -1,68 +1,24 @@
-﻿using System.Text.Json;
-using FluentValidation;
+﻿using FluentValidation;
 using PetFamily.Application.Validation;
 using PetFamily.Domain.Models.Volonteer;
-using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.CreateVolonteer
 {
-    public class CreateVolonteerRequestValidator : AbstractValidator<CreateVolonteerRequest>
+    public class CreateVolonteerRequestValidator : AbstractValidator<CreateVolonteerDTO>
     {
         public CreateVolonteerRequestValidator()
         {
-            RuleFor(c => new { c.fullName, c.email, c.phoneNumber })
-                .MustBeValueObject(x => PersonalData.Create(x.fullName, x.email, x.phoneNumber));
+            RuleFor(c => new { c.FullName, c.Email, c.PhoneNumber })
+                .MustBeValueObject(x => PersonalData.Create(x.FullName, x.Email, x.PhoneNumber));
 
-            RuleFor(c => new { c.description, c.experienceInYears})
-                .MustBeValueObject(x => ProfessionalData.Create(x.description, x.experienceInYears));
+            RuleFor(c => new { c.Description, c.ExperienceInYears})
+                .MustBeValueObject(x => ProfessionalData.Create(x.Description, x.ExperienceInYears));
 
-            RuleForEach(c => c.socialNetworks).MustBeValueObject(x =>
-            {
-                try
-                {
-                    var jsonDoc = JsonDocument.Parse(x);
-                    var root = jsonDoc.RootElement;
-                    var name = root.GetProperty("name").GetString();
-                    var link = root.GetProperty("link").GetString();
-                    return SocialNetwork.Create(name!, link!);
-                }
-                catch (JsonException)
-                {
-                    return Errors.General.ValueIsInvalid("SocialNetwork");
-                }
-                catch(ArgumentException)
-                {
-                    return Errors.General.ValueIsInvalid("SocialNetwork");
-                }
-                catch (KeyNotFoundException)
-                {
-                    return Errors.General.ValueIsInvalid("SocialNetwork");
-                }
-            });
+            RuleForEach(c => c.SocialNetworks)
+                .MustBeValueObject(x => SocialNetwork.Create(x.Name, x.Link));
 
-            RuleForEach(c => c.donationDetails).MustBeValueObject(x =>
-            {
-                try
-                {
-                    var jsonDoc = JsonDocument.Parse(x);
-                    var root = jsonDoc.RootElement;
-                    var name = root.GetProperty("name").GetString();
-                    var description = root.GetProperty("description").GetString();
-                    return DonationDetails.Create(name!, description!);
-                }
-                catch (JsonException)
-                {
-                    return Errors.General.ValueIsInvalid("DonationDetails");
-                }
-                catch (ArgumentException)
-                {
-                    return Errors.General.ValueIsInvalid("DonationDetails");
-                }
-                catch (KeyNotFoundException)
-                {
-                    return Errors.General.ValueIsInvalid("DonationDetails");
-                }
-            });
+            RuleForEach(c => c.DonationDetails)
+                .MustBeValueObject(x => DonationDetails.Create(x.Name, x.Description));
         }
     }
 }

@@ -11,8 +11,8 @@ namespace PetFamily.API.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(
             [FromServices] CreateVolonteerHandler handler,
-            [FromServices] IValidator<CreateVolonteerRequest> validator,
-            [FromBody] CreateVolonteerRequest request,
+            [FromServices] IValidator<CreateVolonteerDTO> validator,
+            [FromBody] CreateVolonteerDTO request,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
