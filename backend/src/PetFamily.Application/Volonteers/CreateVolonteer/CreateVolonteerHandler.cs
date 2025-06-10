@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
@@ -7,11 +8,14 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
     public class CreateVolonteerHandler
     {
         private readonly IVolonteersRepository _volonteersRepository;
+        private readonly ILogger<CreateVolonteerHandler> _logger;
 
         public CreateVolonteerHandler(
-            IVolonteersRepository volonteersRepository)
+            IVolonteersRepository volonteersRepository,
+            ILogger<CreateVolonteerHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
+            _logger = logger;
         }
 
         public async Task<Result<Guid, Error>> Handle(CreateVolonteerDTO request, CancellationToken cancellationToken = default)
@@ -26,6 +30,8 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
                 .Value;
 
             var volonteerByEmail = await _volonteersRepository.GetByEmail(request.Email);
+            if(volonteerByEmail.IsSuccess)
+                return Errors.Volonteer.AlreadyExists();
 
             var professionalData = ProfessionalData.Create(
                 request.Description, 
@@ -49,7 +55,9 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
                 new SocialNetwokrsWrapper(socialNetworks),
                 new DonationDetailsWrapper(donationDetails));
 
-            await _volonteersRepository.Add(volonteer);
+            await _volonteersRepository.Add(volonteer, cancellationToken);
+
+            _logger.LogInformation("Added volonteer {volonteer} with id {volonteerId}", volonteer, volonteerId);
 
             return volonteerId;
         }
