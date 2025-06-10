@@ -8,47 +8,46 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
     {
         private readonly IVolonteersRepository _volonteersRepository;
 
-        public CreateVolonteerHandler(IVolonteersRepository volonteersRepository)
+        public CreateVolonteerHandler(
+            IVolonteersRepository volonteersRepository)
         {
             _volonteersRepository = volonteersRepository;
         }
 
-        public async Task<Result<Guid, Error>> Handle(CreateVolonteerRequest request, CancellationToken cancellationToken = default)
+        public async Task<Result<Guid, Error>> Handle(CreateVolonteerDTO request, CancellationToken cancellationToken = default)
         {
+
             var volonteerId = Guid.NewGuid();
 
-            var personalData = PersonalData.Create(request.fullName, request.email, request.phoneNumber);
-            if(personalData.IsFailure)
-                return personalData.Error;
+            var personalData = PersonalData.Create(
+                request.FullName, 
+                request.Email, 
+                request.PhoneNumber)
+                .Value;
 
-            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.email);
-            if (volonteerByEmail.IsSuccess)
-                return Errors.Volonteer.AlreadyExists();
+            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.Email);
 
-            var professionalData = ProfessionalData.Create(request.description, request.experienceInYears);
-            if(professionalData.IsFailure)
-                return professionalData.Error;
+            var professionalData = ProfessionalData.Create(
+                request.Description, 
+                request.ExperienceInYears)
+                .Value;
 
-            var socialNetworks = SocialNetwork.Create(request.socialNetworkName, request.socialNetworkLink);
-            if(socialNetworks.IsFailure)
-                return socialNetworks.Error;
+            var socialNetworks = new List<SocialNetwork>();
+            
+            foreach (var sn in request.SocialNetworks)
+                socialNetworks.Add(SocialNetwork.Create(sn.Name, sn.Link).Value);
 
-            var donationDetails = DonationDetails.Create(request.donationDetailsName, request.donationDetailsDescription);
-            if(donationDetails.IsFailure)
-                return donationDetails.Error;
+            var donationDetails = new List<DonationDetails>();
 
-            var socialNetworksCollection = new List<SocialNetwork>();
-            socialNetworksCollection!.Add(socialNetworks.Value);
-
-            var donationDetailsCollection = new List<DonationDetails>();
-            donationDetailsCollection!.Add(donationDetails.Value);
+            foreach (var dd in request.DonationDetails)
+                donationDetails.Add(DonationDetails.Create(dd.Name, dd.Description).Value);
 
             var volonteer = new Volonteer(volonteerId,
-                personalData.Value,
-                professionalData.Value,
+                personalData,
+                professionalData,
                 new List<Pet>(),
-                new SocialNetwokrsWrapper(socialNetworksCollection!),
-                new DonationDetailsWrapper(donationDetailsCollection));
+                new SocialNetwokrsWrapper(socialNetworks),
+                new DonationDetailsWrapper(donationDetails));
 
             await _volonteersRepository.Add(volonteer);
 
