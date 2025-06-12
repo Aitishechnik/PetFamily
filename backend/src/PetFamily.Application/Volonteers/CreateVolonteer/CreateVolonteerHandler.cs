@@ -24,18 +24,18 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
             var volonteerId = Guid.NewGuid();
 
             var personalData = PersonalData.Create(
-                request.FullName, 
-                request.Email, 
-                request.PhoneNumber)
+                request.PersonalDataDTO.FullName, 
+                request.PersonalDataDTO.Email, 
+                request.PersonalDataDTO.PhoneNumber)
                 .Value;
 
-            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.Email);
+            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.PersonalDataDTO.FullName);
             if(volonteerByEmail.IsSuccess)
                 return Errors.Volonteer.AlreadyExists();
 
             var professionalData = ProfessionalData.Create(
-                request.Description, 
-                request.ExperienceInYears)
+                request.ProfessionalDataDTO.Description, 
+                request.ProfessionalDataDTO.ExperienceInYears)
                 .Value;
 
             var socialNetworks = new List<SocialNetwork>();

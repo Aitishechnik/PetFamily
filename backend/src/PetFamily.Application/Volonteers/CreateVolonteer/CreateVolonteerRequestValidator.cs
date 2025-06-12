@@ -8,10 +8,10 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
     {
         public CreateVolonteerRequestValidator()
         {
-            RuleFor(c => new { c.FullName, c.Email, c.PhoneNumber })
+            RuleFor(c => c.PersonalDataDTO)
                 .MustBeValueObject(x => PersonalData.Create(x.FullName, x.Email, x.PhoneNumber));
 
-            RuleFor(c => new { c.Description, c.ExperienceInYears})
+            RuleFor(c => c.ProfessionalDataDTO)
                 .MustBeValueObject(x => ProfessionalData.Create(x.Description, x.ExperienceInYears));
 
             RuleForEach(c => c.SocialNetworks)

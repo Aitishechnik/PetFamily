@@ -6,6 +6,7 @@ namespace PetFamily.Domain.Models.Volonteer
     public record ProfessionalData
     {
         public string Description { get; }
+
         public int ExperienceInYears { get; }
 
         private ProfessionalData(string description, int experienceInYears)

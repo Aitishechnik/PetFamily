@@ -1,11 +1,8 @@
 ﻿namespace PetFamily.Application.Volonteers.CreateVolonteer
 {
     public record CreateVolonteerDTO(
-        string FullName,
-        string Email,
-        string Description,
-        int ExperienceInYears,
-        string PhoneNumber,
+        PersonalDataDTO PersonalDataDTO,
+        ProfessionalDataDTO ProfessionalDataDTO,
         IEnumerable<SocialNetworkDTO> SocialNetworks,
         IEnumerable<DonationDetailsDTO> DonationDetails);
 }
