@@ -17,7 +17,7 @@ namespace PetFamily.Domain.Models.Volonteer
 
         public static Result<ProfessionalData, Error> Create(string description, int experienceInYears)
         {
-            if (description is null || description.Length > Constants.MAX_TEXT_DESCRIPTION_LENGTH)
+            if (description.Length > Constants.MAX_TEXT_DESCRIPTION_LENGTH)
                 return Errors.General.ValueIsInvalid("Description");
 
             if (experienceInYears < 0 || experienceInYears > Constants.MAX_YEARS_OF_EXPERIENCE)

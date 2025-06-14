@@ -6,10 +6,10 @@ namespace PetFamily.Domain.Models.Volonteer
     {
         protected Volonteer() { }
         public Volonteer(
-            Guid id, 
+            Guid id,
             PersonalData personalData,
             ProfessionalData professionalData,
-            List<Pet> pets, 
+            List<Pet> pets,
             SocialNetwokrsWrapper socialNetwokrs,
             DonationDetailsWrapper donationDetails)
         {
@@ -41,6 +41,14 @@ namespace PetFamily.Domain.Models.Volonteer
         public int PetsUnderTreatment()
         {
             return GetPetsCountByStatus(HelpStatus.NeedsHelp);
+        }
+
+        public void UpdateMainInfo(
+            PersonalData personalData,
+            ProfessionalData professionalData)
+        {
+            PersonalData = personalData;
+            ProfessionalData = professionalData;
         }
     }
 }

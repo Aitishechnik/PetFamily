@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.Volonteers.CreateVolonteer
+namespace PetFamily.Application.Volonteers.Create
 {
     public class CreateVolonteerHandler
     {
@@ -18,7 +18,7 @@ namespace PetFamily.Application.Volonteers.CreateVolonteer
             _logger = logger;
         }
 
-        public async Task<Result<Guid, Error>> Handle(CreateVolonteerDTO request, CancellationToken cancellationToken = default)
+        public async Task<Result<Guid, Error>> Handle(CreateVolonteerRequest request, CancellationToken cancellationToken = default)
         {
 
             var volonteerId = Guid.NewGuid();

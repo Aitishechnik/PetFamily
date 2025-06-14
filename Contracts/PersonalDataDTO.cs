@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Application.Volonteers.CreateVolonteer
+﻿namespace PetFamily.Contracts
 {
     public record PersonalDataDTO(string FullName, string Email, string PhoneNumber);
 }

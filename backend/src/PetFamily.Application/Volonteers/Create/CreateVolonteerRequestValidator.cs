@@ -2,9 +2,9 @@
 using PetFamily.Application.Validation;
 using PetFamily.Domain.Models.Volonteer;
 
-namespace PetFamily.Application.Volonteers.CreateVolonteer
+namespace PetFamily.Application.Volonteers.Create
 {
-    public class CreateVolonteerRequestValidator : AbstractValidator<CreateVolonteerDTO>
+    public class CreateVolonteerRequestValidator : AbstractValidator<CreateVolonteerRequest>
     {
         public CreateVolonteerRequestValidator()
         {
