@@ -17,9 +17,4 @@
     <ProjectReference Include="..\PetFamily.Domain\PetFamily.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Volonteers\UpdateDonationDetails\" />
-    <Folder Include="Volonteers\UpdateSocialNetworks\" />
-  </ItemGroup>
-
 </Project>

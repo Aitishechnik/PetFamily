@@ -29,7 +29,7 @@ namespace PetFamily.Application.Volonteers.Create
                 request.PersonalDataDTO.PhoneNumber)
                 .Value;
 
-            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.PersonalDataDTO.FullName);
+            var volonteerByEmail = await _volonteersRepository.GetByEmail(request.PersonalDataDTO.FullName, cancellationToken);
             if(volonteerByEmail.IsSuccess)
                 return Errors.Volonteer.AlreadyExists();
 

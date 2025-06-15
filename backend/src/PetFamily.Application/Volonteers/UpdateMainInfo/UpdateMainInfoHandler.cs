@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
-using static PetFamily.Domain.Shared.Errors;
 
 namespace PetFamily.Application.Volonteers.UpdateMainInfo
 {
@@ -24,18 +22,18 @@ namespace PetFamily.Application.Volonteers.UpdateMainInfo
             UpdateMainInfoRequest request, 
             CancellationToken cancellationToken = default)
         {
-            var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId);
+            var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId, cancellationToken);
             if(volonteerResult.IsFailure)
                 return volonteerResult.Error;
 
             var personalData = PersonalData.Create(
-                request.Dto.PersonalDataDTO.FullName,
-                request.Dto.PersonalDataDTO.Email,
-                request.Dto.PersonalDataDTO.PhoneNumber);
+                request.MainInfoDTO.PersonalDataDTO.FullName,
+                request.MainInfoDTO.PersonalDataDTO.Email,
+                request.MainInfoDTO.PersonalDataDTO.PhoneNumber);
 
             var professionalData = ProfessionalData.Create(
-                request.Dto.ProfessionalDataDTO.Description,
-                request.Dto.ProfessionalDataDTO.ExperienceInYears);
+                request.MainInfoDTO.ProfessionalDataDTO.Description,
+                request.MainInfoDTO.ProfessionalDataDTO.ExperienceInYears);
 
             volonteerResult.Value.UpdateMainInfo(
                 personalData.Value,

@@ -4,5 +4,5 @@ namespace PetFamily.Application.Volonteers.UpdateMainInfo
 {
     public record UpdateMainInfoRequest(
         Guid VolonteerId,
-        UpdateMainInfoDTO Dto);
+        MainInfoDTO MainInfoDTO);
 }

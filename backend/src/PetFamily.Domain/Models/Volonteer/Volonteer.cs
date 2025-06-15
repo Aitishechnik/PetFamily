@@ -50,5 +50,15 @@ namespace PetFamily.Domain.Models.Volonteer
             PersonalData = personalData;
             ProfessionalData = professionalData;
         }
+
+        public void UpdateSocialNetworks(SocialNetwokrsWrapper socialNetworks)
+        {
+            SocialNetworks = socialNetworks;
+        }
+
+        public void UpdateDonationDetails(DonationDetailsWrapper donationDetails)
+        {
+            DonationDetails = donationDetails;
+        }
     }
 }
