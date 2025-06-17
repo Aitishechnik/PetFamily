@@ -104,13 +104,13 @@ namespace PetFamily.API.Controllers
             [FromServices] IValidator<DeleteVolonteerRequest> validator,
             CancellationToken cancellationToken = default)
         {
-            var requset = new DeleteVolonteerRequest(id);
+            var request = new DeleteVolonteerRequest(id);
 
-            var validationResult = await validator.ValidateAsync(requset, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (validationResult.IsValid == false)
                 return validationResult.ToValidationErrorResponse();
 
-            var result = await handler.Handle(requset, cancellationToken);
+            var result = await handler.Handle(request, cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
 
@@ -124,13 +124,13 @@ namespace PetFamily.API.Controllers
             [FromServices] IValidator<DeleteVolonteerRequest> validator,
             CancellationToken cancellationToken = default)
         {
-            var requset = new DeleteVolonteerRequest(id);
+            var request = new DeleteVolonteerRequest(id);
 
-            var validationResult = await validator.ValidateAsync(requset, cancellationToken);
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (validationResult.IsValid == false)
                 return validationResult.ToValidationErrorResponse();
 
-            var result = await handler.Handle(requset, cancellationToken);
+            var result = await handler.Handle(request, cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
 
