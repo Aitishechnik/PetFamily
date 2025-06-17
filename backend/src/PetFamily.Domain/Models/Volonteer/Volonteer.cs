@@ -1,8 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Models.Volonteer
 {
-    public class Volonteer : Entity<Guid>
+    public class Volonteer : Entity<Guid>, ISoftDeletable
     {
         protected Volonteer() { }
         public Volonteer(
@@ -26,6 +27,11 @@ namespace PetFamily.Domain.Models.Volonteer
         public List<Pet> Pets { get; private set; } = new();
         public SocialNetwokrsWrapper SocialNetworks { get; private set; } = default!;
         public DonationDetailsWrapper DonationDetails { get; private set; } = default!;
+
+        public bool IsDeleted { get; private set; } = false;
+
+        public DateTime? DeletionDate { get; private set; } = null;
+
         private int GetPetsCountByStatus(HelpStatus status) => Pets.Count(p => p.PetGeneralInfo.HelpStatus == status);
 
         public int PetsFoundHome()
@@ -59,6 +65,26 @@ namespace PetFamily.Domain.Models.Volonteer
         public void UpdateDonationDetails(DonationDetailsWrapper donationDetails)
         {
             DonationDetails = donationDetails;
+        }
+
+        public void Delete()
+        {
+            IsDeleted = true;
+
+            foreach(var pet in Pets)
+                pet.Delete();
+
+            DeletionDate = DateTime.Now;
+        }
+
+        public void Restore()
+        {
+            IsDeleted = false;
+
+            foreach (var pet in Pets)
+                pet.Restore();
+
+            DeletionDate = null;
         }
     }
 }

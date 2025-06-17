@@ -10,7 +10,9 @@ namespace PetFamily.Application.Volonteers.UpdateMainInfo
         public UpdateMainInfoRequestValidator()
         {
             RuleFor(u => u.VolonteerId)
-                .NotEmpty().WithErrorCode(Errors.General.ValueIsRequired().Code);
+                .NotEmpty()
+                .WithErrorCode(Errors.General.ValueIsRequired().Code)
+                .WithMessage(Errors.General.ValueIsInvalid().Message);
             RuleFor(u => u.MainInfoDTO.PersonalDataDTO)
                 .MustBeValueObject(x => PersonalData.Create(x.FullName, x.Email, x.PhoneNumber));
             RuleFor(u => u.MainInfoDTO.ProfessionalDataDTO)

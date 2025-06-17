@@ -47,7 +47,7 @@ namespace PetFamily.Infrastructure.Configurations
             builder.HasMany(v => v.Pets)
                 .WithOne()
                 .HasForeignKey("volonteer_id")
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.OwnsOne(v => v.SocialNetworks, sns =>
             {
@@ -62,7 +62,7 @@ namespace PetFamily.Infrastructure.Configurations
                     snb.Property(snb => snb.Link)
                         .IsRequired()
                         .HasMaxLength(Constants.MAX_LINK_LENGTH);
-                }); 
+                });
             });
 
             builder.OwnsOne(v => v.DonationDetails, dd =>
@@ -80,6 +80,15 @@ namespace PetFamily.Infrastructure.Configurations
                         .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
                 });
             });
+
+            builder.Property(v => v.IsDeleted)
+                .HasColumnName("deleted");
+
+            builder.Property(v => v.DeletionDate)
+                .HasColumnName("deletion_date")
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Local) : null);
         }
     }
 }

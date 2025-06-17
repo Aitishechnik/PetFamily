@@ -116,6 +116,7 @@ namespace PetFamily.Infrastructure.Configurations
             });
 
             builder.Property(p => p.CreatedAt)
+                .IsRequired()
                 .HasConversion(
                 value => value.ToUniversalTime(),
                 value => DateTime.SpecifyKind(value, DateTimeKind.Local));
@@ -123,6 +124,15 @@ namespace PetFamily.Infrastructure.Configurations
             builder.HasOne<Volonteer>()
                 .WithMany(v => v.Pets)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(v => v.IsDeleted)
+                .HasColumnName("deleted");
+
+            builder.Property(v => v.DeletionDate)
+                .HasColumnName("deletion_date")
+                .HasConversion(
+                    v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Local) : null);
         }
     }
 }
