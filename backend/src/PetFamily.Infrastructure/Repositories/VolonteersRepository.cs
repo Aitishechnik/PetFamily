@@ -23,6 +23,20 @@ namespace PetFamily.Infrastructure.Repositories
             return volonteer.Id;
         }
 
+        public async Task<Result<Guid, Error>> Delete(Volonteer volonteer, CancellationToken cancellationToken = default)
+        {
+            var result = await _appDbContext.Volonteers
+                .FirstOrDefaultAsync(v => v.Id == volonteer.Id);
+
+            if (result is null)
+                return Errors.General.NotFound();
+
+            _appDbContext.Volonteers.Remove(volonteer);
+            await _appDbContext.SaveChangesAsync();
+
+            return result.Id;
+        }
+
         public async Task<Result<Volonteer, Error>> GetByEmail(string email, CancellationToken cancellationToken = default)
         {
             var result = await _appDbContext.Volonteers

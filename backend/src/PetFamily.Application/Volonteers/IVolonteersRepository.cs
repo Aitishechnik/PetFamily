@@ -13,5 +13,7 @@ namespace PetFamily.Application.Volonteers
         Task<Result<Volonteer, Error>> GetByEmail(string email, CancellationToken cancellationToken = default);
 
         Task<Guid> Save(Volonteer volonteer, CancellationToken cancellationToken = default);
+
+        Task<Result<Guid, Error>> Delete(Volonteer volonteer, CancellationToken cancellationToken = default);
     }
 }
