@@ -2,7 +2,7 @@
 {
     public record DonationDetailsWrapper
     {
-        private DonationDetailsWrapper()
+        public DonationDetailsWrapper()
         {
         }
         public DonationDetailsWrapper(IReadOnlyCollection<DonationDetails> donationDetails)

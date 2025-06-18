@@ -86,5 +86,48 @@ namespace PetFamily.Domain.Models.Volonteer
 
             DeletionDate = null;
         }
+
+        public UnitResult<Error> AddPet(Pet pet)
+        {
+            var serialNumberResult = SerialNumber.Create(Pets.Count + 1);
+            if (serialNumberResult.IsFailure)
+                return serialNumberResult.Error;
+
+            pet.SetSerialNumber(serialNumberResult.Value);
+
+            Pets.Add(pet);
+
+            return Result.Success<Error>();
+        }
+
+        public UnitResult<Error> MovePet(SerialNumber current, SerialNumber target)
+        {
+            var pet = Pets.FirstOrDefault(p => p.SerialNumber == current);
+            if(pet is null)
+                return Errors.General.ValueIsInvalid("serial number");
+
+            if (target.Value <= 0 || target.Value > Pets.Count)
+                return Errors.General.ValueIsInvalid("new position");
+
+            int oldIndex = Pets.IndexOf(pet);
+            int targetIndex = target.Value - 1;
+
+            if (oldIndex == targetIndex)
+                return Result.Success<Error>();
+
+            Pets.RemoveAt(oldIndex);
+            Pets.Insert(targetIndex, pet);
+
+            for (int i = targetIndex; i < Pets.Count; i++)
+            {
+                var serialResult = SerialNumber.Create(i + 1);
+                if (serialResult.IsFailure)
+                    return serialResult.Error;
+
+                Pets[i].SetSerialNumber(serialResult.Value);
+            }
+
+            return Result.Success<Error>();
+        }
     }
 }
