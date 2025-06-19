@@ -86,6 +86,13 @@ namespace PetFamily.Infrastructure.Configurations
 
             });
 
+            builder.ComplexProperty(pet => pet.SerialNumber, snb =>
+            {
+                snb.Property(s => s.Value)
+                    .HasColumnName("serial_number")
+                    .IsRequired();
+            });
+
             builder.OwnsOne(v => v.DonationDetails, dd =>
             {
                 dd.ToJson("donation_details");

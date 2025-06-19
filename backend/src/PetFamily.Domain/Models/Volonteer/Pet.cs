@@ -25,7 +25,8 @@ namespace PetFamily.Domain.Models.Volonteer
             CreatedAt = DateTime.Now;
         }
 
-        public PetGeneralInfo PetGeneralInfo { get; } = default!;
+        public SerialNumber SerialNumber { get; private set; }
+        public PetGeneralInfo PetGeneralInfo { get; private set; } = default!;
         public BreedAndSpecies BreedAndSpecies { get; private set; } = default!;
         public PetCharacteristics PetCharacteristics { get; private set; } = default!;
         public PetHealthInfo PetHealthInfo { get; private set; } = default!;
@@ -46,5 +47,7 @@ namespace PetFamily.Domain.Models.Volonteer
             IsDeleted = false;
             DeletionDate = null;
         }
+
+        public void SetSerialNumber(SerialNumber serialNumber) => SerialNumber = serialNumber;
     }
 }

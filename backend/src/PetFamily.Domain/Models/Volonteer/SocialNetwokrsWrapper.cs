@@ -2,7 +2,7 @@
 {
     public record SocialNetwokrsWrapper
     {
-        private SocialNetwokrsWrapper()
+        public SocialNetwokrsWrapper()
         {
         }
         public SocialNetwokrsWrapper(IReadOnlyCollection<SocialNetwork> socialNetworks)
