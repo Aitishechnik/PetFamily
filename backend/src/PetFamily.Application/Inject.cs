@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using PetFamily.Application.TestMinio;
 using PetFamily.Application.Volonteers.Create;
 using PetFamily.Application.Volonteers.Delete;
 using PetFamily.Application.Volonteers.UpdateDonationDetails;
@@ -18,6 +19,7 @@ namespace PetFamily.Application
             services.AddScoped<UpdateDonationDetailsHandler>();
             services.AddScoped<SoftDeleteVolonteerHandler>();
             services.AddScoped<HardDeleteVolonteerHandler>();
+            services.AddScoped<AddFileHandler>();
 
             services.AddValidatorsFromAssembly(typeof(Inject).Assembly);
 
