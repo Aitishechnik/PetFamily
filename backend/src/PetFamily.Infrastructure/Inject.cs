@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using Minio.AspNetCore;
-using PetFamily.Application.Providers;
+using PetFamily.Application.TestMinio.Providers;
 using PetFamily.Application.Volonteers;
 using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
@@ -35,6 +35,7 @@ namespace PetFamily.Infrastructure
                 options.WithEndpoint(minioOptions.Endpoint);
 
                 options.WithCredentials(minioOptions.AccessKey, minioOptions.SecretKey);
+
                 options.WithSSL(minioOptions.WithSsl);
 
             });
