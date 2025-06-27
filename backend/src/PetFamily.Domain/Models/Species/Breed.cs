@@ -4,6 +4,7 @@ namespace PetFamily.Domain.Models.Species
 {
     public class Breed : Entity<Guid>
     {
+        protected Breed() { }
         public Breed(Guid id, string name)
         {
             Id = id;

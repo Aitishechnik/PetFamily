@@ -9,9 +9,10 @@ namespace PetFamily.Domain.Models.Species
         {
             Id = id;
             Name = name;
-            Breeds = breeds;
+            _breeds = breeds;
         }
         public string Name { get; private set; } = default!;
-        public List<Breed> Breeds { get; private set; } = new();
+        public IReadOnlyList<Breed>? Breeds => _breeds;
+        private readonly List<Breed>? _breeds = [];
     }
 }
