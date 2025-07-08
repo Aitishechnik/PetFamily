@@ -46,8 +46,12 @@ namespace PetFamily.Infrastructure.Configurations
 
             builder.HasMany(v => v.Pets)
                 .WithOne()
-                .HasForeignKey("volonteer_id")
+                .HasForeignKey(p => p.VolonteerId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Navigation(v => v.Pets)
+                .AutoInclude();
 
             builder.OwnsOne(v => v.SocialNetworks, sns =>
             {

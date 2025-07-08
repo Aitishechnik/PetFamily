@@ -12,7 +12,7 @@ namespace PetFamily.Domain.Models.Species
             _breeds = breeds;
         }
         public string Name { get; private set; } = default!;
-        public IReadOnlyList<Breed>? Breeds => _breeds;
-        private readonly List<Breed>? _breeds = [];
+        public IReadOnlyList<Breed> Breeds => _breeds;
+        private readonly List<Breed> _breeds = [];
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using PetFamily.Application.TestMinio.Providers;
+using PetFamily.Application.FileManagement.Providers;
 
-namespace PetFamily.Application.TestMinio
+namespace PetFamily.Application.FileManagement
 {
     public abstract class AbstractFileHandler<T> where T : class
     {

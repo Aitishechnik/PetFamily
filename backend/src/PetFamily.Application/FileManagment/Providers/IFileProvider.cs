@@ -1,12 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Contracts;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.TestMinio.Providers
+namespace PetFamily.Application.FileManagement.Providers
 {
     public interface IFileProvider
     {
-        Task <Result<string, Error>> UploadFile(
-            Stream stream, string fileData, CancellationToken cancellationToken = default);
+        Task <Result<IReadOnlyList<FilePath>, Error>> UploadFiles(
+            IReadOnlyList<FileDTO> filesDTO, CancellationToken cancellationToken = default);
 
         Task<Result<string, Error>> DeleteFile(string objectName, CancellationToken cancellationToken = default);
 

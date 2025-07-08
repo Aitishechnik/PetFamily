@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.TestMinio.Providers;
+using PetFamily.Application.FileManagement.Providers;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.TestMinio.Delete
+namespace PetFamily.Application.FileManagement.Delete
 {
     public class DeleteFileHandler : AbstractFileHandler<DeleteFileHandler>
     {

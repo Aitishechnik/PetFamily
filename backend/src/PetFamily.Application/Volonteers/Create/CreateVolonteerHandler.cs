@@ -55,7 +55,7 @@ namespace PetFamily.Application.Volonteers.Create
                 new SocialNetwokrsWrapper(socialNetworks),
                 new DonationDetailsWrapper(donationDetails));
 
-            await _volonteersRepository.Add(volonteer, cancellationToken);
+                await _volonteersRepository.Add(volonteer, cancellationToken);
 
             _logger.LogInformation("Added volonteer {volonteer} with id {volonteerId}", volonteer, volonteerId);
 

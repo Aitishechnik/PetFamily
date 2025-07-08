@@ -40,6 +40,7 @@ namespace PetFamily.Infrastructure.Repositories
         public async Task<Result<Volonteer, Error>> GetByEmail(string email, CancellationToken cancellationToken = default)
         {
             var result = await _appDbContext.Volonteers
+                .Include(p => p.Pets)
                 .FirstOrDefaultAsync(v => v.PersonalData.Email == email);
 
             if (result is null)
@@ -51,7 +52,8 @@ namespace PetFamily.Infrastructure.Repositories
         public async Task<Result<Volonteer, Error>> GetById(Guid id, CancellationToken cancellationToken = default)
         {
             var result = await _appDbContext.Volonteers
-                .FirstOrDefaultAsync(v => v.Id == id);
+                .Include(v => v.Pets)
+                .FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
 
             if (result is null)
                 return Errors.General.NotFound(id);
@@ -61,7 +63,9 @@ namespace PetFamily.Infrastructure.Repositories
 
         public async Task<Guid> Save(Volonteer volonteer, CancellationToken cancellationToken = default)
         {
+
             _appDbContext.Volonteers.Attach(volonteer);
+
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
             return volonteer.Id;

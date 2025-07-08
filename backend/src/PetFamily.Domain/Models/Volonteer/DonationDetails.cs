@@ -5,6 +5,7 @@ namespace PetFamily.Domain.Models.Volonteer
 {
     public record class DonationDetails
     {
+        public DonationDetails() { }
         private DonationDetails(string name, string description)
         {
             Name = name;

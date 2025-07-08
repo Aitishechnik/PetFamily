@@ -1,4 +1,4 @@
-﻿namespace PetFamily.Application.TestMinio.Delete
+﻿namespace PetFamily.Application.FileManagement.Delete
 {
     public record DeleteFileRequest(string ObjectName);
 }

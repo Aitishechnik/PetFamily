@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetFamily.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,6 +28,8 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
                     full_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -65,10 +67,12 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    volonteer_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    donation_details = table.Column<string>(type: "jsonb", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    volonteer_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    breed = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    species = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    pet_photos = table.Column<string>(type: "jsonb", nullable: false),
                     color = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     height = table.Column<double>(type: "double precision", nullable: false),
                     weight = table.Column<double>(type: "double precision", nullable: false),
@@ -81,9 +85,9 @@ namespace PetFamily.Infrastructure.Migrations
                     health_info = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     is_neutered = table.Column<bool>(type: "boolean", nullable: false),
                     is_vaccinated = table.Column<bool>(type: "boolean", nullable: false),
-                    breed_id = table.Column<long>(type: "bigint", maxLength: 100, nullable: false),
-                    species_id = table.Column<long>(type: "bigint", maxLength: 100, nullable: false),
-                    donation_details = table.Column<string>(type: "jsonb", nullable: false)
+                    breed_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    species_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    serial_number = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,7 +96,8 @@ namespace PetFamily.Infrastructure.Migrations
                         name: "fk_pets_volonteers_volonteer_id",
                         column: x => x.volonteer_id,
                         principalTable: "volonteers",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

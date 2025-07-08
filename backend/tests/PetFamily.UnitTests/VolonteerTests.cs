@@ -9,6 +9,7 @@ namespace PetFamily.Domain.UnitTests
         public void Add_Pet_First_In_List_Return_Success_Result()
         {
             // arrange
+            
             var volonteer = new Volonteer(
                 Guid.NewGuid(),
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
@@ -19,12 +20,12 @@ namespace PetFamily.Domain.UnitTests
 
             var pet = new Pet(
                 Guid.NewGuid(),
+                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
-                BreedAndSpecies.Create("test", "test").Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
-                new DonationDetailsWrapper(),
-                PetType.Create(1, 1).Value);
+                new List<DonationDetails>(),
+                PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value);
 
             // act
             var result = volonteer.AddPet(pet);
@@ -52,21 +53,21 @@ namespace PetFamily.Domain.UnitTests
 
             var pets = Enumerable.Range(1,5).Select(_ =>new Pet(
                 Guid.NewGuid(),
+                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
-                BreedAndSpecies.Create("test", "test").Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
-                new DonationDetailsWrapper(),
-                PetType.Create(1, 1).Value));
+                new List<DonationDetails>(),
+                PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value));
 
             var petToAdd = new Pet(
                 Guid.NewGuid(),
+                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
-                BreedAndSpecies.Create("test", "test").Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
-                new DonationDetailsWrapper(),
-                PetType.Create(1, 1).Value);
+                new List<DonationDetails>(),
+                PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value);
 
             foreach (var pet in pets)
                 volonteer.AddPet(pet);
@@ -96,21 +97,21 @@ namespace PetFamily.Domain.UnitTests
 
             var pets = Enumerable.Range(1, 5).Select(_ => new Pet(
                 Guid.NewGuid(),
+                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
-                BreedAndSpecies.Create("test", "test").Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
-                new DonationDetailsWrapper(),
-                PetType.Create(1, 1).Value));
+                new List<DonationDetails>(),
+                PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value));
 
             var petToMove = new Pet(
                 Guid.NewGuid(),
+                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
-                BreedAndSpecies.Create("test", "test").Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
-                new DonationDetailsWrapper(),
-                PetType.Create(1, 1).Value);
+                new List<DonationDetails>(),
+                PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value);
 
             foreach (var pet in pets)
                 volonteer.AddPet(pet);

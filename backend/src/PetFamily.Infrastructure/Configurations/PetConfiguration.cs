@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
@@ -45,18 +46,6 @@ namespace PetFamily.Infrastructure.Configurations
                         value => Utilities.ParseHelpStatus(value));
             });
 
-            builder.ComplexProperty(pet => pet.BreedAndSpecies, bs =>
-            {
-                bs.Property(b => b.Species)
-                    .HasColumnName("species")
-                    .IsRequired()
-                    .HasMaxLength(Constants.MAX_NAME_LENGTH);
-                bs.Property(b => b.Breed)
-                    .HasColumnName("breed")
-                    .IsRequired()
-                    .HasMaxLength(Constants.MAX_NAME_LENGTH);
-            });
-
             builder.ComplexProperty(pet => pet.PetCharacteristics, pcb =>
             {
                 pcb.Property(pc => pc.Weight)
@@ -93,33 +82,31 @@ namespace PetFamily.Infrastructure.Configurations
                     .IsRequired();
             });
 
-            builder.OwnsOne(v => v.DonationDetails, dd =>
-            {
-                dd.ToJson("donation_details");
+            builder.Property(p => p.DonationDetails)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    json => JsonSerializer.Deserialize<List<DonationDetails>>(json, JsonSerializerOptions.Default)!)
+                .HasColumnType("jsonb")
+                .HasColumnName("donation_details")
+                .IsRequired();
 
-                dd.OwnsMany(dd => dd.DonationDetails, ddb =>
-                {
-                    ddb.Property(ddb => ddb.Name)
-                        .IsRequired()
-                        .HasMaxLength(Constants.MAX_NAME_LENGTH);
-
-                    ddb.Property(ddb => ddb.Description)
-                        .IsRequired()
-                        .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
-                });
-            });
+            builder.Property(p => p.PetPhotos)
+                .HasConversion(
+                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                json => JsonSerializer.Deserialize<List<FilePath>>(json, JsonSerializerOptions.Default)!)
+                .HasColumnType("jsonb")
+                .HasColumnName("pet_photos")
+                .IsRequired();
 
             builder.ComplexProperty(pet => pet.PetType, ptb =>
             {
                 ptb.Property(p => p.SpeciesID)
                     .HasColumnName("species_id")
-                    .IsRequired()
-                    .HasMaxLength(Constants.MAX_NAME_LENGTH);
+                    .IsRequired();
 
                 ptb.Property(p => p.BreedID)
                     .HasColumnName("breed_id")
-                    .IsRequired()
-                    .HasMaxLength(Constants.MAX_NAME_LENGTH);
+                    .IsRequired();
             });
 
             builder.Property(p => p.CreatedAt)
@@ -128,9 +115,9 @@ namespace PetFamily.Infrastructure.Configurations
                 value => value.ToUniversalTime(),
                 value => DateTime.SpecifyKind(value, DateTimeKind.Local));
 
-            builder.HasOne<Volonteer>()
-                .WithMany(v => v.Pets)
-                .OnDelete(DeleteBehavior.NoAction);
+            builder.Property(p => p.VolonteerId)
+                .HasColumnName("volonteer_id")
+                .IsRequired();
 
             builder.Property(v => v.IsDeleted)
                 .HasColumnName("deleted");

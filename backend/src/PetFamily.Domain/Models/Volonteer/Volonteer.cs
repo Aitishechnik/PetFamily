@@ -100,6 +100,37 @@ namespace PetFamily.Domain.Models.Volonteer
             return Result.Success<Error>();
         }
 
+        public Result<Pet, Error> GetPetById(Guid petId)
+        {
+            if(petId == Guid.Empty)
+                return Errors.General.ValueIsInvalid(petId.ToString());
+
+            var result = Pets.FirstOrDefault(p => p.Id == petId);
+
+            if (result == null)
+                return Errors.General.ValueIsInvalid(petId.ToString());
+
+            return result;
+        }
+
+        public UnitResult<Error> AddPetPhotos(Guid petId, IEnumerable<FilePath> petPhotos)
+        {
+            if(petPhotos is null || petPhotos.ToList().Count == 0)
+                return Errors.General.ValueIsInvalid("pet photos collection");
+
+            if (petId == Guid.Empty)
+                return Errors.General.ValueIsInvalid("pet is null");
+
+            var pet = Pets.FirstOrDefault(p => p.Id == petId);
+
+            if (pet is null)
+                return Errors.General.ValueIsInvalid("pet is not in volunteer's list");
+            
+            pet.AddPhotos(petPhotos);
+
+            return Result.Success<Error>();
+        }
+
         public UnitResult<Error> MovePet(SerialNumber current, SerialNumber target)
         {
             var pet = Pets.FirstOrDefault(p => p.SerialNumber == current);

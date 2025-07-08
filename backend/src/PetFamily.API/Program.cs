@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using PetFamily.API.Middlewares;
 using PetFamily.Application;
 using PetFamily.Infrastructure;
@@ -16,7 +17,11 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore.Rounting", LogEventLevel.Warning)
     .CreateLogger();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSerilog();

@@ -1,67 +1,70 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Extensions;
-using PetFamily.Application.TestMinio.Add;
-using PetFamily.Application.TestMinio.Delete;
-using PetFamily.Application.TestMinio.Presign;
+using PetFamily.API.Processors;
+using PetFamily.Application.FileManagement.Add;
+using PetFamily.Application.FileManagement.Delete;
+using PetFamily.Application.FileManagement.Presign;
 
 namespace PetFamily.API.Controllers
 {
-    public class MinioTestController : ApplicationController
-    {
-        [HttpPost]
-        public async Task<IActionResult> UploadFile(
-            IFormFile file,
-            [FromServices] AddFileHandler handler,
-            CancellationToken cancellationToken = default)
-        {
-            await using var stream = file.OpenReadStream();
-            var fileName = Guid.NewGuid().ToString();
+    //public class MinioTestController : ApplicationController
+    //{
+    //    [HttpPost]
+    //    public async Task<IActionResult> UploadFiles(
+    //        IFormFileCollection files,
+    //        [FromServices] AddFilesHandler handler,
+    //        CancellationToken cancellationToken = default)
+    //    {
+    //        await using var fileProcessor = new FormFileProcessor();
+    //        var createFilesDTO = fileProcessor.Process(files);
 
-            var request = new AddFileRequest(stream, fileName);
+    //        var fileName = Guid.NewGuid().ToString();
 
-            var result = await handler.Handle(
-                request,
-                cancellationToken);
+    //        var request = new AddFilesRequest(createFilesDTO);
 
-            if (result.IsFailure)
-                return result.Error.ToResponse();
+    //        var result = await handler.Handle(
+    //            request,
+    //            cancellationToken);
 
-            return Ok(result.Value);
-        }
+    //        if (result.IsFailure)
+    //            return result.Error.ToResponse();
 
-        [HttpDelete]
-        public async Task<IActionResult> RemoveFile(
-            [FromQuery] string objectName,
-            [FromServices] DeleteFileHandler handler,
-            CancellationToken cancellationToken = default)
-        {
-            var request = new DeleteFileRequest(objectName);
+    //        return Ok(result.Value);
+    //    }
 
-            var result = await handler.Handle(request, cancellationToken);
-            if (result.IsFailure)
-            {
-                return result.Error.ToResponse();
-            }
+    //    [HttpDelete]
+    //    public async Task<IActionResult> RemoveFile(
+    //        [FromQuery] string objectName,
+    //        [FromServices] DeleteFileHandler handler,
+    //        CancellationToken cancellationToken = default)
+    //    {
+    //        var request = new DeleteFileRequest(objectName);
 
-            return Ok(result.Value);
-        }
+    //        var result = await handler.Handle(request, cancellationToken);
+    //        if (result.IsFailure)
+    //        {
+    //            return result.Error.ToResponse();
+    //        }
 
-        [HttpGet("link")]
-        public async Task<IActionResult> PresignedLink(
-            [FromQuery] string objectName,
-            [FromServices] GetPresignedHandler handler,
-            CancellationToken cancellationToken = default)
-        {
-            var request = new GetPresignedRequest(objectName);
+    //        return Ok(result.Value);
+    //    }
 
-            var result = await handler.Handle(request, cancellationToken);
+    //    [HttpGet("link")]
+    //    public async Task<IActionResult> PresignedLink(
+    //        [FromQuery] string objectName,
+    //        [FromServices] GetPresignedHandler handler,
+    //        CancellationToken cancellationToken = default)
+    //    {
+    //        var request = new GetPresignedRequest(objectName);
 
-            if (result.IsFailure)
-            {
-                return result.Error.ToResponse();
-            }
+    //        var result = await handler.Handle(request, cancellationToken);
 
-            return Ok(result.Value);
-        }
-    }
+    //        if (result.IsFailure)
+    //        {
+    //            return result.Error.ToResponse();
+    //        }
+
+    //        return Ok(result.Value);
+    //    }
+    //}
 }

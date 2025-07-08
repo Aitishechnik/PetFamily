@@ -5,10 +5,10 @@
         public DonationDetailsWrapper()
         {
         }
-        public DonationDetailsWrapper(IReadOnlyCollection<DonationDetails> donationDetails)
+        public DonationDetailsWrapper(IEnumerable<DonationDetails> donationDetails)
         {
-            DonationDetails = donationDetails;
+            DonationDetails = donationDetails.ToList();
         }
-        public IReadOnlyCollection<DonationDetails> DonationDetails { get; } = default!;
+        public IReadOnlyList<DonationDetails> DonationDetails { get; } = default!;
     }
 }

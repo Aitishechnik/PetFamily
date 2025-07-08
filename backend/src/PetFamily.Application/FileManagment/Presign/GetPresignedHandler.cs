@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.TestMinio.Providers;
+using PetFamily.Application.FileManagement.Providers;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.TestMinio.Presign
+namespace PetFamily.Application.FileManagement.Presign
 {
     public class GetPresignedHandler : AbstractFileHandler<GetPresignedHandler>
     {
