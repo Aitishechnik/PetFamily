@@ -56,12 +56,16 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                 var filePathList = GenerateFilePathList(
                     volonteer.Id,
                     pet.Id,
-                    pet.PetPhotos.Count,
+                    pet.GetLastPhotoIndex()+1,
                     request.Content.Count(),
                     Constants.PHOTO_FILE_EXTENSION);
 
+                var t1 = _unitOfWork.ChangeTrackerEntry();
+
                 var addPhotoResult = volonteer.AddPetPhotos(
                     pet.Id, filePathList);
+
+                var t2 = _unitOfWork.ChangeTrackerEntry();
 
                 if (addPhotoResult.IsFailure)
                 {
@@ -69,10 +73,10 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                     return addPhotoResult.Error;
                 }
 
-                //_unitOfWork.EntryChangeStateOnModified(volonteer);
-                _unitOfWork.EntryChangeStateOnModified(pet);
-
                 await _unitOfWork.SaveChanges();
+
+                var t4 = _unitOfWork.ChangeTrackerEntry();
+
 
                 var fileDTOsResult = GenerateLileDTOList(
                     request.Content,
@@ -94,6 +98,7 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                     return result.Error;
                 }
 
+                transaction.Commit();
                 return filePathList;
             }
             catch (Exception ex)

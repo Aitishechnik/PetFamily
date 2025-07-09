@@ -8,13 +8,16 @@ namespace PetFamily.Application.Volonteers.UpdateSocialNetworks
     public class UpdateSocialNetworksHandler
     {
         private readonly IVolonteersRepository _volonteersRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<UpdateSocialNetworksHandler> _logger;
 
         public UpdateSocialNetworksHandler(
             IVolonteersRepository volonteersRepository,
+            IUnitOfWork unitOfWork,
             ILogger<UpdateSocialNetworksHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
@@ -22,23 +25,36 @@ namespace PetFamily.Application.Volonteers.UpdateSocialNetworks
             UpdateSocialNetworksRequest request,
             CancellationToken cancellationToken = default)
         {
-            var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId, cancellationToken);
+            var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
 
-            if (volonteerResult.IsFailure)
-                return volonteerResult.Error;
+            try
+            {
+                var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId, cancellationToken);
 
-            var socialNetworks = new List<SocialNetwork>();
+                if (volonteerResult.IsFailure)
+                    return volonteerResult.Error;
 
-            foreach (var sn in request.SocialNetworks)
-                socialNetworks.Add(SocialNetwork.Create(sn.Name, sn.Link).Value);
+                var socialNetworks = new List<SocialNetwork>();
 
-            volonteerResult.Value.UpdateSocialNetworks(new SocialNetwokrsWrapper(socialNetworks));
+                foreach (var sn in request.SocialNetworks)
+                    socialNetworks.Add(SocialNetwork.Create(sn.Name, sn.Link).Value);
 
-            var result = await _volonteersRepository.Save(volonteerResult.Value, cancellationToken);
+                volonteerResult.Value.UpdateSocialNetworks(new SocialNetwokrsWrapper(socialNetworks));
 
-            _logger.LogInformation("Volonteer with id {result} has been updated with new social networks", result);
+                await _unitOfWork.SaveChanges(cancellationToken);
 
-            return result;
+                transaction.Commit();
+
+                _logger.LogInformation("Volonteer with id {Id} has been updated with new social networks", volonteerResult.Value.Id);
+
+                return volonteerResult.Value.Id;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                _logger.LogError(ex, "Error occurred while updating social networks for volonteer with id {VolonteerId}", request.VolonteerId);
+                return Errors.General.ValueIsInvalid("volonteer social networks update");
+            }
         }
     }
 }

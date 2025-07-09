@@ -8,7 +8,6 @@ namespace PetFamily.Domain.Models.Volonteer
         protected Pet() { }
         public Pet(
             Guid id,
-            Guid volonteerId,
             PetGeneralInfo petGeneralInfo,
             PetCharacteristics petCharacteristics,
             PetHealthInfo petHealthInfo,
@@ -16,7 +15,6 @@ namespace PetFamily.Domain.Models.Volonteer
             PetType petType
         ) : base(id)
         {
-            VolonteerId = volonteerId;
             PetGeneralInfo = petGeneralInfo;
             PetCharacteristics = petCharacteristics;
             PetHealthInfo = petHealthInfo;
@@ -39,6 +37,15 @@ namespace PetFamily.Domain.Models.Volonteer
         public IReadOnlyList<FilePath> PetPhotos => _petPhotos;
         private readonly List<FilePath> _petPhotos = [];
 
+        public void RemovePhotos(IEnumerable<FilePath> petPhotos)
+        {
+            foreach (var photo in petPhotos)
+            {
+                if (_petPhotos.Contains(photo))
+                    _petPhotos.Remove(photo);
+            }
+        }
+
         public void Delete()
         {
             IsDeleted = true;
@@ -49,6 +56,23 @@ namespace PetFamily.Domain.Models.Volonteer
         {
             IsDeleted = false;
             DeletionDate = null;
+        }
+
+        public int GetLastPhotoIndex()
+        {
+            var lastPhoto = _petPhotos.LastOrDefault();
+            if (lastPhoto == null)
+                return -1;
+
+            var lastIndexString = lastPhoto.Path.
+                Split('/')[2].
+                Split('.')[0]
+                .Trim();
+
+            if(int.TryParse(lastIndexString, out var index)) 
+                return index;
+            else
+                return -1;
         }
 
         public void AddPhotos(IEnumerable<FilePath> petPhotos) => _petPhotos.AddRange(petPhotos);

@@ -82,21 +82,46 @@ namespace PetFamily.Infrastructure.Configurations
                     .IsRequired();
             });
 
-            builder.Property(p => p.DonationDetails)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                    json => JsonSerializer.Deserialize<List<DonationDetails>>(json, JsonSerializerOptions.Default)!)
-                .HasColumnType("jsonb")
-                .HasColumnName("donation_details")
-                .IsRequired();
+            //builder.Property(p => p.DonationDetails)
+            //    .HasConversion(
+            //        v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+            //        json => JsonSerializer.Deserialize<List<DonationDetails>>(json, JsonSerializerOptions.Default)!)
+            //    .HasColumnType("jsonb")
+            //    .HasColumnName("donation_details")
+            //    .IsRequired();
 
-            builder.Property(p => p.PetPhotos)
-                .HasConversion(
-                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                json => JsonSerializer.Deserialize<List<FilePath>>(json, JsonSerializerOptions.Default)!)
-                .HasColumnType("jsonb")
-                .HasColumnName("pet_photos")
-                .IsRequired();
+            //builder.Property(p => p.PetPhotos)
+            //    .HasConversion(
+            //    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+            //    json => JsonSerializer.Deserialize<List<FilePath>>(json, JsonSerializerOptions.Default)!)
+            //    .HasColumnType("jsonb")
+            //    .HasColumnName("pet_photos")
+            //    .IsRequired();
+
+            builder.OwnsMany(p => p.DonationDetails, ddb =>
+            {
+                ddb.ToJson("donation_details");
+
+                ddb.Property(dd => dd.Name)
+                    .HasMaxLength(Constants.MAX_NAME_LENGTH)
+                    .HasColumnName("amount")
+                    .IsRequired();
+
+                ddb.Property(dd => dd.Description)
+                    .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH)
+                    .HasColumnName("description")
+                    .IsRequired();
+            });
+
+            builder.OwnsMany(p => p.PetPhotos, ppb =>
+            {
+                ppb.ToJson("pet_photos");
+
+                ppb.Property(pp => pp.Path)
+                    .HasColumnName("path")
+                    .IsRequired()
+                    .HasMaxLength(Constants.MAX_LINK_LENGTH);
+            });
 
             builder.ComplexProperty(pet => pet.PetType, ptb =>
             {

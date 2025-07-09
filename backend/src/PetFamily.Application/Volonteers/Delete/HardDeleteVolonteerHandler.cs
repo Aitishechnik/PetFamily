@@ -7,13 +7,16 @@ namespace PetFamily.Application.Volonteers.Delete
     public class HardDeleteVolonteerHandler
     {
         private readonly IVolonteersRepository _volonteersRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<HardDeleteVolonteerHandler> _logger;
 
         public HardDeleteVolonteerHandler(
             IVolonteersRepository volonteersRepository,
+            IUnitOfWork unitOfWork,
             ILogger<HardDeleteVolonteerHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
@@ -21,15 +24,29 @@ namespace PetFamily.Application.Volonteers.Delete
             DeleteVolonteerRequest request,
             CancellationToken cancellationToken = default)
         {
-            var result = await _volonteersRepository.GetById(request.VolonteerId);
-            if (result.IsFailure)
-                return result.Error;
+            var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
 
-            await _volonteersRepository.Delete(result.Value, cancellationToken);
+            try
+            {
+                var result = await _volonteersRepository.GetById(request.VolonteerId);
+                if (result.IsFailure)
+                    return result.Error;
 
-            _logger.LogInformation("Volonteer with id {request.VolonteerId) was permenantly deleted}", request.VolonteerId);
+                _unitOfWork.Delete(result.Value);
 
-            return result.Value.Id;
+                await _unitOfWork.SaveChanges();
+
+                transaction.Commit();
+
+                _logger.LogInformation("Volonteer with id {request.VolonteerId) was permenantly deleted}", request.VolonteerId);
+
+                return result.Value.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while deleting volonteer with id {request.VolonteerId}", request.VolonteerId);
+                return Errors.General.ValueIsInvalid("volonteer deletion");
+            }
         }
     }
 }

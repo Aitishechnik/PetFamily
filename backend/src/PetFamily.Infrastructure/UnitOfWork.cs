@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PetFamily.Infrastructure
@@ -13,9 +13,11 @@ namespace PetFamily.Infrastructure
             _appDbContext = appDbContext;
         }
 
-        public async Task<IDbTransaction> BeginTransaction(CancellationToken cancellationToken = default)
+        public async Task<IDbTransaction> BeginTransaction(
+            CancellationToken cancellationToken = default)
         {
-            var transaction = await _appDbContext.Database.BeginTransactionAsync(cancellationToken);
+            var transaction = await _appDbContext.Database
+                .BeginTransactionAsync(cancellationToken);
             return transaction.GetDbTransaction();
         }
 
@@ -24,14 +26,23 @@ namespace PetFamily.Infrastructure
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public void EntryChangeStateOnAdded<TEntity>(TEntity entity) where TEntity : class
+        public async Task AddAsync<TEntity>(
+            TEntity entity, 
+            CancellationToken cancellationToken = default) where TEntity : class
         {
-            _appDbContext.Entry(entity).State = EntityState.Added;
+            await _appDbContext.AddAsync(entity);
         }
 
-        public void EntryChangeStateOnModified<TEntity>(TEntity entity) where TEntity : class
+        public IEnumerable<EntityEntry> ChangeTrackerEntry()
         {
-            _appDbContext.Entry(entity).State = EntityState.Modified;
+            return _appDbContext.ChangeTracker.Entries();
+        }
+
+        public void Delete<TEntity>(
+            TEntity entity, 
+            CancellationToken cancellationToken = default) where TEntity : class
+        {
+            _appDbContext.Remove(entity);
         }
     }
 }

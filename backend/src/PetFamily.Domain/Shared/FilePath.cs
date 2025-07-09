@@ -4,7 +4,6 @@ namespace PetFamily.Domain.Shared
 {
     public record FilePath
     {
-        public FilePath() { }
         private FilePath(string path)
         {
             Path = path;

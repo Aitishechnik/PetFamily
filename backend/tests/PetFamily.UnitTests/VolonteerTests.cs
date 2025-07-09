@@ -20,7 +20,6 @@ namespace PetFamily.Domain.UnitTests
 
             var pet = new Pet(
                 Guid.NewGuid(),
-                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -53,7 +52,6 @@ namespace PetFamily.Domain.UnitTests
 
             var pets = Enumerable.Range(1,5).Select(_ =>new Pet(
                 Guid.NewGuid(),
-                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -62,7 +60,6 @@ namespace PetFamily.Domain.UnitTests
 
             var petToAdd = new Pet(
                 Guid.NewGuid(),
-                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -97,7 +94,6 @@ namespace PetFamily.Domain.UnitTests
 
             var pets = Enumerable.Range(1, 5).Select(_ => new Pet(
                 Guid.NewGuid(),
-                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -106,7 +102,6 @@ namespace PetFamily.Domain.UnitTests
 
             var petToMove = new Pet(
                 Guid.NewGuid(),
-                volonteer.Id,
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,

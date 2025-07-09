@@ -68,11 +68,9 @@ namespace PetFamily.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     volonteer_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    donation_details = table.Column<string>(type: "jsonb", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    pet_photos = table.Column<string>(type: "jsonb", nullable: false),
                     color = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     height = table.Column<double>(type: "double precision", nullable: false),
                     weight = table.Column<double>(type: "double precision", nullable: false),
@@ -87,7 +85,9 @@ namespace PetFamily.Infrastructure.Migrations
                     is_vaccinated = table.Column<bool>(type: "boolean", nullable: false),
                     breed_id = table.Column<Guid>(type: "uuid", nullable: false),
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    serial_number = table.Column<int>(type: "integer", nullable: false)
+                    serial_number = table.Column<int>(type: "integer", nullable: false),
+                    donation_details = table.Column<string>(type: "jsonb", nullable: true),
+                    pet_photos = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -60,7 +60,6 @@ namespace PetFamily.Application.Volonteers.AddPet
 
                 var pet = new Pet(
                     Guid.NewGuid(),
-                    volonteer.Id,
                     PetGeneralInfo.Create(
                         addPetRequest.PetGeneralInfoDTO.Name,
                         addPetRequest.PetGeneralInfoDTO.Description,
@@ -82,7 +81,7 @@ namespace PetFamily.Application.Volonteers.AddPet
                         addPetRequest.PetTypeDTO.BreedID).Value);
 
                 volonteer.AddPet(pet);
-                _unitOfWork.EntryChangeStateOnAdded(pet);
+                await _unitOfWork.AddAsync(pet, cancellationToken);
                 await _unitOfWork.SaveChanges();
                 transaction.Commit();
                 

@@ -11,6 +11,8 @@ using PetFamily.Application.Volonteers.Delete;
 using PetFamily.Application.Volonteers.AddPet;
 using PetFamily.Application.Volonteers.AddPetPhotos;
 using PetFamily.API.Processors;
+using PetFamily.Domain.Shared;
+using PetFamily.Application.Volonteers.RemovePetPhotos;
 
 namespace PetFamily.API.Controllers
 {
@@ -166,7 +168,7 @@ namespace PetFamily.API.Controllers
 
             var result = await handler.Handle(request);
 
-            if(result.IsFailure)
+            if (result.IsFailure)
                 return result.Error.ToResponse();
 
             return Ok(Envelope.Ok(result.Value));
@@ -199,6 +201,32 @@ namespace PetFamily.API.Controllers
             return Ok(Envelope.Ok(result.Value));
         }
 
-        
+        [HttpDelete("{VolonteerId:guid}/{petId:guid}/photos")]
+        public async Task<IActionResult> RemoveFiles(
+            [FromRoute] Guid VolonteerId,
+            [FromRoute] Guid petId,
+            [FromBody] RemovePetPhotoDTO dto,
+            [FromServices] RemovePetPhotosHandler handler,
+            [FromServices] IValidator<RemovePetPhotosRequest> validator,
+            CancellationToken cancellationToken = default)
+        {
+            var request = new RemovePetPhotosRequest(
+                VolonteerId, 
+                petId, 
+                dto.Paths.Select(filePath => FilePath.Create(filePath).Value));
+
+            var validationResult = validator.Validate(request);
+
+            if (validationResult.IsValid == false)
+                return validationResult.ToValidationErrorResponse();
+
+            var result = await handler.Handle(request, cancellationToken);
+            if (result.IsFailure)
+            {
+                return result.Error.ToResponse();
+            }
+
+            return Ok(Envelope.Ok());
+        }
     }
 }

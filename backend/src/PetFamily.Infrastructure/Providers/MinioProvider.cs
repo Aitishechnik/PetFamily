@@ -25,24 +25,31 @@ namespace PetFamily.Infrastructure.Providers
             _configuration = configuration;
         }
 
-        public async Task<Result<string, Error>> DeleteFile(string objectName, CancellationToken cancellationToken = default)
+        public async Task<UnitResult<Error>> DeleteFiles(
+            IEnumerable<FilePath> objectsNames, CancellationToken cancellationToken = default)
         {
             try
             {
                 var bucketName = GetBucketNameFromConfig();
-
+                var semaphoreSlim = new SemaphoreSlim(GetMaxDeleteConcurrencyFromConfig());
                 var bucketExists = await IsBucketExist(bucketName, cancellationToken);
                 if (!bucketExists)
                 {
                     return Error.Failure("file.delete", "Bucket does not exist");
                 }
-                var deleteObjectArgs = new RemoveObjectArgs()
-                    .WithBucket(bucketName)
-                    .WithObject(objectName);
 
-                await _minioClient.RemoveObjectAsync(deleteObjectArgs, cancellationToken);
+                var tasksResult = objectsNames.Select(async filePath=>
+                {
+                    return await RemoveObject(bucketName, filePath, semaphoreSlim, cancellationToken);
+                });
 
-                return objectName;
+                var tasksResults = await Task.WhenAll(tasksResult);
+
+                var result = tasksResult.FirstOrDefault(t => t.Result.IsFailure);
+                if (result != null)
+                    return result.Result.Error;
+
+                return Result.Success<Error>();
             }
             catch (Exception e)
             {
@@ -51,7 +58,8 @@ namespace PetFamily.Infrastructure.Providers
             }
         }
 
-        public async Task<Result<string, Error>> GetPresignedFile(string FileName, CancellationToken cancellationToken = default)
+        public async Task<Result<string, Error>> GetPresignedFile(
+            string FileName, CancellationToken cancellationToken = default)
         {
             var bucketName = GetBucketNameFromConfig();
 
@@ -90,7 +98,8 @@ namespace PetFamily.Infrastructure.Providers
 
                 var tasks = filesList.Select(async dto =>
                 {
-                    return await PutObject(dto, semaphoreSlim, cancellationToken);
+                    return await PutObject(
+                        bucketName, dto, semaphoreSlim, cancellationToken);
                 });
 
                 var pathsResult = await Task.WhenAll(tasks);
@@ -120,12 +129,14 @@ namespace PetFamily.Infrastructure.Providers
             }
         }
 
-        private async Task<bool> IsBucketExist(string bucketName, CancellationToken cancellationToken)
+        private async Task<bool> IsBucketExist(
+            string bucketName, CancellationToken cancellationToken)
         {
             var backetExistsArgs = new BucketExistsArgs()
                     .WithBucket(bucketName);
 
-            return await _minioClient.BucketExistsAsync(backetExistsArgs, cancellationToken);
+            return await _minioClient.BucketExistsAsync(
+                backetExistsArgs, cancellationToken);
         }
 
         private string GetBucketNameFromConfig()
@@ -142,17 +153,54 @@ namespace PetFamily.Infrastructure.Providers
                     ?? throw new ApplicationException("Max write concurrency is missing");
         }
 
+        private int GetMaxDeleteConcurrencyFromConfig()
+        {
+            return _configuration.GetSection(MinioBucketOptions.MINIO_BUCKETS)
+                    .Get<MinioBucketOptions>()?.MaxDeleteConcurrency
+                    ?? throw new ApplicationException("Max delete concurrency is missing");
+        }
+
+        private async Task<UnitResult<Error>> RemoveObject(
+            string bucketName,
+            FilePath filePath,
+            SemaphoreSlim semaphoreSlim,
+            CancellationToken cancellationToken
+            )
+        {
+            await semaphoreSlim.WaitAsync(cancellationToken);
+            try
+            {
+                var removeObjectArgs = new RemoveObjectArgs()
+                    .WithBucket(bucketName)
+                    .WithObject(filePath.Path);
+                await _minioClient.RemoveObjectAsync(removeObjectArgs, cancellationToken);
+                return Result.Success<Error>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Fail to remove file in minio with path {path} in bucket {bucket}",
+                    filePath.Path,
+                    bucketName);
+                return Error.Failure("file.remove", "Fail to remove file in minio");
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+
         private async Task<Result<FilePath, Error>> PutObject(
+        string bucketName,
         FileDTO fileData,
         SemaphoreSlim semaphoreSlim,
         CancellationToken cancellationToken)
         {
             await semaphoreSlim.WaitAsync(cancellationToken);
 
-            var backetName = GetBucketNameFromConfig();
-
             var putObjectArgs = new PutObjectArgs()
-                .WithBucket(backetName)
+                .WithBucket(bucketName)
                 .WithStreamData(fileData.Content)
                 .WithObjectSize(fileData.Content.Length)
                 .WithObject(fileData.FileName);
@@ -166,10 +214,11 @@ namespace PetFamily.Infrastructure.Providers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
+                _logger.LogError(
+                    ex,
                     "Fail to upload file in minio with path {path} in bucket {bucket}",
                     fileData.FileName,
-                    backetName);
+                    bucketName);
 
                 return Error.Failure("file.upload", "Fail to upload file in minio");
             }

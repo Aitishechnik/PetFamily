@@ -60,10 +60,12 @@ namespace PetFamily.Infrastructure.Configurations
                 sns.OwnsMany(sns => sns.SocialNetworks, snb =>
                 {
                     snb.Property(snb => snb.Name)
+                        .HasColumnName("name")
                         .IsRequired()
                         .HasMaxLength(Constants.MAX_NAME_LENGTH);
 
                     snb.Property(snb => snb.Link)
+                        .HasColumnName("link")
                         .IsRequired()
                         .HasMaxLength(Constants.MAX_LINK_LENGTH);
                 });
@@ -76,10 +78,12 @@ namespace PetFamily.Infrastructure.Configurations
                 dd.OwnsMany(dd => dd.DonationDetails, ddb =>
                 {
                     ddb.Property(ddb => ddb.Name)
+                        .HasColumnName("name")
                         .IsRequired()
                         .HasMaxLength(Constants.MAX_NAME_LENGTH);
 
                     ddb.Property(ddb => ddb.Description)
+                        .HasColumnName("description")
                         .IsRequired()
                         .HasMaxLength(Constants.MAX_TEXT_DESCRIPTION_LENGTH);
                 });

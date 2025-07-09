@@ -9,7 +9,7 @@ namespace PetFamily.Application.FileManagement.Providers
         Task <Result<IReadOnlyList<FilePath>, Error>> UploadFiles(
             IReadOnlyList<FileDTO> filesDTO, CancellationToken cancellationToken = default);
 
-        Task<Result<string, Error>> DeleteFile(string objectName, CancellationToken cancellationToken = default);
+        Task<UnitResult<Error>> DeleteFiles(IEnumerable<FilePath> objectsNames, CancellationToken cancellationToken = default);
 
         Task<Result<string, Error>> GetPresignedFile(string FileName, CancellationToken cancellationToken = default);
     }
