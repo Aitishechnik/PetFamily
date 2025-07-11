@@ -59,7 +59,6 @@ namespace PetFamily.Application.Volonteers.AddPet
                         Value);
 
                 var pet = new Pet(
-                    Guid.NewGuid(),
                     PetGeneralInfo.Create(
                         addPetRequest.PetGeneralInfoDTO.Name,
                         addPetRequest.PetGeneralInfoDTO.Description,
@@ -79,7 +78,7 @@ namespace PetFamily.Application.Volonteers.AddPet
                     PetType.Create(
                         addPetRequest.PetTypeDTO.SpeciesID,
                         addPetRequest.PetTypeDTO.BreedID).Value);
-
+                
                 volonteer.AddPet(pet);
 
                 await _unitOfWork.SaveChanges();

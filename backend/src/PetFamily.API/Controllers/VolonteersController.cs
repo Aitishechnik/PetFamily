@@ -13,6 +13,7 @@ using PetFamily.Application.Volonteers.AddPetPhotos;
 using PetFamily.API.Processors;
 using PetFamily.Domain.Shared;
 using PetFamily.Application.Volonteers.RemovePetPhotos;
+using PetFamily.Application.Volonteers.ShiftPetPosition;
 
 namespace PetFamily.API.Controllers
 {
@@ -201,9 +202,9 @@ namespace PetFamily.API.Controllers
             return Ok(Envelope.Ok(result.Value));
         }
 
-        [HttpDelete("{VolonteerId:guid}/{petId:guid}/photos")]
+        [HttpDelete("{volonteerId:guid}/{petId:guid}/photos")]
         public async Task<IActionResult> RemoveFiles(
-            [FromRoute] Guid VolonteerId,
+            [FromRoute] Guid volonteerId,
             [FromRoute] Guid petId,
             [FromBody] RemovePetPhotoDTO dto,
             [FromServices] RemovePetPhotosHandler handler,
@@ -211,7 +212,7 @@ namespace PetFamily.API.Controllers
             CancellationToken cancellationToken = default)
         {
             var request = new RemovePetPhotosRequest(
-                VolonteerId, 
+                volonteerId, 
                 petId, 
                 dto.Paths.Select(filePath => FilePath.Create(filePath).Value));
 
@@ -225,6 +226,31 @@ namespace PetFamily.API.Controllers
             {
                 return result.Error.ToResponse();
             }
+
+            return Ok(Envelope.Ok());
+        }
+
+        [HttpPut("{volonteerId:guid}/{petId:guid}/shift-pet-position")]
+        public async Task<IActionResult> ShiftPetPosition(
+            [FromRoute] Guid volonteerId,
+            [FromRoute] Guid petId,
+            [FromServices] ShiftPetPositionHandler handler,
+            [FromBody] ShiftPetPositionDTO dto,
+            [FromServices] IValidator<ShiftPetPositionRequest> validator,
+            CancellationToken cancellationToken = default)
+        {
+            var request = new ShiftPetPositionRequest(
+                volonteerId, 
+                petId, 
+                dto.NewPosition);
+
+            var validationResult = validator.Validate(request);
+            if (validationResult.IsValid == false)
+                return validationResult.ToValidationErrorResponse();
+
+            var result = await handler.Handle(request, cancellationToken);
+            if (result.IsFailure)
+                return result.Error.ToResponse();
 
             return Ok(Envelope.Ok());
         }

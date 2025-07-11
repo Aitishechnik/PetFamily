@@ -7,13 +7,12 @@ namespace PetFamily.Domain.Models.Volonteer
     {
         protected Pet() { }
         public Pet(
-            Guid id,
             PetGeneralInfo petGeneralInfo,
             PetCharacteristics petCharacteristics,
             PetHealthInfo petHealthInfo,
             IEnumerable<DonationDetails> donationDetails,
             PetType petType
-        ) : base(id)
+        ) : base()
         {
             PetGeneralInfo = petGeneralInfo;
             PetCharacteristics = petCharacteristics;
@@ -64,9 +63,9 @@ namespace PetFamily.Domain.Models.Volonteer
             if (lastPhoto == null)
                 return -1;
 
-            var lastIndexString = lastPhoto.Path.
-                Split('/')[2].
-                Split('.')[0]
+            var lastIndexString = lastPhoto.Path
+                .Split('/')[2]
+                .Split('.')[0]
                 .Trim();
 
             if(int.TryParse(lastIndexString, out var index)) 
