@@ -32,9 +32,7 @@ namespace PetFamily.Application.Volonteers.Delete
                 if (result.IsFailure)
                     return result.Error;
 
-                _unitOfWork.Delete(result.Value);
-
-                await _unitOfWork.SaveChanges();
+                await _volonteersRepository.Delete(result.Value);
 
                 transaction.Commit();
 

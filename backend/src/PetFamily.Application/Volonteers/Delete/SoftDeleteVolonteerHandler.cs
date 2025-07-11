@@ -38,7 +38,6 @@ namespace PetFamily.Application.Volonteers.Delete
                 result.Value.Delete();
 
                 await _unitOfWork.SaveChanges();
-                //await _volonteersRepository.Save(result.Value, cancellationToken);
 
                 transaction.Commit();
 

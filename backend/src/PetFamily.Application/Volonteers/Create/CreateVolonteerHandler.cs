@@ -61,9 +61,7 @@ namespace PetFamily.Application.Volonteers.Create
                     new SocialNetwokrsWrapper(socialNetworks),
                     new DonationDetailsWrapper(donationDetails));
                 
-                await _unitOfWork.AddAsync(volonteer, cancellationToken);
-
-                await _unitOfWork.SaveChanges();
+                await _volonteersRepository.Add(volonteer);
 
                 transaction.Commit();
 

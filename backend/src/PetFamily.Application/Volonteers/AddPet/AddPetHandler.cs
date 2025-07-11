@@ -81,7 +81,7 @@ namespace PetFamily.Application.Volonteers.AddPet
                         addPetRequest.PetTypeDTO.BreedID).Value);
 
                 volonteer.AddPet(pet);
-                await _unitOfWork.AddAsync(pet, cancellationToken);
+
                 await _unitOfWork.SaveChanges();
                 transaction.Commit();
                 

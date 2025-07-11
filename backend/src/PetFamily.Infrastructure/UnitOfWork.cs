@@ -25,24 +25,5 @@ namespace PetFamily.Infrastructure
         {
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }
-
-        public async Task AddAsync<TEntity>(
-            TEntity entity, 
-            CancellationToken cancellationToken = default) where TEntity : class
-        {
-            await _appDbContext.AddAsync(entity);
-        }
-
-        public IEnumerable<EntityEntry> ChangeTrackerEntry()
-        {
-            return _appDbContext.ChangeTracker.Entries();
-        }
-
-        public void Delete<TEntity>(
-            TEntity entity, 
-            CancellationToken cancellationToken = default) where TEntity : class
-        {
-            _appDbContext.Remove(entity);
-        }
     }
 }

@@ -60,12 +60,8 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                     request.Content.Count(),
                     Constants.PHOTO_FILE_EXTENSION);
 
-                var t1 = _unitOfWork.ChangeTrackerEntry();
-
                 var addPhotoResult = volonteer.AddPetPhotos(
                     pet.Id, filePathList);
-
-                var t2 = _unitOfWork.ChangeTrackerEntry();
 
                 if (addPhotoResult.IsFailure)
                 {
@@ -74,9 +70,6 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                 }
 
                 await _unitOfWork.SaveChanges();
-
-                var t4 = _unitOfWork.ChangeTrackerEntry();
-
 
                 var fileDTOsResult = GenerateLileDTOList(
                     request.Content,

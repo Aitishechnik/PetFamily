@@ -47,7 +47,7 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
                 }
 
                 var pet = petResult.Value;
-                var t1 = _unitOfWork.ChangeTrackerEntry();
+
                 foreach(var path in request.Paths)
                 {
                     if (pet.PetPhotos.Any(p => p == path) == false)
@@ -58,10 +58,8 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
                 }
 
                 pet.RemovePhotos(request.Paths);
-                var t2 = _unitOfWork.ChangeTrackerEntry();
 
                 await _unitOfWork.SaveChanges();
-                var t3 = _unitOfWork.ChangeTrackerEntry();
 
                 var deleteFilesRequest = new DeleteFilesRequest(request.Paths);
 

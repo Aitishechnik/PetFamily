@@ -32,6 +32,7 @@ namespace PetFamily.Infrastructure.Repositories
                 return Errors.General.NotFound();
 
             _appDbContext.Volonteers.Remove(volonteer);
+
             await _appDbContext.SaveChangesAsync();
 
             return result.Id;
@@ -59,16 +60,6 @@ namespace PetFamily.Infrastructure.Repositories
                 return Errors.General.NotFound(id);
 
             return result;
-        }
-
-        public async Task<Guid> Save(Volonteer volonteer, CancellationToken cancellationToken = default)
-        {
-
-            _appDbContext.Volonteers.Attach(volonteer);
-
-            await _appDbContext.SaveChangesAsync(cancellationToken);
-
-            return volonteer.Id;
         }
     }
 }
