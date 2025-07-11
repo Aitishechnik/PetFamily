@@ -8,42 +8,58 @@ namespace PetFamily.Application.Volonteers.UpdateMainInfo
     public class UpdateMainInfoHandler
     {
         private readonly IVolonteersRepository _volonteersRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<UpdateMainInfoHandler> _logger;
 
         public UpdateMainInfoHandler(
             IVolonteersRepository volonteersRepository,
+            IUnitOfWork unitOfWork,
             ILogger<UpdateMainInfoHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
         public async Task<Result<Guid, Error>> Handle(
-            UpdateMainInfoRequest request, 
+            UpdateMainInfoRequest request,
             CancellationToken cancellationToken = default)
         {
-            var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId, cancellationToken);
-            if(volonteerResult.IsFailure)
-                return volonteerResult.Error;
+            var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
 
-            var personalData = PersonalData.Create(
-                request.MainInfoDTO.PersonalDataDTO.FullName,
-                request.MainInfoDTO.PersonalDataDTO.Email,
-                request.MainInfoDTO.PersonalDataDTO.PhoneNumber);
+            try
+            {
+                var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId, cancellationToken);
+                if (volonteerResult.IsFailure)
+                    return volonteerResult.Error;
 
-            var professionalData = ProfessionalData.Create(
-                request.MainInfoDTO.ProfessionalDataDTO.Description,
-                request.MainInfoDTO.ProfessionalDataDTO.ExperienceInYears);
+                var personalData = PersonalData.Create(
+                    request.MainInfoDTO.PersonalDataDTO.FullName,
+                    request.MainInfoDTO.PersonalDataDTO.Email,
+                    request.MainInfoDTO.PersonalDataDTO.PhoneNumber);
 
-            volonteerResult.Value.UpdateMainInfo(
-                personalData.Value,
-                professionalData.Value);
+                var professionalData = ProfessionalData.Create(
+                    request.MainInfoDTO.ProfessionalDataDTO.Description,
+                    request.MainInfoDTO.ProfessionalDataDTO.ExperienceInYears);
 
-            var result = await _volonteersRepository.Save(volonteerResult.Value, cancellationToken);
+                volonteerResult.Value.UpdateMainInfo(
+                    personalData.Value,
+                    professionalData.Value);
 
-            _logger.LogInformation("Volonteer with id {result} has been updated", result);
+                await _unitOfWork.SaveChanges();
 
-            return result;
+                transaction.Commit();
+
+                _logger.LogInformation("Volonteer with id {Id} has been updated", volonteerResult.Value.Id);
+
+                return volonteerResult.Value.Id;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                _logger.LogError(ex, "Error occurred while updating main info for volonteer with id {VolonteerId}", request.VolonteerId);
+                return Errors.General.ValueIsInvalid("volonteer main info update");
+            }
         }
     }
 }

@@ -8,6 +8,11 @@ using PetFamily.Application.Volonteers.UpdateSocialNetworks;
 using PetFamily.Contracts;
 using PetFamily.Application.Volonteers.UpdateDonationDetails;
 using PetFamily.Application.Volonteers.Delete;
+using PetFamily.Application.Volonteers.AddPet;
+using PetFamily.Application.Volonteers.AddPetPhotos;
+using PetFamily.API.Processors;
+using PetFamily.Domain.Shared;
+using PetFamily.Application.Volonteers.RemovePetPhotos;
 
 namespace PetFamily.API.Controllers
 {
@@ -17,9 +22,15 @@ namespace PetFamily.API.Controllers
         public async Task<ActionResult> Create(
             [FromServices] CreateVolonteerHandler handler,
             [FromServices] IValidator<CreateVolonteerRequest> validator,
-            [FromBody] CreateVolonteerRequest request,
+            [FromBody] VolonteerDTO dto,
             CancellationToken cancellationToken = default)
         {
+            var request = new CreateVolonteerRequest(
+                dto.PersonalDataDTO,
+                dto.ProfessionalDataDTO,
+                dto.SocialNetworks,
+                dto.DonationDetails);
+
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
             if (!validationResult.IsValid)
@@ -135,6 +146,87 @@ namespace PetFamily.API.Controllers
                 return result.Error.ToResponse();
 
             return Ok(Envelope.Ok(result.Value));
+        }
+
+        [HttpPost("{volunteerId:guid}/{petId:guid}/photos")]
+        public async Task<IActionResult> AddPhotos(
+            [FromRoute] Guid volunteerId,
+            [FromRoute] Guid petId,
+            [FromServices] AddPetPhotosHandler handler,
+            [FromServices] IValidator<AddPetPhotosRequest> validator,
+            IFormFileCollection files,
+            CancellationToken cancellationToken = default)
+        {
+            List<Stream> streamCollection;
+            await using var fileProsessor = new FormFileProcessor();
+            streamCollection = fileProsessor.Process(files);
+            var request = new AddPetPhotosRequest(volunteerId, petId, streamCollection);
+
+            var validationResult = await validator.ValidateAsync(request);
+            if (validationResult.IsValid == false)
+                return validationResult.ToValidationErrorResponse();
+
+            var result = await handler.Handle(request);
+
+            if (result.IsFailure)
+                return result.Error.ToResponse();
+
+            return Ok(Envelope.Ok(result.Value));
+        }
+
+        [HttpPost("{id:guid}/pet")]
+        public async Task<ActionResult> AddPet(
+            [FromRoute] Guid id,
+            [FromServices] AddPetHandler handler,
+            [FromServices] IValidator<AddPetRequest> validator,
+            [FromBody] PetDTO dto,
+            CancellationToken cancellationToken = default)
+        {
+            var request = new AddPetRequest(
+                id,
+                dto.PetGeneralInfoDTO,
+                dto.PetCharacteristicsDTO,
+                dto.PetHealthInfoDTO,
+                dto.DonationDetails,
+                dto.PetTypeDTO);
+
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+            if (validationResult.IsValid == false)
+                return validationResult.ToValidationErrorResponse();
+
+            var result = await handler.Handler(request, cancellationToken);
+            if (result.IsFailure)
+                return result.Error.ToResponse();
+
+            return Ok(Envelope.Ok(result.Value));
+        }
+
+        [HttpDelete("{VolonteerId:guid}/{petId:guid}/photos")]
+        public async Task<IActionResult> RemoveFiles(
+            [FromRoute] Guid VolonteerId,
+            [FromRoute] Guid petId,
+            [FromBody] RemovePetPhotoDTO dto,
+            [FromServices] RemovePetPhotosHandler handler,
+            [FromServices] IValidator<RemovePetPhotosRequest> validator,
+            CancellationToken cancellationToken = default)
+        {
+            var request = new RemovePetPhotosRequest(
+                VolonteerId, 
+                petId, 
+                dto.Paths.Select(filePath => FilePath.Create(filePath).Value));
+
+            var validationResult = validator.Validate(request);
+
+            if (validationResult.IsValid == false)
+                return validationResult.ToValidationErrorResponse();
+
+            var result = await handler.Handle(request, cancellationToken);
+            if (result.IsFailure)
+            {
+                return result.Error.ToResponse();
+            }
+
+            return Ok(Envelope.Ok());
         }
     }
 }

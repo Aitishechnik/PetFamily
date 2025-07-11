@@ -11,5 +11,6 @@ namespace PetFamily.Domain.Models.Species
             Name = name;
         }
         public string Name { get; private set; } = default!;
+        public Guid SpeciesId { get; private set; } = default!;
     }
 }

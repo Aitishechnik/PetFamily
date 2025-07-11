@@ -8,13 +8,16 @@ namespace PetFamily.Application.Volonteers.UpdateDonationDetails
     public class UpdateDonationDetailsHandler
     {
         private readonly IVolonteersRepository _volonteersRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<UpdateDonationDetailsHandler> _logger;
 
         public UpdateDonationDetailsHandler(
             IVolonteersRepository volonteersRepository,
+            IUnitOfWork unitOfWork,
             ILogger<UpdateDonationDetailsHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
@@ -22,22 +25,35 @@ namespace PetFamily.Application.Volonteers.UpdateDonationDetails
             UpdateDonationDetailsRequest updateDonationDetailsRequest,
             CancellationToken cancellationToken)
         {
-            var volonteerResult = await _volonteersRepository.GetById(updateDonationDetailsRequest.VolonteerId, cancellationToken);
-            if (volonteerResult.IsFailure)
-                return volonteerResult.Error;
+            var transaction = await _unitOfWork.BeginTransaction();
 
-            var donationDetails = new List<DonationDetails>();
+            try
+            {
+                var volonteerResult = await _volonteersRepository.GetById(updateDonationDetailsRequest.VolonteerId, cancellationToken);
+                if (volonteerResult.IsFailure)
+                    return volonteerResult.Error;
 
-            foreach (var dd in updateDonationDetailsRequest.DonationDetails)
-                donationDetails.Add(DonationDetails.Create(dd.Name, dd.Description).Value);
+                var donationDetails = new List<DonationDetails>();
 
-            volonteerResult.Value.UpdateDonationDetails(new DonationDetailsWrapper(donationDetails));
+                foreach (var dd in updateDonationDetailsRequest.DonationDetails)
+                    donationDetails.Add(DonationDetails.Create(dd.Name, dd.Description).Value);
 
-            var result = await _volonteersRepository.Save(volonteerResult.Value, cancellationToken);
+                volonteerResult.Value.UpdateDonationDetails(new DonationDetailsWrapper(donationDetails));
 
-            _logger.LogInformation("Volonteer with id {result} has been updated with new donation details", result);
+                await _unitOfWork.SaveChanges();
 
-            return result;
+                transaction.Commit();
+
+                _logger.LogInformation("Volonteer with id {Id} has been updated with new donation details", volonteerResult.Value.Id);
+
+                return volonteerResult.Value.Id;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                _logger.LogError(ex, "Error occurred while updating donation details for volonteer with id {VolonteerId}", updateDonationDetailsRequest.VolonteerId);
+                return Errors.General.ValueIsInvalid("volonteer donation details update");
+            }
         }
     }
 }

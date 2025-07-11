@@ -5,20 +5,20 @@ namespace PetFamily.Domain.Models.Volonteer
 {
     public record PetType
     {
-        private PetType(long speciesID, long breedID)
+        private PetType(Guid speciesID, Guid breedID)
         {
             SpeciesID = speciesID;
             BreedID = breedID;
         }
 
-        public long SpeciesID { get; }
-        public long BreedID { get; }
+        public Guid SpeciesID { get; }
+        public Guid BreedID { get; }
 
-        public static Result<PetType, Error> Create(long speciesID, long breedID)
+        public static Result<PetType, Error> Create(Guid speciesID, Guid breedID)
         {
-            if (speciesID <= 0)
+            if (speciesID == Guid.Empty)
                 return Errors.General.ValueIsInvalid("SpeciedID");
-            if (breedID <= 0)
+            if (breedID == Guid.Empty)
                 return Errors.General.ValueIsInvalid("BreedID");
 
             return new PetType(speciesID, breedID);

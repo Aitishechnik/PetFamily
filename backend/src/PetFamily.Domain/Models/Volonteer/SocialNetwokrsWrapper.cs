@@ -5,9 +5,9 @@
         public SocialNetwokrsWrapper()
         {
         }
-        public SocialNetwokrsWrapper(IReadOnlyCollection<SocialNetwork> socialNetworks)
+        public SocialNetwokrsWrapper(IEnumerable<SocialNetwork> socialNetworks)
         {
-            SocialNetworks = socialNetworks;
+            SocialNetworks = socialNetworks.ToList();
         }
 
         public IReadOnlyCollection<SocialNetwork> SocialNetworks { get; } = default!;

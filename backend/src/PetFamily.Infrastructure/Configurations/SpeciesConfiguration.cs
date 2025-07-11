@@ -19,7 +19,7 @@ namespace PetFamily.Infrastructure.Configurations
 
             builder.HasMany(species => species.Breeds)
                 .WithOne()
-                .HasForeignKey("species_id")
+                .HasForeignKey(b => b.SpeciesId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

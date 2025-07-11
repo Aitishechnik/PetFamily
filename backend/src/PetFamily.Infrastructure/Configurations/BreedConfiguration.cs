@@ -16,12 +16,6 @@ namespace PetFamily.Infrastructure.Configurations
             builder.Property(breed => breed.Name)
                 .IsRequired()
                 .HasMaxLength(Constants.MAX_NAME_LENGTH);
-
-            builder.HasOne<Species>()
-                .WithMany(s => s.Breeds)
-                .HasForeignKey("species_id")
-                .OnDelete(DeleteBehavior.NoAction)
-                .IsRequired();
         }
     }
 }
