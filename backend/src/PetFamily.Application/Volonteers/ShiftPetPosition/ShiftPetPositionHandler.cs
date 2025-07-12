@@ -25,7 +25,6 @@ namespace PetFamily.Application.Volonteers.ShiftPetPosition
             ShiftPetPositionRequest request,
             CancellationToken cancellationToken)
         {
-            bool IsCommited = false;
             using var transaction = await _unitOfWork.BeginTransaction();
 
             var volonteerResult = await _volonteersRepository.GetById(request.VoloteerId);
@@ -51,21 +50,16 @@ namespace PetFamily.Application.Volonteers.ShiftPetPosition
 
                 await _unitOfWork.SaveChanges();
                 transaction.Commit();
-                IsCommited = true;
 
                 return Result.Success<Error>();
             }
             catch (Exception ex)
             {
+                transaction.Rollback();
                 _logger.LogError(
                     ex, 
                     "Error occurred while changing pet position");
                 return Errors.General.ValueIsInvalid(ex.Message);
-            }
-            finally
-            {
-                if (IsCommited == false)
-                    transaction.Rollback();
             }
         }
     }
