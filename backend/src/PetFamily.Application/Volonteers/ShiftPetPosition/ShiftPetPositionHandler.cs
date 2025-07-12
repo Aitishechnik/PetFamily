@@ -25,52 +25,47 @@ namespace PetFamily.Application.Volonteers.ShiftPetPosition
             ShiftPetPositionRequest request,
             CancellationToken cancellationToken)
         {
-            var transaction = await _unitOfWork.BeginTransaction();
+            bool IsCommited = false;
+            using var transaction = await _unitOfWork.BeginTransaction();
+
+            var volonteerResult = await _volonteersRepository.GetById(request.VoloteerId);
+            if (volonteerResult.IsFailure)
+                return volonteerResult.Error;
+
+            var petResult = volonteerResult.Value.GetPetById(request.PetId);
+            if (petResult.IsFailure)
+                return petResult.Error;
+
+            var newPositionResult = SerialNumber.Create(request.NewPosition);
+            if (newPositionResult.IsFailure)
+                return newPositionResult.Error;
+
             try
             {
-                var volonteerResult = await _volonteersRepository.GetById(request.VoloteerId);
-                if (volonteerResult.IsFailure)
-                {
-                    transaction.Rollback();
-                    return volonteerResult.Error;
-                }
-
-                var petResult = volonteerResult.Value.GetPetById(request.PetId);
-                if (petResult.IsFailure)
-                {
-                    transaction.Rollback();
-                    return petResult.Error;
-                }
-
-                var newPositionResult = SerialNumber.Create(request.NewPosition);
-                if (newPositionResult.IsFailure)
-                {
-                    transaction.Rollback();
-                    return newPositionResult.Error;
-                }
-
                 var result = volonteerResult.Value.MovePet(
                     petResult.Value.SerialNumber, 
                     newPositionResult.Value);
 
                 if (result.IsFailure)
-                {
-                    transaction.Rollback();
                     return result.Error;
-                }
 
                 await _unitOfWork.SaveChanges();
                 transaction.Commit();
+                IsCommited = true;
 
                 return Result.Success<Error>();
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
                 _logger.LogError(
                     ex, 
                     "Error occurred while changing pet position");
                 return Errors.General.ValueIsInvalid(ex.Message);
+            }
+            finally
+            {
+                if (IsCommited == false)
+                    transaction.Rollback();
             }
         }
     }
