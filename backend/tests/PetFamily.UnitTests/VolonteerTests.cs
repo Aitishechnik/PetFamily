@@ -19,7 +19,6 @@ namespace PetFamily.Domain.UnitTests
                 new DonationDetailsWrapper());
 
             var pet = new Pet(
-                Guid.NewGuid(),
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -51,7 +50,6 @@ namespace PetFamily.Domain.UnitTests
                 new DonationDetailsWrapper());
 
             var pets = Enumerable.Range(1,5).Select(_ =>new Pet(
-                Guid.NewGuid(),
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -59,7 +57,6 @@ namespace PetFamily.Domain.UnitTests
                 PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value));
 
             var petToAdd = new Pet(
-                Guid.NewGuid(),
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -93,7 +90,6 @@ namespace PetFamily.Domain.UnitTests
                 new DonationDetailsWrapper());
 
             var pets = Enumerable.Range(1, 5).Select(_ => new Pet(
-                Guid.NewGuid(),
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -101,7 +97,6 @@ namespace PetFamily.Domain.UnitTests
                 PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value));
 
             var petToMove = new Pet(
-                Guid.NewGuid(),
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
