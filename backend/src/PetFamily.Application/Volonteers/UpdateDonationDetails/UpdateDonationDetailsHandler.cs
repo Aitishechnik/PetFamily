@@ -25,7 +25,7 @@ namespace PetFamily.Application.Volonteers.UpdateDonationDetails
             UpdateDonationDetailsRequest updateDonationDetailsRequest,
             CancellationToken cancellationToken)
         {
-            var transaction = await _unitOfWork.BeginTransaction();
+            using var transaction = await _unitOfWork.BeginTransaction();
 
             try
             {

@@ -1,8 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.FileManagement.Add;
+using PetFamily.Application.Messaging;
 using PetFamily.Contracts;
 using PetFamily.Domain.Shared;
+using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 
 namespace PetFamily.Application.Volonteers.AddPetPhotos
 {
@@ -11,17 +13,20 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly AddFilesHandler _addFilesHandler;
+        private readonly IMessageQueue<IEnumerable<FileInfo>> _messageQueue;
         private readonly ILogger<AddPetPhotosHandler> _logger;
 
         public AddPetPhotosHandler(
             IVolonteersRepository volonteersRepository,
             IUnitOfWork unitOfWork,
             AddFilesHandler addFilesHandler,
+            IMessageQueue<IEnumerable<FileInfo>> messageQueue,
             ILogger<AddPetPhotosHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _addFilesHandler = addFilesHandler;
             _unitOfWork = unitOfWork;
+            _messageQueue = messageQueue;
             _logger = logger;
         }
 
@@ -29,27 +34,21 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
             AddPetPhotosRequest request,
             CancellationToken cancellationToken = default)
         {
-            var transaction = await _unitOfWork.BeginTransaction();
+            using var transaction = await _unitOfWork.BeginTransaction();
 
             try
             {
                 var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId);
 
                 if (volonteerResult.IsFailure)
-                {
-                    transaction.Rollback();
                     return volonteerResult.Error;
-                }
 
                 var volonteer = volonteerResult.Value;
 
                 var petResult = volonteer.GetPetById(request.PetId);
 
                 if (petResult.IsFailure)
-                {
-                    transaction.Rollback();
                     return petResult.Error;
-                }
 
                 var pet = petResult.Value;
 
@@ -64,10 +63,7 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                     pet.Id, filePathList);
 
                 if (addPhotoResult.IsFailure)
-                {
-                    transaction.Rollback();
                     return addPhotoResult.Error;
-                }
 
                 await _unitOfWork.SaveChanges();
 
@@ -76,10 +72,7 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                     filePathList);
 
                 if(fileDTOsResult.IsFailure)
-                {
-                    transaction.Rollback();
                     return fileDTOsResult.Error;
-                }
 
                 var result = await _addFilesHandler.Handle(
                     new AddFilesRequest(fileDTOsResult.Value),
@@ -87,7 +80,12 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
 
                 if (result.IsFailure)
                 {
-                    transaction.Rollback();
+                    await _messageQueue.WriteAsync(
+                        fileDTOsResult.Value.Select(
+                            dto => new FileInfo(
+                                request.Bucket, FilePath.Create(
+                                    dto.FileName).Value)));
+
                     return result.Error;
                 }
 

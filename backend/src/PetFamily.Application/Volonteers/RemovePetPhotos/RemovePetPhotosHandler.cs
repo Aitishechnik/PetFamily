@@ -27,7 +27,7 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
             RemovePetPhotosRequest request,
             CancellationToken cancellationToken = default)
         {
-            var transaction = await _unitOfWork.BeginTransaction();
+            using var transaction = await _unitOfWork.BeginTransaction();
             try
             {
                 var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId, cancellationToken);
@@ -48,7 +48,9 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
 
                 var pet = petResult.Value;
 
-                foreach(var path in request.Paths)
+                var paths = request.FileInfo.Select(fileInfo => fileInfo.FilePath);
+
+                foreach(var path in paths)
                 {
                     if (pet.PetPhotos.Any(p => p == path) == false)
                     {
@@ -57,11 +59,11 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
                     }
                 }
 
-                pet.RemovePhotos(request.Paths);
+                pet.RemovePhotos(paths);
 
                 await _unitOfWork.SaveChanges();
 
-                var deleteFilesRequest = new DeleteFilesRequest(request.Paths);
+                var deleteFilesRequest = new DeleteFilesRequest(request.FileInfo);
 
                 var deletionResult = await _deleteFilesHandler.Handle(deleteFilesRequest, cancellationToken);
 

@@ -24,7 +24,7 @@ namespace PetFamily.Application.Volonteers.Delete
             DeleteVolonteerRequest request,
             CancellationToken cancellationToken = default)
         {
-            var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
+            using var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
 
             try
             {

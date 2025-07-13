@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PetFamily.Infrastructure
@@ -16,7 +15,7 @@ namespace PetFamily.Infrastructure
         public async Task<IDbTransaction> BeginTransaction(
             CancellationToken cancellationToken = default)
         {
-            var transaction = await _appDbContext.Database
+            using var transaction = await _appDbContext.Database
                 .BeginTransactionAsync(cancellationToken);
             return transaction.GetDbTransaction();
         }
