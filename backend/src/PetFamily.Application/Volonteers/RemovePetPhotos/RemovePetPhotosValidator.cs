@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
-using PetFamily.Domain.Shared;
+﻿using FluentValidation;
 
 namespace PetFamily.Application.Volonteers.RemovePetPhotos
 {
@@ -13,12 +6,12 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
     {
         public RemovePetPhotosValidator()
         {
-            RuleFor(r => r.Paths)
+            RuleFor(r => r.FileInfo)
                 .NotEmpty();
 
-            RuleForEach(r => r.Paths)
+            RuleForEach(r => r.FileInfo)
                 .NotEmpty()
-                .Must(path => path.Path.Length <= Constants.MAX_LINK_LENGTH);
+                .Must(path => !string.IsNullOrWhiteSpace(path.Bucket));
         }
     }
 }

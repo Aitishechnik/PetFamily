@@ -23,7 +23,7 @@ namespace PetFamily.Application.Volonteers.Create
 
         public async Task<Result<Guid, Error>> Handle(CreateVolonteerRequest request, CancellationToken cancellationToken = default)
         {
-            var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
+            using var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
 
             try
             {

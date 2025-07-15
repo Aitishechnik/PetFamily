@@ -14,6 +14,8 @@ using PetFamily.API.Processors;
 using PetFamily.Domain.Shared;
 using PetFamily.Application.Volonteers.RemovePetPhotos;
 using PetFamily.Application.Volonteers.ShiftPetPosition;
+using PetFamily.Application.FileManagment.Files;
+using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 
 namespace PetFamily.API.Controllers
 {
@@ -149,10 +151,11 @@ namespace PetFamily.API.Controllers
             return Ok(Envelope.Ok(result.Value));
         }
 
-        [HttpPost("{volunteerId:guid}/{petId:guid}/photos")]
+        [HttpPost("{volunteerId:guid}/{petId:guid}/{photos}")]
         public async Task<IActionResult> AddPhotos(
             [FromRoute] Guid volunteerId,
             [FromRoute] Guid petId,
+            [FromRoute] string photos,
             [FromServices] AddPetPhotosHandler handler,
             [FromServices] IValidator<AddPetPhotosRequest> validator,
             IFormFileCollection files,
@@ -161,7 +164,7 @@ namespace PetFamily.API.Controllers
             List<Stream> streamCollection;
             await using var fileProsessor = new FormFileProcessor();
             streamCollection = fileProsessor.Process(files);
-            var request = new AddPetPhotosRequest(volunteerId, petId, streamCollection);
+            var request = new AddPetPhotosRequest(volunteerId, petId, photos, streamCollection);
 
             var validationResult = await validator.ValidateAsync(request);
             if (validationResult.IsValid == false)
@@ -202,10 +205,11 @@ namespace PetFamily.API.Controllers
             return Ok(Envelope.Ok(result.Value));
         }
 
-        [HttpDelete("{volonteerId:guid}/{petId:guid}/photos")]
+        [HttpDelete("{volonteerId:guid}/{petId:guid}/{photos}")]
         public async Task<IActionResult> RemoveFiles(
             [FromRoute] Guid volonteerId,
             [FromRoute] Guid petId,
+            [FromRoute] string photos,
             [FromBody] RemovePetPhotoDTO dto,
             [FromServices] RemovePetPhotosHandler handler,
             [FromServices] IValidator<RemovePetPhotosRequest> validator,
@@ -214,7 +218,7 @@ namespace PetFamily.API.Controllers
             var request = new RemovePetPhotosRequest(
                 volonteerId, 
                 petId, 
-                dto.Paths.Select(filePath => FilePath.Create(filePath).Value));
+                dto.Paths.Select(filePath => new FileInfo(photos, FilePath.Create(filePath).Value)));
 
             var validationResult = validator.Validate(request);
 

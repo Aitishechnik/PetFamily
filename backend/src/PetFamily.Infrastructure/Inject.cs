@@ -3,10 +3,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using Minio.AspNetCore;
 using PetFamily.Application.FileManagement.Providers;
+using PetFamily.Application.Messaging;
 using PetFamily.Application.Species;
 using PetFamily.Application.Volonteers;
+using PetFamily.Infrastructure.BackgroundServices;
+using PetFamily.Infrastructure.MessageQueues;
 using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
+using static PetFamily.Infrastructure.Files.FilesCleanerBackgroundService;
+using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 using MinioOptions = PetFamily.Infrastructure.Options.MinioOptions;
 
 namespace PetFamily.Infrastructure
@@ -23,6 +28,12 @@ namespace PetFamily.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddMinioCustom(configuration);
+
+            services.AddHostedService<FilesCleanerBackgroundService>();
+
+            services.AddSingleton<IMessageQueue<IEnumerable<FileInfo>>, MemoryMessageQueue<IEnumerable<FileInfo>>>();
+
+            services.AddScoped<IFilesCleanerService, FilesCleanerService>();
 
             return services;
         }

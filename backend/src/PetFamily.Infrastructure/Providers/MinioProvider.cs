@@ -7,6 +7,7 @@ using PetFamily.Domain.Shared;
 using Microsoft.Extensions.Configuration;
 using PetFamily.Infrastructure.Options;
 using PetFamily.Contracts;
+using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 
 namespace PetFamily.Infrastructure.Providers
 {
@@ -26,21 +27,26 @@ namespace PetFamily.Infrastructure.Providers
         }
 
         public async Task<UnitResult<Error>> DeleteFiles(
-            IEnumerable<FilePath> objectsNames, CancellationToken cancellationToken = default)
+            IEnumerable<FileInfo> filesInfo, CancellationToken cancellationToken = default)
         {
             try
             {
-                var bucketName = GetBucketNameFromConfig();
+                var bucketName = filesInfo.FirstOrDefault()?.Bucket
+                    ?? throw new Exception("empty filesInfo collection");
+
                 var semaphoreSlim = new SemaphoreSlim(GetMaxDeleteConcurrencyFromConfig());
-                var bucketExists = await IsBucketExist(bucketName, cancellationToken);
+                var bucketExists = await IsBucketExist(bucketName!, cancellationToken);
                 if (!bucketExists)
                 {
                     return Error.Failure("file.delete", "Bucket does not exist");
                 }
 
-                var tasksResult = objectsNames.Select(async filePath=>
+                var tasksResult = filesInfo.Select(async fileInfo=>
                 {
-                    return await RemoveObject(bucketName, filePath, semaphoreSlim, cancellationToken);
+                    return await RemoveObject(
+                        fileInfo.Bucket, 
+                        fileInfo.FilePath.Path, 
+                        semaphoreSlim, cancellationToken);
                 });
 
                 var tasksResults = await Task.WhenAll(tasksResult);
@@ -162,7 +168,7 @@ namespace PetFamily.Infrastructure.Providers
 
         private async Task<UnitResult<Error>> RemoveObject(
             string bucketName,
-            FilePath filePath,
+            string filePath,
             SemaphoreSlim semaphoreSlim,
             CancellationToken cancellationToken
             )
@@ -172,7 +178,7 @@ namespace PetFamily.Infrastructure.Providers
             {
                 var removeObjectArgs = new RemoveObjectArgs()
                     .WithBucket(bucketName)
-                    .WithObject(filePath.Path);
+                    .WithObject(filePath);
                 await _minioClient.RemoveObjectAsync(removeObjectArgs, cancellationToken);
                 return Result.Success<Error>();
             }
@@ -181,7 +187,7 @@ namespace PetFamily.Infrastructure.Providers
                 _logger.LogError(
                     ex,
                     "Fail to remove file in minio with path {path} in bucket {bucket}",
-                    filePath.Path,
+                    filePath,
                     bucketName);
                 return Error.Failure("file.remove", "Fail to remove file in minio");
             }

@@ -29,7 +29,7 @@ namespace PetFamily.Application.Volonteers.AddPet
             AddPetRequest addPetRequest,
             CancellationToken cancellationToken = default)
         {
-            var transaction = await _unitOfWork.BeginTransaction();
+            using var transaction = await _unitOfWork.BeginTransaction();
 
             try
             {

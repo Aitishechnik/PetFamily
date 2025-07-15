@@ -25,7 +25,7 @@ namespace PetFamily.Application.Volonteers.UpdateSocialNetworks
             UpdateSocialNetworksRequest request,
             CancellationToken cancellationToken = default)
         {
-            var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
+            using var transaction = await _unitOfWork.BeginTransaction(cancellationToken);
 
             try
             {

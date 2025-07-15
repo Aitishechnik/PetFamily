@@ -22,12 +22,12 @@ namespace PetFamily.Application.FileManagement.Delete
             CancellationToken cancellationToken = default)
         {
             var result = await _fileProvider
-                .DeleteFiles(request.ObjectsNames, cancellationToken);
+                .DeleteFiles(request.filesInfo, cancellationToken);
             if (result.IsFailure)
             {
                 _logger.LogError(
                     "Failed to delete file {FileName}: {ErrorMessage}"
-                    , request.ObjectsNames, result.Error.Message);
+                    , request.filesInfo, result.Error.Message);
                 return result.Error;
             }
 
