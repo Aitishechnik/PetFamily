@@ -1,6 +1,6 @@
 ﻿namespace PetFamily.Application.Volonteers.ShiftPetPosition
 {
-    public record ShiftPetPositionRequest(
+    public record ShiftPetPositionCommand(
         Guid VoloteerId, 
         Guid PetId, 
         int NewPosition);

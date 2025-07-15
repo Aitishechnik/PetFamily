@@ -1,5 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Extensions;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
@@ -21,23 +23,28 @@ namespace PetFamily.Application.Volonteers.ShiftPetPosition
             _logger = logger;
         }
 
-        public async Task<UnitResult<Error>> Handle(
-            ShiftPetPositionRequest request,
+        public async Task<UnitResult<ErrorList>> Handle(
+            IValidator<ShiftPetPositionCommand> validator,
+            ShiftPetPositionCommand command,
             CancellationToken cancellationToken)
         {
-            using var transaction = await _unitOfWork.BeginTransaction();
+            var validationResult = validator.Validate(command);
+            if (validationResult.IsValid == false)
+                return validationResult.ToErrorList();
 
-            var volonteerResult = await _volonteersRepository.GetById(request.VoloteerId);
+            var volonteerResult = await _volonteersRepository.GetById(command.VoloteerId);
             if (volonteerResult.IsFailure)
-                return volonteerResult.Error;
+                return volonteerResult.Error.ToErrorList();
 
-            var petResult = volonteerResult.Value.GetPetById(request.PetId);
+            var petResult = volonteerResult.Value.GetPetById(command.PetId);
             if (petResult.IsFailure)
-                return petResult.Error;
+                return petResult.Error.ToErrorList();
 
-            var newPositionResult = SerialNumber.Create(request.NewPosition);
+            var newPositionResult = SerialNumber.Create(command.NewPosition);
             if (newPositionResult.IsFailure)
-                return newPositionResult.Error;
+                return newPositionResult.Error.ToErrorList();
+
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             try
             {
@@ -46,12 +53,12 @@ namespace PetFamily.Application.Volonteers.ShiftPetPosition
                     newPositionResult.Value);
 
                 if (result.IsFailure)
-                    return result.Error;
+                    return result.Error.ToErrorList();
 
-                await _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
                 transaction.Commit();
 
-                return Result.Success<Error>();
+                return Result.Success<ErrorList>();
             }
             catch (Exception ex)
             {
@@ -59,7 +66,9 @@ namespace PetFamily.Application.Volonteers.ShiftPetPosition
                 _logger.LogError(
                     ex, 
                     "Error occurred while changing pet position");
-                return Errors.General.ValueIsInvalid(ex.Message);
+                return Errors.General
+                    .ValueIsInvalid(ex.Message)
+                    .ToErrorList();
             }
         }
     }

@@ -5,9 +5,9 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.UpdateSocialNetworks
 {
-    public class UpdateSocialNetworksValidator : AbstractValidator<UpdateSocialNetworksRequest>
+    public class UpdateSocialNetworksCommandValidator : AbstractValidator<UpdateSocialNetworksCommand>
     {
-        public UpdateSocialNetworksValidator()
+        public UpdateSocialNetworksCommandValidator()
         {
             RuleFor(u => u.VolonteerId)
                 .NotEmpty()

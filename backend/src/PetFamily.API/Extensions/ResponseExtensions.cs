@@ -11,21 +11,9 @@ namespace PetFamily.API.Extensions
         public static ActionResult ToResponse(this Error error)
         {
 
-            var statusCode = error.Type switch
-            {
-                ErrorType.Validation => StatusCodes.Status400BadRequest,
-                ErrorType.NotFound => StatusCodes.Status404NotFound,
-                ErrorType.Conflict => StatusCodes.Status409Conflict,
-                ErrorType.Failure => StatusCodes.Status500InternalServerError,
-                _ => StatusCodes.Status500InternalServerError
-            };
+            var statusCode = GetStatusCodeForErrorType(error.Type);
 
-            var responseError = new ResponseError(
-                error.Code,
-                error.Message,
-                null);
-
-            var envelope = Envelope.Error([responseError]);
+            var envelope = Envelope.Error(error);
 
             return new ObjectResult(envelope)
             {
@@ -33,27 +21,38 @@ namespace PetFamily.API.Extensions
             };
         }
 
-        public static ActionResult ToValidationErrorResponse(this ValidationResult result)
+        public static ActionResult ToResponse(this ErrorList errors)
         {
-            if (result.IsValid)
-                throw new InvalidOperationException("Result can not be succeed");
 
-            var validationErrors = result.Errors;
-
-            var responseErrors = from validationError in validationErrors
-                                 let errorMssage = validationError.ErrorMessage
-                                 let error = Error.Deserialize(errorMssage)
-                                 select new ResponseError(
-                                     error.Code,
-                                     error.Message,
-                                     validationError.PropertyName);
-
-            var envelope = Envelope.Error(responseErrors);
-
-            return new ObjectResult(envelope)
+            if (!errors.Any())
             {
-                StatusCode = StatusCodes.Status400BadRequest
-            };
+                return new ObjectResult(Envelope.Error(errors))
+                { StatusCode = StatusCodes.Status500InternalServerError};
+            }
+
+            var distinctErrorTypes = errors
+                .Select(e => e.Type)
+                .Distinct()
+                .ToList();
+
+            var statusCode = distinctErrorTypes.Count > 1
+                ? StatusCodes.Status500InternalServerError
+                : GetStatusCodeForErrorType(distinctErrorTypes.First());
+
+            var envelope = Envelope.Error(errors);
+
+            return new ObjectResult(envelope) { StatusCode = statusCode };
+
         }
+
+        private static int GetStatusCodeForErrorType(ErrorType errorType)
+            => errorType switch
+            {
+                ErrorType.Validation => StatusCodes.Status400BadRequest,
+                ErrorType.NotFound => StatusCodes.Status404NotFound,
+                ErrorType.Conflict => StatusCodes.Status409Conflict,
+                ErrorType.Failure => StatusCodes.Status500InternalServerError,
+                _ => StatusCodes.Status500InternalServerError
+            };
     }
 }

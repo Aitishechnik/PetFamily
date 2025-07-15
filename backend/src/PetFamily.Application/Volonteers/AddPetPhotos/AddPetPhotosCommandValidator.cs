@@ -4,9 +4,9 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.AddPetPhotos
 {
-    public class AddPetPhotosValidator : AbstractValidator<AddPetPhotosRequest>
+    public class AddPetPhotosCommandValidator : AbstractValidator<AddPetPhotosCommand>
     {
-        public AddPetPhotosValidator()
+        public AddPetPhotosCommandValidator()
         {
             RuleFor(a => a.Content)
                 .NotNull()

@@ -2,7 +2,7 @@
 
 namespace PetFamily.Application.Volonteers.UpdateSocialNetworks
 {
-    public record UpdateSocialNetworksRequest(
+    public record UpdateSocialNetworksCommand(
         Guid VolonteerId,
         IEnumerable<SocialNetworkDTO> SocialNetworks);
 }

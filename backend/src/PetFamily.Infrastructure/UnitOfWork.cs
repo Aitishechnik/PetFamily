@@ -12,15 +12,15 @@ namespace PetFamily.Infrastructure
             _appDbContext = appDbContext;
         }
 
-        public async Task<IDbTransaction> BeginTransaction(
+        public async Task<IDbTransaction> BeginTransactionAsync(
             CancellationToken cancellationToken = default)
         {
-            using var transaction = await _appDbContext.Database
+            var transaction = await _appDbContext.Database
                 .BeginTransactionAsync(cancellationToken);
             return transaction.GetDbTransaction();
         }
 
-        public async Task SaveChanges(CancellationToken cancellationToken = default)
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }

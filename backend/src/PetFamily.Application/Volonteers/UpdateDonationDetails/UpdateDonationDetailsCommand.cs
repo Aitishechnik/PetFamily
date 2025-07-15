@@ -2,7 +2,7 @@
 
 namespace PetFamily.Application.Volonteers.UpdateDonationDetails
 {
-    public record UpdateDonationDetailsRequest(
+    public record UpdateDonationDetailsCommand(
         Guid VolonteerId,
         IEnumerable<DonationDetailsDTO> DonationDetails);
 }

@@ -1,5 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Extensions;
 using PetFamily.Application.FileManagement.Delete;
 using PetFamily.Domain.Shared;
 
@@ -23,47 +25,48 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
             _logger = logger;
         }
 
-        public async Task<UnitResult<Error>> Handle(
-            RemovePetPhotosRequest request,
+        public async Task<UnitResult<ErrorList>> Handle(
+            IValidator<RemovePetPhotosCommand> validator,
+            RemovePetPhotosCommand command,
             CancellationToken cancellationToken = default)
         {
-            using var transaction = await _unitOfWork.BeginTransaction();
+            var validationResult = validator.Validate(command);
+
+            if (validationResult.IsValid == false)
+                return validationResult.ToErrorList();
+
+
+            var volonteerResult = await _volonteersRepository.GetById(command.VolonteerId, cancellationToken);
+            if(volonteerResult.IsFailure)
+                return volonteerResult.Error.ToErrorList();
+
+            var volonteer = volonteerResult.Value;
+
+            var petResult = volonteer.GetPetById(command.PetId);
+            if (petResult.IsFailure)
+                return petResult.Error.ToErrorList();
+
+            var pet = petResult.Value;
+
+            var paths = command.FileInfo.Select(fileInfo => fileInfo.FilePath);
+
+            foreach(var path in paths)
+            {
+                if (pet.PetPhotos.Any(p => p == path) == false)
+                    return Errors.General
+                        .ValueIsInvalid("Pet photo path is not valid")
+                        .ToErrorList();
+            }
+
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+
             try
             {
-                var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId, cancellationToken);
-                if(volonteerResult.IsFailure)
-                {
-                    transaction.Rollback();
-                    return volonteerResult.Error;
-                }
-
-                var volonteer = volonteerResult.Value;
-
-                var petResult = volonteer.GetPetById(request.PetId);
-                if (petResult.IsFailure)
-                {
-                    transaction.Rollback();
-                    return petResult.Error;
-                }
-
-                var pet = petResult.Value;
-
-                var paths = request.FileInfo.Select(fileInfo => fileInfo.FilePath);
-
-                foreach(var path in paths)
-                {
-                    if (pet.PetPhotos.Any(p => p == path) == false)
-                    {
-                        transaction.Rollback();
-                        return Errors.General.ValueIsInvalid("Pet photo path is not valid");
-                    }
-                }
-
                 pet.RemovePhotos(paths);
 
-                await _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
 
-                var deleteFilesRequest = new DeleteFilesRequest(request.FileInfo);
+                var deleteFilesRequest = new DeleteFilesRequest(command.FileInfo);
 
                 var deletionResult = await _deleteFilesHandler.Handle(deleteFilesRequest, cancellationToken);
 
@@ -71,18 +74,20 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
                 {
                     transaction.Rollback();
                     _logger.LogError("Failed to delete pet photos: {ErrorMessage}", deletionResult.Error.Message);
-                    return deletionResult.Error;
+                    return deletionResult.Error.ToErrorList();
                 }
 
                 transaction.Commit();
                 
-                return Result.Success<Error>();
+                return Result.Success<ErrorList>();
             }
             catch
             {
                 transaction.Rollback();
                 
-                return Errors.General.ValueIsInvalid("Failed to remove pet photos");
+                return Errors.General
+                    .ValueIsInvalid("Failed to remove pet photos")
+                    .ToErrorList();
             }
         }
     }

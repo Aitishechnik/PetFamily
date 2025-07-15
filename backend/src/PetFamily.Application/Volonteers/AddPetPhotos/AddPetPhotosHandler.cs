@@ -1,5 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Extensions;
 using PetFamily.Application.FileManagement.Add;
 using PetFamily.Application.Messaging;
 using PetFamily.Contracts;
@@ -30,49 +32,54 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
             _logger = logger;
         }
 
-        public async Task<Result<IReadOnlyList<FilePath>, Error>> Handle(
-            AddPetPhotosRequest request,
+        public async Task<Result<IReadOnlyList<FilePath>, ErrorList>> Handle(
+            IValidator<AddPetPhotosCommand> validator,
+            AddPetPhotosCommand command,
             CancellationToken cancellationToken = default)
         {
-            using var transaction = await _unitOfWork.BeginTransaction();
+            var validationResult = await validator.ValidateAsync(command);
+            if (validationResult.IsValid == false)
+                return validationResult.ToErrorList();
+
+            var volonteerResult = await _volonteersRepository.GetById(command.VolonteerId);
+
+            if (volonteerResult.IsFailure)
+                return volonteerResult.Error.ToErrorList();
+
+            var volonteer = volonteerResult.Value;
+
+            var petResult = volonteer.GetPetById(command.PetId);
+
+            if (petResult.IsFailure)
+                return petResult.Error.ToErrorList();
+
+            var pet = petResult.Value;
+
+            var filePathList = GenerateFilePathList(
+                volonteer.Id,
+                pet.Id,
+                pet.GetLastPhotoIndex()+1,
+                command.Content.Count(),
+                Constants.PHOTO_FILE_EXTENSION);
+
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             try
             {
-                var volonteerResult = await _volonteersRepository.GetById(request.VolonteerId);
-
-                if (volonteerResult.IsFailure)
-                    return volonteerResult.Error;
-
-                var volonteer = volonteerResult.Value;
-
-                var petResult = volonteer.GetPetById(request.PetId);
-
-                if (petResult.IsFailure)
-                    return petResult.Error;
-
-                var pet = petResult.Value;
-
-                var filePathList = GenerateFilePathList(
-                    volonteer.Id,
-                    pet.Id,
-                    pet.GetLastPhotoIndex()+1,
-                    request.Content.Count(),
-                    Constants.PHOTO_FILE_EXTENSION);
-
                 var addPhotoResult = volonteer.AddPetPhotos(
                     pet.Id, filePathList);
 
                 if (addPhotoResult.IsFailure)
-                    return addPhotoResult.Error;
+                    return addPhotoResult.Error.ToErrorList();
 
-                await _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
 
                 var fileDTOsResult = GenerateLileDTOList(
-                    request.Content,
+                    command.Content,
                     filePathList);
 
                 if(fileDTOsResult.IsFailure)
-                    return fileDTOsResult.Error;
+                    return fileDTOsResult.Error.ToErrorList();
 
                 var result = await _addFilesHandler.Handle(
                     new AddFilesRequest(fileDTOsResult.Value),
@@ -83,10 +90,10 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
                     await _messageQueue.WriteAsync(
                         fileDTOsResult.Value.Select(
                             dto => new FileInfo(
-                                request.Bucket, FilePath.Create(
+                                command.Bucket, FilePath.Create(
                                     dto.FileName).Value)));
 
-                    return result.Error;
+                    return result.Error.ToErrorList();
                 }
 
                 transaction.Commit();
@@ -96,7 +103,7 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
             {
                 transaction.Rollback();
                 _logger.LogError(ex.Message);
-                return Errors.General.ValueIsInvalid(ex.Message);
+                return Errors.General.ValueIsInvalid(ex.Message).ToErrorList();
             }
         }
 

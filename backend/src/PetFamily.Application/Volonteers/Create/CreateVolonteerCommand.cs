@@ -1,7 +1,8 @@
-﻿namespace PetFamily.Contracts
+﻿using PetFamily.Contracts;
+
+namespace PetFamily.Application.Volonteers.Create
 {
-    public record 
-        VolonteerDTO(
+    public record CreateVolonteerCommand(
         PersonalDataDTO PersonalDataDTO,
         ProfessionalDataDTO ProfessionalDataDTO,
         IEnumerable<SocialNetworkDTO> SocialNetworks,

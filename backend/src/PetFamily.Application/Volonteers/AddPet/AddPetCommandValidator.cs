@@ -4,9 +4,9 @@ using PetFamily.Domain.Models.Volonteer;
 
 namespace PetFamily.Application.Volonteers.AddPet
 {
-    public class AddPetRequestValidator : AbstractValidator<AddPetRequest>
+    public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
     {
-        public AddPetRequestValidator()
+        public AddPetCommandValidator()
         {
             RuleFor(a => a.VolonteerID)
                 .NotNull()
@@ -36,7 +36,7 @@ namespace PetFamily.Application.Volonteers.AddPet
             RuleForEach(a => a.DonationDetails)
                 .MustBeValueObject(x => DonationDetails.Create(
                     x.Name,
-                    x.Description));
+                    x.Link));
 
             RuleFor(a => a.PetTypeDTO)
                 .MustBeValueObject(x => PetType.Create(
