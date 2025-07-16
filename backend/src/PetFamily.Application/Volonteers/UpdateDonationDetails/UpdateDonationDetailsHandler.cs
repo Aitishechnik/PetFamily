@@ -1,5 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Extensions;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
@@ -9,38 +11,47 @@ namespace PetFamily.Application.Volonteers.UpdateDonationDetails
     {
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<UpdateDonationDetailsCommand> _validator;
         private readonly ILogger<UpdateDonationDetailsHandler> _logger;
 
         public UpdateDonationDetailsHandler(
             IVolonteersRepository volonteersRepository,
             IUnitOfWork unitOfWork,
+            IValidator<UpdateDonationDetailsCommand> validator,
             ILogger<UpdateDonationDetailsHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _unitOfWork = unitOfWork;
+            _validator = validator;
             _logger = logger;
         }
 
-        public async Task<Result<Guid, Error>> Handle(
-            UpdateDonationDetailsRequest updateDonationDetailsRequest,
+        public async Task<Result<Guid, ErrorList>> Handle(
+            UpdateDonationDetailsCommand command,
             CancellationToken cancellationToken)
         {
-            using var transaction = await _unitOfWork.BeginTransaction();
+            var validationResult = await _validator.ValidateAsync(
+                command,
+                cancellationToken);
+            if (validationResult.IsValid == false)
+                return validationResult.ToErrorList();
+
+            var volonteerResult = await _volonteersRepository.GetById(command.VolonteerId, cancellationToken);
+            if (volonteerResult.IsFailure)
+                return volonteerResult.Error.ToErrorList();
+
+            var donationDetails = new List<DonationDetails>();
+
+            foreach (var dd in command.DonationDetails)
+                donationDetails.Add(DonationDetails.Create(dd.Name, dd.Link).Value);
+
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             try
             {
-                var volonteerResult = await _volonteersRepository.GetById(updateDonationDetailsRequest.VolonteerId, cancellationToken);
-                if (volonteerResult.IsFailure)
-                    return volonteerResult.Error;
-
-                var donationDetails = new List<DonationDetails>();
-
-                foreach (var dd in updateDonationDetailsRequest.DonationDetails)
-                    donationDetails.Add(DonationDetails.Create(dd.Name, dd.Description).Value);
-
                 volonteerResult.Value.UpdateDonationDetails(new DonationDetailsWrapper(donationDetails));
 
-                await _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
 
                 transaction.Commit();
 
@@ -51,8 +62,10 @@ namespace PetFamily.Application.Volonteers.UpdateDonationDetails
             catch (Exception ex)
             {
                 transaction.Rollback();
-                _logger.LogError(ex, "Error occurred while updating donation details for volonteer with id {VolonteerId}", updateDonationDetailsRequest.VolonteerId);
-                return Errors.General.ValueIsInvalid("volonteer donation details update");
+                _logger.LogError(ex, "Error occurred while updating donation details for volonteer with id {VolonteerId}", command.VolonteerId);
+                return Errors.General
+                    .ValueIsInvalid("volonteer donation details update")
+                    .ToErrorList();
             }
         }
     }

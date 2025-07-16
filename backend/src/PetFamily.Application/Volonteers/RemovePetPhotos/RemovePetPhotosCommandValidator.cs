@@ -2,9 +2,9 @@
 
 namespace PetFamily.Application.Volonteers.RemovePetPhotos
 {
-    public class RemovePetPhotosValidator : AbstractValidator<RemovePetPhotosRequest>
+    public class RemovePetPhotosCommandValidator : AbstractValidator<RemovePetPhotosCommand>
     {
-        public RemovePetPhotosValidator()
+        public RemovePetPhotosCommandValidator()
         {
             RuleFor(r => r.FileInfo)
                 .NotEmpty();

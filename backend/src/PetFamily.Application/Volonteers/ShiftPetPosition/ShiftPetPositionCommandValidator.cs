@@ -2,9 +2,9 @@
 
 namespace PetFamily.Application.Volonteers.ShiftPetPosition
 {
-    public class ShiftPetPositionValidator : AbstractValidator<ShiftPetPositionRequest>
+    public class ShiftPetPositionCommandValidator : AbstractValidator<ShiftPetPositionCommand>
     {
-        public ShiftPetPositionValidator()
+        public ShiftPetPositionCommandValidator()
         {
             RuleFor(c => c.VoloteerId)
                 .NotEmpty();

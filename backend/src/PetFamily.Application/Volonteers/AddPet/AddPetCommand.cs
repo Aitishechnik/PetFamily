@@ -2,7 +2,7 @@
 
 namespace PetFamily.Application.Volonteers.AddPet
 {
-    public record AddPetRequest(
+    public record AddPetCommand(
         Guid VolonteerID,
         PetGeneralInfoDTO PetGeneralInfoDTO,
         PetCharacteristicsDTO PetCharacteristicsDTO,

@@ -3,9 +3,9 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.Delete
 {
-    public class DeleteVolonteerRequestValidator : AbstractValidator<DeleteVolonteerRequest>
+    public class DeleteVolonteerCommandValidator : AbstractValidator<DeleteVolonteerCommand>
     {
-        public DeleteVolonteerRequestValidator()
+        public DeleteVolonteerCommandValidator()
         {
             RuleFor(u => u.VolonteerId)
                 .NotEmpty()

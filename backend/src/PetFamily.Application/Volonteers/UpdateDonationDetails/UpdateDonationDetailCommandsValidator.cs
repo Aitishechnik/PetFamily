@@ -5,16 +5,16 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.UpdateDonationDetails
 {
-    public class UpdateDonationDetailsValidator : AbstractValidator<UpdateDonationDetailsRequest>
+    public class UpdateDonationDetailCommandsValidator : AbstractValidator<UpdateDonationDetailsCommand>
     {
-        public UpdateDonationDetailsValidator()
+        public UpdateDonationDetailCommandsValidator()
         {
             RuleFor(x => x.VolonteerId)
                 .NotEmpty()
                 .WithErrorCode(Errors.General.ValueIsRequired().Code)
                 .WithMessage(Errors.General.ValueIsInvalid().Message);
             RuleForEach(x => x.DonationDetails)
-                .MustBeValueObject(u => DonationDetails.Create(u.Name, u.Description));
+                .MustBeValueObject(u => DonationDetails.Create(u.Name, u.Link));
         }
     }
 }

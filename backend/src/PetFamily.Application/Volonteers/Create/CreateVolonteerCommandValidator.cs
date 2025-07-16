@@ -4,9 +4,9 @@ using PetFamily.Domain.Models.Volonteer;
 
 namespace PetFamily.Application.Volonteers.Create
 {
-    public class CreateVolonteerRequestValidator : AbstractValidator<CreateVolonteerRequest>
+    public class CreateVolonteerCommandValidator : AbstractValidator<CreateVolonteerCommand>
     {
-        public CreateVolonteerRequestValidator()
+        public CreateVolonteerCommandValidator()
         {
             RuleFor(c => c.PersonalDataDTO)
                 .MustBeValueObject(x => PersonalData.Create(x.FullName, x.Email, x.PhoneNumber));
@@ -18,7 +18,7 @@ namespace PetFamily.Application.Volonteers.Create
                 .MustBeValueObject(x => SocialNetwork.Create(x.Name, x.Link));
 
             RuleForEach(c => c.DonationDetails)
-                .MustBeValueObject(x => DonationDetails.Create(x.Name, x.Description));
+                .MustBeValueObject(x => DonationDetails.Create(x.Name, x.Link));
         }
     }
 }

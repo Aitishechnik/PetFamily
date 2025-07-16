@@ -7,19 +7,19 @@ namespace PetFamily.API.Response
     {
         public object? Result { get; }
 
-        public IEnumerable<ResponseError> Errors { get; }
+        public ErrorList? Errors { get; }
 
         public DateTime TimeGenerated { get; }
 
-        private Envelope(object? result, IEnumerable<ResponseError> errors)
+        private Envelope(object? result, ErrorList? errors)
         {
             Result = result;
-            Errors = errors.ToList();
+            Errors = errors;
             TimeGenerated = DateTime.Now;
         }
 
-        public static Envelope Ok(object? result = null) => new(result, []);
+        public static Envelope Ok(object? result = null) => new(result, null);
 
-        public static Envelope Error(IEnumerable<ResponseError> errors) => new(null, errors);
+        public static Envelope Error(ErrorList errors) => new(null, errors);
     }
 }
