@@ -11,24 +11,26 @@ namespace PetFamily.Application.Volonteers.UpdateSocialNetworks
     {
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<UpdateSocialNetworksCommand> _validator;
         private readonly ILogger<UpdateSocialNetworksHandler> _logger;
 
         public UpdateSocialNetworksHandler(
             IVolonteersRepository volonteersRepository,
             IUnitOfWork unitOfWork,
+            IValidator<UpdateSocialNetworksCommand> validator,
             ILogger<UpdateSocialNetworksHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _unitOfWork = unitOfWork;
+            _validator = validator;
             _logger = logger;
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            IValidator<UpdateSocialNetworksCommand> validator,
             UpdateSocialNetworksCommand command,
             CancellationToken cancellationToken = default)
         {
-            var validationResult = await validator.ValidateAsync(
+            var validationResult = await _validator.ValidateAsync(
                 command,
                 cancellationToken);
             if (validationResult.IsValid == false)

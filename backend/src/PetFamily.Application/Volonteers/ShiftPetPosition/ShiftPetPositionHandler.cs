@@ -11,24 +11,26 @@ namespace PetFamily.Application.Volonteers.ShiftPetPosition
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IVolonteersRepository _volonteersRepository;
+        private readonly IValidator<ShiftPetPositionCommand> _validator;
         private readonly ILogger<ShiftPetPositionHandler> _logger;
 
         public ShiftPetPositionHandler(
             IUnitOfWork unitOfWork, 
-            IVolonteersRepository volonteersRepository, 
+            IVolonteersRepository volonteersRepository,
+            IValidator<ShiftPetPositionCommand> validator,
             ILogger<ShiftPetPositionHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _volonteersRepository = volonteersRepository;
+            _validator = validator;
             _logger = logger;
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            IValidator<ShiftPetPositionCommand> validator,
             ShiftPetPositionCommand command,
             CancellationToken cancellationToken)
         {
-            var validationResult = validator.Validate(command);
+            var validationResult = _validator.Validate(command);
             if (validationResult.IsValid == false)
                 return validationResult.ToErrorList();
 

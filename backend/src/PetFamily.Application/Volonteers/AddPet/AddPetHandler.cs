@@ -13,26 +13,28 @@ namespace PetFamily.Application.Volonteers.AddPet
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly ISpeciesRepository _speciesRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<AddPetCommand> _validator;
         private readonly ILogger<AddPetHandler> _logger;
 
         public AddPetHandler(
             IVolonteersRepository volonteersRepository,
             ISpeciesRepository speciesRepository,
             IUnitOfWork unitOfWork,
+            IValidator<AddPetCommand> validator,
             ILogger<AddPetHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _speciesRepository = speciesRepository;
             _unitOfWork = unitOfWork;
+            _validator = validator;
             _logger = logger;
         }
 
         public async Task<Result<Guid, ErrorList>> Handler(
-            IValidator<AddPetCommand> validator,
             AddPetCommand command,
             CancellationToken cancellationToken = default)
         {
-            var validationResult = await validator.ValidateAsync(
+            var validationResult = await _validator.ValidateAsync(
                 command,
                 cancellationToken);
             if (validationResult.IsValid == false)

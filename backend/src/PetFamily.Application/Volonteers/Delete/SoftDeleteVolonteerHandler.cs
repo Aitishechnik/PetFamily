@@ -10,24 +10,27 @@ namespace PetFamily.Application.Volonteers.Delete
     {
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<DeleteVolonteerCommand> _validator;
         private readonly ILogger<SoftDeleteVolonteerHandler> _logger;
 
         public SoftDeleteVolonteerHandler(
             IVolonteersRepository volonteersRepository,
             IUnitOfWork unitOfWork,
+            IValidator<DeleteVolonteerCommand> validator,
             ILogger<SoftDeleteVolonteerHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _unitOfWork = unitOfWork;
+            _validator = validator;
             _logger = logger;
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            IValidator<DeleteVolonteerCommand> validator,
+            
             DeleteVolonteerCommand command,
             CancellationToken cancellationToken = default)
         {
-            var validationResult = await validator.ValidateAsync(
+            var validationResult = await _validator.ValidateAsync(
                 command,
                 cancellationToken);
             if (validationResult.IsValid == false)

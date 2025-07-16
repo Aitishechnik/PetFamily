@@ -12,24 +12,26 @@ namespace PetFamily.Application.Volonteers.Create
     {
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<CreateVolonteerCommand> _validator;
         private readonly ILogger<CreateVolonteerHandler> _logger;
 
         public CreateVolonteerHandler(
             IVolonteersRepository volonteersRepository,
             IUnitOfWork unitOfWork,
+            IValidator<CreateVolonteerCommand> validator,
             ILogger<CreateVolonteerHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _unitOfWork = unitOfWork;
+            _validator = validator;
             _logger = logger;
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            IValidator<CreateVolonteerCommand> validator, 
             CreateVolonteerCommand command, 
             CancellationToken cancellationToken = default)
         {
-            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+            var validationResult = await _validator.ValidateAsync(command, cancellationToken);
 
             if (!validationResult.IsValid)
                 return validationResult.ToErrorList();

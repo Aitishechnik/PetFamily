@@ -9,28 +9,31 @@ namespace PetFamily.Application.Volonteers.RemovePetPhotos
 {
     public class RemovePetPhotosHandler
     {
-        IUnitOfWork _unitOfWork;
-        IVolonteersRepository _volonteersRepository;
-        DeleteFilesHandler _deleteFilesHandler;
-        ILogger<RemovePetPhotosHandler> _logger;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IVolonteersRepository _volonteersRepository;
+        private readonly DeleteFilesHandler _deleteFilesHandler;
+        private readonly IValidator<RemovePetPhotosCommand> _validator;
+        private readonly ILogger<RemovePetPhotosHandler> _logger;
+
         public RemovePetPhotosHandler(
             IUnitOfWork unitOfWork,
             IVolonteersRepository volonteersRepository,
             DeleteFilesHandler deleteFilesHandler,
+            IValidator<RemovePetPhotosCommand> validator,
             ILogger<RemovePetPhotosHandler> logger)
         {
             _unitOfWork = unitOfWork;
             _volonteersRepository = volonteersRepository;
             _deleteFilesHandler = deleteFilesHandler;
+            _validator = validator;
             _logger = logger;
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            IValidator<RemovePetPhotosCommand> validator,
             RemovePetPhotosCommand command,
             CancellationToken cancellationToken = default)
         {
-            var validationResult = validator.Validate(command);
+            var validationResult = _validator.Validate(command);
 
             if (validationResult.IsValid == false)
                 return validationResult.ToErrorList();

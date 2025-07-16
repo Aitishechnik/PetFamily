@@ -15,6 +15,7 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly AddFilesHandler _addFilesHandler;
+        private readonly IValidator<AddPetPhotosCommand> _validator;
         private readonly IMessageQueue<IEnumerable<FileInfo>> _messageQueue;
         private readonly ILogger<AddPetPhotosHandler> _logger;
 
@@ -22,22 +23,23 @@ namespace PetFamily.Application.Volonteers.AddPetPhotos
             IVolonteersRepository volonteersRepository,
             IUnitOfWork unitOfWork,
             AddFilesHandler addFilesHandler,
+            IValidator<AddPetPhotosCommand> validator,
             IMessageQueue<IEnumerable<FileInfo>> messageQueue,
             ILogger<AddPetPhotosHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _addFilesHandler = addFilesHandler;
+            _validator = validator;
             _unitOfWork = unitOfWork;
             _messageQueue = messageQueue;
             _logger = logger;
         }
 
         public async Task<Result<IReadOnlyList<FilePath>, ErrorList>> Handle(
-            IValidator<AddPetPhotosCommand> validator,
             AddPetPhotosCommand command,
             CancellationToken cancellationToken = default)
         {
-            var validationResult = await validator.ValidateAsync(command);
+            var validationResult = await _validator.ValidateAsync(command);
             if (validationResult.IsValid == false)
                 return validationResult.ToErrorList();
 

@@ -23,12 +23,10 @@ namespace PetFamily.API.Controllers.Volonteers
         [HttpPost]
         public async Task<ActionResult> Create(
             [FromServices] CreateVolonteerHandler handler,
-            [FromServices] IValidator<CreateVolonteerCommand> validator,
             [FromBody] CreateVolonteerRequest request,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                validator,
                 request.ToCommand(), 
                 cancellationToken);
 
@@ -43,10 +41,9 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] Guid id,
             [FromBody] UpdateMainInfoRequest request,
             [FromServices] UpdateMainInfoHandler handler,
-            [FromServices] IValidator<UpdateMainInfoCommand> validator,
             CancellationToken cancellationToken = default)
         {
-            var result = await handler.Handle(validator, 
+            var result = await handler.Handle(
                 request.ToCommand(id), 
                 cancellationToken);
 
@@ -61,11 +58,9 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] Guid id,
             [FromBody] UpdateSocialNetworkRequest request,
             [FromServices] UpdateSocialNetworksHandler handler,
-            [FromServices] IValidator<UpdateSocialNetworksCommand> validator,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                validator,
                 request.ToCommand(id), 
                 cancellationToken);
             if (result.IsFailure)
@@ -79,11 +74,9 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] Guid id,
             [FromBody] UpdateDonationDetailsRequest request,
             [FromServices] UpdateDonationDetailsHandler handler,
-            [FromServices] IValidator<UpdateDonationDetailsCommand> validator,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                validator,
                 request.ToCommand(id), 
                 cancellationToken);
             if (result.IsFailure)
@@ -96,11 +89,9 @@ namespace PetFamily.API.Controllers.Volonteers
         public async Task<ActionResult> SoftDelete(
             [FromRoute] Guid id,
             [FromServices] SoftDeleteVolonteerHandler handler,
-            [FromServices] IValidator<DeleteVolonteerCommand> validator,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                validator, 
                 new DeleteVolonteerCommand(id), 
                 cancellationToken);
             if (result.IsFailure)
@@ -113,11 +104,9 @@ namespace PetFamily.API.Controllers.Volonteers
         public async Task<ActionResult> Delete(
             [FromRoute] Guid id,
             [FromServices] HardDeleteVolonteerHandler handler,
-            [FromServices] IValidator<DeleteVolonteerCommand> validator,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                validator,
                 new DeleteVolonteerCommand(id), 
                 cancellationToken);
             if (result.IsFailure)
@@ -132,7 +121,6 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] Guid petId,
             [FromRoute] string photos,
             [FromServices] AddPetPhotosHandler handler,
-            [FromServices] IValidator<AddPetPhotosCommand> validator,
             IFormFileCollection files,
             CancellationToken cancellationToken = default)
         {
@@ -141,7 +129,6 @@ namespace PetFamily.API.Controllers.Volonteers
             streamCollection = fileProsessor.Process(files);
 
             var result = await handler.Handle(
-                validator,
                 new AddPetPhotosCommand(
                 volunteerId, petId, photos, streamCollection), 
                 cancellationToken);
@@ -156,12 +143,10 @@ namespace PetFamily.API.Controllers.Volonteers
         public async Task<ActionResult> AddPet(
             [FromRoute] Guid id,
             [FromServices] AddPetHandler handler,
-            [FromServices] IValidator<AddPetCommand> validator,
             [FromBody] AddPetRequest request,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handler(
-                validator,
                 request.ToCommand(id), 
                 cancellationToken);
             if (result.IsFailure)
@@ -177,11 +162,9 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] string photos,
             [FromBody] RemovePetPhotoRequest request,
             [FromServices] RemovePetPhotosHandler handler,
-            [FromServices] IValidator<RemovePetPhotosCommand> validator,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                validator,
                 new RemovePetPhotosCommand(
                 volonteerId,
                 petId,
@@ -203,11 +186,9 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] Guid petId,
             [FromServices] ShiftPetPositionHandler handler,
             [FromBody] ShiftPetPositionRequest request,
-            [FromServices] IValidator<ShiftPetPositionCommand> validator,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                validator,
                 new ShiftPetPositionCommand(
                 volonteerId,
                 petId,

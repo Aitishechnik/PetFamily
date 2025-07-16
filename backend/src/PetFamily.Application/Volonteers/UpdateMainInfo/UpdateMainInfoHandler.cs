@@ -11,24 +11,26 @@ namespace PetFamily.Application.Volonteers.UpdateMainInfo
     {
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<UpdateMainInfoCommand> _validator;
         private readonly ILogger<UpdateMainInfoHandler> _logger;
 
         public UpdateMainInfoHandler(
             IVolonteersRepository volonteersRepository,
             IUnitOfWork unitOfWork,
+            IValidator<UpdateMainInfoCommand> validator,
             ILogger<UpdateMainInfoHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _unitOfWork = unitOfWork;
+            _validator = validator;
             _logger = logger;
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            IValidator<UpdateMainInfoCommand> validator,
             UpdateMainInfoCommand command,
             CancellationToken cancellationToken = default)
         {
-            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+            var validationResult = await _validator.ValidateAsync(command, cancellationToken);
             if (validationResult.IsValid == false)
                 return validationResult.ToErrorList();
 
