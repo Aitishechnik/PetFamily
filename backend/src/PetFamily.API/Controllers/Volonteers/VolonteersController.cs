@@ -1,20 +1,24 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Extensions;
 using PetFamily.API.Response;
-using PetFamily.Application.Volonteers.Create;
-using PetFamily.Application.Volonteers.UpdateMainInfo;
-using PetFamily.Application.Volonteers.UpdateSocialNetworks;
-using PetFamily.Application.Volonteers.UpdateDonationDetails;
-using PetFamily.Application.Volonteers.Delete;
-using PetFamily.Application.Volonteers.AddPet;
-using PetFamily.Application.Volonteers.AddPetPhotos;
 using PetFamily.API.Processors;
 using PetFamily.Domain.Shared;
-using PetFamily.Application.Volonteers.RemovePetPhotos;
-using PetFamily.Application.Volonteers.ShiftPetPosition;
 using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 using PetFamily.API.Controllers.Volonteers.Requests;
+using PetFamily.Application.Volonteers.Commands.AddPet;
+using PetFamily.Application.Volonteers.Commands.ShiftPetPosition;
+using PetFamily.Application.Volonteers.Commands.UpdateDonationDetails;
+using PetFamily.Application.Volonteers.Commands.AddPetPhotos;
+using PetFamily.Application.Volonteers.Commands.RemovePetPhotos;
+using PetFamily.Application.Volonteers.Commands.UpdateSocialNetworks;
+using PetFamily.Application.Volonteers.Commands.UpdateMainInfo;
+using PetFamily.Application.Volonteers.Commands.Delete;
+using PetFamily.Application.Volonteers.Commands.Create;
+using PetFamily.Application.Abstraction;
+using PetFamily.Application.Models;
+using PetFamily.Application.Dtos;
+using PetFamily.Application.Volonteers.Queries.GetVolonteers;
+using PetFamily.Application.Volonteers.GetById;
 
 namespace PetFamily.API.Controllers.Volonteers
 {
@@ -22,12 +26,12 @@ namespace PetFamily.API.Controllers.Volonteers
     {
         [HttpPost]
         public async Task<ActionResult> Create(
-            [FromServices] CreateVolonteerHandler handler,
             [FromBody] CreateVolonteerRequest request,
+            [FromServices] ICommandHandler<Guid, CreateVolonteerCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                request.ToCommand(), 
+                request.ToCommand(),
                 cancellationToken);
 
             if (result.IsFailure)
@@ -40,11 +44,11 @@ namespace PetFamily.API.Controllers.Volonteers
         public async Task<ActionResult> UpdateMainInfo(
             [FromRoute] Guid id,
             [FromBody] UpdateMainInfoRequest request,
-            [FromServices] UpdateMainInfoHandler handler,
+            [FromServices] ICommandHandler<Guid, UpdateMainInfoCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                request.ToCommand(id), 
+                request.ToCommand(id),
                 cancellationToken);
 
             if (result.IsFailure)
@@ -57,11 +61,11 @@ namespace PetFamily.API.Controllers.Volonteers
         public async Task<ActionResult> UpdateSocialNetworks(
             [FromRoute] Guid id,
             [FromBody] UpdateSocialNetworkRequest request,
-            [FromServices] UpdateSocialNetworksHandler handler,
+            [FromServices] ICommandHandler<Guid, UpdateSocialNetworksCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                request.ToCommand(id), 
+                request.ToCommand(id),
                 cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
@@ -73,11 +77,11 @@ namespace PetFamily.API.Controllers.Volonteers
         public async Task<ActionResult> UpdateDonationDetails(
             [FromRoute] Guid id,
             [FromBody] UpdateDonationDetailsRequest request,
-            [FromServices] UpdateDonationDetailsHandler handler,
+            [FromServices] ICommandHandler<Guid, UpdateDonationDetailsCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                request.ToCommand(id), 
+                request.ToCommand(id),
                 cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
@@ -88,11 +92,11 @@ namespace PetFamily.API.Controllers.Volonteers
         [HttpDelete("{id:guid}/soft")]
         public async Task<ActionResult> SoftDelete(
             [FromRoute] Guid id,
-            [FromServices] SoftDeleteVolonteerHandler handler,
+            [FromServices] ICommandHandler<Guid, DeleteVolonteerCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                new DeleteVolonteerCommand(id), 
+                new DeleteVolonteerCommand(id),
                 cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
@@ -103,11 +107,11 @@ namespace PetFamily.API.Controllers.Volonteers
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(
             [FromRoute] Guid id,
-            [FromServices] HardDeleteVolonteerHandler handler,
+            [FromServices] ICommandHandler<Guid, DeleteVolonteerCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
-                new DeleteVolonteerCommand(id), 
+                new DeleteVolonteerCommand(id),
                 cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
@@ -120,7 +124,7 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] Guid volunteerId,
             [FromRoute] Guid petId,
             [FromRoute] string photos,
-            [FromServices] AddPetPhotosHandler handler,
+            [FromServices] ICommandHandler<IReadOnlyList<FilePath>, AddPetPhotosCommand> handler,
             IFormFileCollection files,
             CancellationToken cancellationToken = default)
         {
@@ -130,7 +134,7 @@ namespace PetFamily.API.Controllers.Volonteers
 
             var result = await handler.Handle(
                 new AddPetPhotosCommand(
-                volunteerId, petId, photos, streamCollection), 
+                volunteerId, petId, photos, streamCollection),
                 cancellationToken);
 
             if (result.IsFailure)
@@ -142,12 +146,12 @@ namespace PetFamily.API.Controllers.Volonteers
         [HttpPost("{id:guid}/pet")]
         public async Task<ActionResult> AddPet(
             [FromRoute] Guid id,
-            [FromServices] AddPetHandler handler,
             [FromBody] AddPetRequest request,
+            [FromServices] ICommandHandler<Guid, AddPetCommand> handler,
             CancellationToken cancellationToken = default)
         {
-            var result = await handler.Handler(
-                request.ToCommand(id), 
+            var result = await handler.Handle(
+                request.ToCommand(id),
                 cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
@@ -161,7 +165,7 @@ namespace PetFamily.API.Controllers.Volonteers
             [FromRoute] Guid petId,
             [FromRoute] string photos,
             [FromBody] RemovePetPhotoRequest request,
-            [FromServices] RemovePetPhotosHandler handler,
+            [FromServices] ICommandHandler<RemovePetPhotosCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
@@ -170,7 +174,7 @@ namespace PetFamily.API.Controllers.Volonteers
                 petId,
                 request.Paths.Select(
                     filePath => new FileInfo(
-                        photos, FilePath.Create(filePath).Value))), 
+                        photos, FilePath.Create(filePath).Value))),
                 cancellationToken);
             if (result.IsFailure)
             {
@@ -184,20 +188,61 @@ namespace PetFamily.API.Controllers.Volonteers
         public async Task<IActionResult> ShiftPetPosition(
             [FromRoute] Guid volonteerId,
             [FromRoute] Guid petId,
-            [FromServices] ShiftPetPositionHandler handler,
             [FromBody] ShiftPetPositionRequest request,
+            [FromServices] ICommandHandler<ShiftPetPositionCommand> handler,
             CancellationToken cancellationToken = default)
         {
             var result = await handler.Handle(
                 new ShiftPetPositionCommand(
                 volonteerId,
                 petId,
-                request.NewPosition), 
+                request.NewPosition),
                 cancellationToken);
             if (result.IsFailure)
                 return result.Error.ToResponse();
 
             return Ok(Envelope.Ok());
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get(
+            [FromQuery] GetVolonteerWithPaginationRequest request,
+            [FromServices] IQueryHandler<PagedList<VolonteerDto>,
+                GetVolonteersWithPaginationQuery> handler,
+            CancellationToken cancellationToken = default)
+        {
+            var query = request.ToQuery();
+
+            var respone = await handler.Handle(query, cancellationToken);
+
+            return Ok(respone);
+        }
+
+        [HttpGet("/dapper")]
+        public async Task<IActionResult> Get(
+            [FromQuery] GetVolonteerWithPaginationRequest request,
+            [FromServices] GetVolonteersWithPaginationHandlerDapper handler,
+            CancellationToken cancellationToken = default)
+        {
+            var query = request.ToQuery();
+
+            var respone = await handler.Handle(query, cancellationToken);
+
+            return Ok(respone);
+        }
+
+        [HttpGet("{volonteerId:guid}")]
+        public async Task<IActionResult> VolonteerById(
+            [FromRoute] Guid volonteerId,
+            [FromServices] IQueryHandler<VolonteerDto, 
+                GetVolonteerByIdQuery> handler,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new GetVolonteerByIdRequest(volonteerId).ToQuery();
+
+            var response = await handler.Handle(query, cancellationToken);
+
+            return Ok(response);
         }
     }
 }

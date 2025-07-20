@@ -3,13 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Volonteers;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
+using PetFamily.Infrastructure.DbContexts;
 
 namespace PetFamily.Infrastructure.Repositories
 {
     public class VolonteersRepository : IVolonteersRepository
     {
-        private readonly AppDbContext _appDbContext;
-        public VolonteersRepository(AppDbContext appDbContext)
+        private readonly WriteDbContext _appDbContext;
+        public VolonteersRepository(WriteDbContext appDbContext)
         {
             _appDbContext = appDbContext;
         }

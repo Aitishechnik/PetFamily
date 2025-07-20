@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,22 +7,47 @@ namespace PetFamily.Infrastructure.Extensions
 {
     public static class EfConfigurationsExtensions
     {
-        public static PropertyBuilder<IReadOnlyList<TVO>> ConvertVOCollectionToJSON<TVO>(this PropertyBuilder<IReadOnlyList<TVO>> builder)
+        public static PropertyBuilder<IReadOnlyList<TValueObject>>
+            ValueObjectsCollectionJsonConversion<TValueObject, TDto>(
+            this PropertyBuilder<IReadOnlyList<TValueObject>> builder,
+            Func<TValueObject, TDto> toDtoSelector,
+            Func<TDto, TValueObject> toValueObjectSelector)
         {
             return builder.HasConversion(
-                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                v => JsonSerializer.Deserialize<IReadOnlyList<TVO>>(v, JsonSerializerOptions.Default)!,
-                new ValueComparer<IReadOnlyList<TVO>>(
-                    (c1, c2) => c1!.SequenceEqual(c2!),
-                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v!.GetHashCode())),
-                    c => c.ToList()));
+                valueObjects => SerializeValueObjectsCollection(
+                    valueObjects, toDtoSelector),
+                json => DeserializeDtoCollection(json, toValueObjectSelector),
+                CreateCollectionValueComparer<TValueObject>())
+                .HasColumnType("jsonb");
+        } 
+
+        private static string SerializeValueObjectsCollection<TValueObject, TDto>(
+            IReadOnlyList<TValueObject> valueObjects,
+            Func<TValueObject, TDto> selector)
+        {
+            var dtos = valueObjects.Select(selector);
+
+            return JsonSerializer.Serialize(dtos, JsonSerializerOptions.Default);
         }
 
-        public static PropertyBuilder<TVO> ConvertVOToJSON<TVO>(this PropertyBuilder<TVO> buid)
+        private static IReadOnlyList<TValueObject>
+            DeserializeDtoCollection<TValueObject, TDto>(
+            string json,
+            Func<TDto, TValueObject> selector)
         {
-            return buid.HasConversion(
-                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                v => JsonSerializer.Deserialize<TVO>(v, JsonSerializerOptions.Default)!);
+            var dtos = JsonSerializer.Deserialize<IEnumerable<TDto>>(
+                json, JsonSerializerOptions.Default) ?? [];
+            return dtos.Select(selector).ToList();
+        }
+
+        private static ValueComparer<IReadOnlyList<T>>
+            CreateCollectionValueComparer<T>()
+        {
+            return new ValueComparer<IReadOnlyList<T>>(
+                (c1, c2) => c1!.SequenceEqual(c2!),
+                c => c.Aggregate(0, (a, v) =>
+                HashCode.Combine(a, v!.GetHashCode())),
+                c => c.ToList());
         }
     }
 }

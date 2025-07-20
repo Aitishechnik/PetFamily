@@ -8,7 +8,6 @@ namespace PetFamily.Domain.Models.Volonteer
         public string Description { get; }
 
         public int ExperienceInYears { get; }
-
         private ProfessionalData(string description, int experienceInYears)
         {
             Description = description;

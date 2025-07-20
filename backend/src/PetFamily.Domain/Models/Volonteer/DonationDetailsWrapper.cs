@@ -2,9 +2,7 @@
 {
     public record DonationDetailsWrapper
     {
-        public DonationDetailsWrapper()
-        {
-        }
+        public DonationDetailsWrapper() { }
         public DonationDetailsWrapper(IEnumerable<DonationDetails> donationDetails)
         {
             DonationDetails = donationDetails.ToList();

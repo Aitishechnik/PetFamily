@@ -34,7 +34,7 @@ namespace PetFamily.Domain.Models.Volonteer
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletionDate { get; private set; } = null;
         public IReadOnlyList<FilePath> PetPhotos => _petPhotos;
-        private readonly List<FilePath> _petPhotos = [];
+        private List<FilePath> _petPhotos = [];
 
         public void RemovePhotos(IEnumerable<FilePath> petPhotos)
         {

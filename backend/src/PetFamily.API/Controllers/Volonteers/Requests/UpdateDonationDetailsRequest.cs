@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Volonteers.UpdateDonationDetails;
+﻿using PetFamily.Application.Volonteers.Commands.UpdateDonationDetails;
 using PetFamily.Contracts;
 using PetFamily.Domain.Models.Volonteer;
 

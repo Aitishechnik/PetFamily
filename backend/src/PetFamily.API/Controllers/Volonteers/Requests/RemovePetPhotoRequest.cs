@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Volonteers.RemovePetPhotos;
+﻿using PetFamily.Application.Volonteers.Commands.RemovePetPhotos;
 using PetFamily.Domain.Shared;
 using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 

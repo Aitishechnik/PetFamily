@@ -1,13 +1,14 @@
 ﻿using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
+using PetFamily.Infrastructure.DbContexts;
 
 namespace PetFamily.Infrastructure
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly WriteDbContext _appDbContext;
 
-        public UnitOfWork(AppDbContext appDbContext)
+        public UnitOfWork(WriteDbContext appDbContext)
         {
             _appDbContext = appDbContext;
         }

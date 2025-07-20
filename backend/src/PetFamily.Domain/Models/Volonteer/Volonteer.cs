@@ -11,23 +11,24 @@ namespace PetFamily.Domain.Models.Volonteer
             PersonalData personalData,
             ProfessionalData professionalData,
             List<Pet> pets,
-            SocialNetwokrsWrapper socialNetwokrs,
-            DonationDetailsWrapper donationDetails)
+            IEnumerable<SocialNetwork> socialNetwokrs,
+            IEnumerable<DonationDetails> donationDetails)
         {
             Id = id;
             PersonalData = personalData;
             ProfessionalData = professionalData;
             Pets = pets;
-            SocialNetworks = socialNetwokrs;
-            DonationDetails = donationDetails;
+            _socialNetworks = socialNetwokrs.ToList();
+            _donationDetails = donationDetails.ToList();
         }
 
         public PersonalData PersonalData { get; private set; } = default!;
         public ProfessionalData ProfessionalData { get; private set; } = default!;
         public List<Pet> Pets { get; private set; } = new();
-        public SocialNetwokrsWrapper SocialNetworks { get; private set; } = default!;
-        public DonationDetailsWrapper DonationDetails { get; private set; } = default!;
-
+        public IReadOnlyList<SocialNetwork> SocialNetworks => _socialNetworks;
+        private List<SocialNetwork> _socialNetworks = [];
+        public IReadOnlyList<DonationDetails> DonationDetails => _donationDetails;
+        private List<DonationDetails> _donationDetails = [];
         public bool IsDeleted { get; private set; } = false;
 
         public DateTime? DeletionDate { get; private set; } = null;
@@ -57,14 +58,14 @@ namespace PetFamily.Domain.Models.Volonteer
             ProfessionalData = professionalData;
         }
 
-        public void UpdateSocialNetworks(SocialNetwokrsWrapper socialNetworks)
+        public void UpdateSocialNetworks(IEnumerable<SocialNetwork> socialNetworks)
         {
-            SocialNetworks = socialNetworks;
+            _socialNetworks = [..socialNetworks];
         }
 
-        public void UpdateDonationDetails(DonationDetailsWrapper donationDetails)
+        public void UpdateDonationDetails(IEnumerable<DonationDetails> donationDetails)
         {
-            DonationDetails = donationDetails;
+            _donationDetails = [..donationDetails];
         }
 
         public void Delete()

@@ -1,5 +1,4 @@
-﻿
-namespace PetFamily.Domain.Shared
+﻿namespace PetFamily.Domain.Shared
 {
     public interface ISoftDeletable
     {

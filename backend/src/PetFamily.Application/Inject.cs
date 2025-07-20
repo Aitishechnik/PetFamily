@@ -1,17 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.FileManagement.Add;
-using PetFamily.Application.FileManagement.Delete;
-using PetFamily.Application.FileManagement.Presign;
-using PetFamily.Application.Volonteers.AddPet;
-using PetFamily.Application.Volonteers.AddPetPhotos;
-using PetFamily.Application.Volonteers.Create;
-using PetFamily.Application.Volonteers.Delete;
-using PetFamily.Application.Volonteers.RemovePetPhotos;
-using PetFamily.Application.Volonteers.ShiftPetPosition;
-using PetFamily.Application.Volonteers.UpdateDonationDetails;
-using PetFamily.Application.Volonteers.UpdateMainInfo;
-using PetFamily.Application.Volonteers.UpdateSocialNetworks;
+using PetFamily.Application.Abstraction;
 
 namespace PetFamily.Application
 {
@@ -19,23 +8,40 @@ namespace PetFamily.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            services.AddScoped<CreateVolonteerHandler>();
-            services.AddScoped<UpdateMainInfoHandler>();
-            services.AddScoped<UpdateSocialNetworksHandler>();
-            services.AddScoped<UpdateDonationDetailsHandler>();
-            services.AddScoped<SoftDeleteVolonteerHandler>();
-            services.AddScoped<HardDeleteVolonteerHandler>();
-            services.AddScoped<AddFilesHandler>();
-            services.AddScoped<DeleteFilesHandler>();
-            services.AddScoped<GetPresignedHandler>();
-            services.AddScoped<AddPetHandler>();
-            services.AddScoped<AddPetPhotosHandler>();
-            services.AddScoped<RemovePetPhotosHandler>();
-            services.AddScoped<ShiftPetPositionHandler>();
-
-            services.AddValidatorsFromAssembly(typeof(Inject).Assembly);
+            services
+                .AddFileHandlers()
+                .AddCommands()
+                .AddQueries()
+                .AddValidatorsFromAssembly(typeof(Inject).Assembly);
 
             return services;
+        }
+
+        private static IServiceCollection AddCommands(this IServiceCollection services)
+        {
+            return services.Scan(scan => scan.FromAssemblies(typeof(Inject).Assembly)
+                .AddClasses(classes => classes
+                    .AssignableToAny(typeof(ICommandHandler<,>), typeof(ICommandHandler<>)))
+                .AsSelfWithInterfaces()
+                .WithScopedLifetime());
+        }
+
+        private static IServiceCollection AddQueries(this IServiceCollection services)
+        {
+            return services.Scan(scan => scan.FromAssemblies(typeof(Inject).Assembly)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(IQueryHandler<,>)))
+                .AsSelfWithInterfaces()
+                .WithScopedLifetime());
+        }
+
+        private static IServiceCollection AddFileHandlers(this IServiceCollection services)
+        {
+            return services.Scan(scan => scan.FromAssemblies(typeof(Inject).Assembly)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(IFileHandler)))
+                .AsSelf()
+                .WithScopedLifetime());
         }
     }
 }

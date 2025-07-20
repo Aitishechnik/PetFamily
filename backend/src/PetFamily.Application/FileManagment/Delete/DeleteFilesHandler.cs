@@ -1,11 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Abstraction;
 using PetFamily.Application.FileManagement.Providers;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.FileManagement.Delete
 {
-    public class DeleteFilesHandler
+    public class DeleteFilesHandler : IFileHandler
     {
         private readonly IFileProvider _fileProvider;
         private readonly ILogger<DeleteFilesHandler> _logger;
@@ -18,16 +19,16 @@ namespace PetFamily.Application.FileManagement.Delete
         }
 
         public async Task<UnitResult<Error>> Handle(
-            DeleteFilesRequest request, 
+            DeleteFilesCommand command, 
             CancellationToken cancellationToken = default)
         {
             var result = await _fileProvider
-                .DeleteFiles(request.filesInfo, cancellationToken);
+                .DeleteFiles(command.filesInfo, cancellationToken);
             if (result.IsFailure)
             {
                 _logger.LogError(
                     "Failed to delete file {FileName}: {ErrorMessage}"
-                    , request.filesInfo, result.Error.Message);
+                    , command.filesInfo, result.Error.Message);
                 return result.Error;
             }
 

@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Volonteers.Create;
+﻿using PetFamily.Application.Volonteers.Commands.Create;
 using PetFamily.Contracts;
 
 namespace PetFamily.API.Controllers.Volonteers.Requests
