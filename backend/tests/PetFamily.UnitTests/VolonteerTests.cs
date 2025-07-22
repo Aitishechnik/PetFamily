@@ -15,8 +15,8 @@ namespace PetFamily.Domain.UnitTests
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),
-                new SocialNetwokrsWrapper(),
-                new DonationDetailsWrapper());
+                new List<SocialNetwork>(),
+                new List<DonationDetails>());
 
             var pet = new Pet(
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
@@ -46,8 +46,8 @@ namespace PetFamily.Domain.UnitTests
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),
-                new SocialNetwokrsWrapper(),
-                new DonationDetailsWrapper());
+                new List<SocialNetwork>(),
+                new List<DonationDetails>());
 
             var pets = Enumerable.Range(1,5).Select(_ =>new Pet(
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
@@ -86,8 +86,8 @@ namespace PetFamily.Domain.UnitTests
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),
-                new SocialNetwokrsWrapper(),
-                new DonationDetailsWrapper());
+                new List<SocialNetwork>(),
+                new List<DonationDetails>());
 
             var pets = Enumerable.Range(1, 5).Select(_ => new Pet(
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,

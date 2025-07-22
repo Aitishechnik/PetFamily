@@ -1,4 +1,4 @@
-﻿using PetFamily.Application.Volonteers.UpdateSocialNetworks;
+﻿using PetFamily.Application.Volonteers.Commands.UpdateSocialNetworks;
 using PetFamily.Contracts;
 
 namespace PetFamily.API.Controllers.Volonteers.Requests
