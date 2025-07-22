@@ -6,7 +6,6 @@ using PetFamily.Application.Dtos;
 
 namespace PetFamily.Infrastructure.DbContexts
 {
-
     public class ReadDbContext(IConfiguration configuration) : DbContext, IReadDbContext
     {
         public IQueryable<VolonteerDto> Volonteers => Set<VolonteerDto>();

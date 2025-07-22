@@ -218,13 +218,13 @@ namespace PetFamily.API.Controllers.Volonteers
             return Ok(respone);
         }
 
-        [HttpGet("/dapper")]
+        [HttpGet("dapper")]
         public async Task<IActionResult> Get(
             [FromQuery] GetVolonteerWithPaginationRequest request,
             [FromServices] GetVolonteersWithPaginationHandlerDapper handler,
             CancellationToken cancellationToken = default)
         {
-            var query = request.ToQuery();
+            var query = request.ToQueryDapper();
 
             var respone = await handler.Handle(query, cancellationToken);
 

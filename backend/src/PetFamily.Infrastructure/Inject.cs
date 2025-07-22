@@ -33,6 +33,8 @@ namespace PetFamily.Infrastructure
                 .AddMessageQueues()
                 .AddServices();
 
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
             return services;
         }
 

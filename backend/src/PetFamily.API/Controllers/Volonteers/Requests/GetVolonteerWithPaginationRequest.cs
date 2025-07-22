@@ -6,5 +6,8 @@ namespace PetFamily.API.Controllers.Volonteers.Requests
     {
         public GetVolonteersWithPaginationQuery ToQuery() =>
             new(Page, PageSize);
+
+        public GetVolonteersWithPaginationQueryDapper ToQueryDapper() =>
+            new(Page, PageSize);
     }
 }

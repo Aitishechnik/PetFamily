@@ -7,7 +7,7 @@ using PetFamily.Application.Models;
 
 namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
 {
-    public class GetVolonteersWithPaginationHandlerDapper : IQueryHandler<PagedList<VolonteerDto>, GetVolonteersWithPaginationQuery>
+    public class GetVolonteersWithPaginationHandlerDapper : IQueryHandler<PagedList<VolonteerDto>, GetVolonteersWithPaginationQueryDapper>
     {
         private readonly ISqlConnectionFactory _sqlConnectionFactory;
         public GetVolonteersWithPaginationHandlerDapper(ISqlConnectionFactory sqlConnectionFactory)
@@ -16,7 +16,7 @@ namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
         }
 
         public async Task<PagedList<VolonteerDto>> Handle(
-            GetVolonteersWithPaginationQuery query,
+            GetVolonteersWithPaginationQueryDapper query,
             CancellationToken cancellationToken)
         {
             var connection = _sqlConnectionFactory.Create();
@@ -27,7 +27,7 @@ namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
             var parameters = new DynamicParameters();
 
             var sql = """
-                SELECT id, email, full_name, description, donation_details, social_networks 
+                SELECT id, email, full_name, description, phone_number, experience_in_years, donation_details, social_networks 
                 FROM volonteers
                 LIMIT @PageSize OFFSET @Offset
                 """;
@@ -35,19 +35,29 @@ namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
             parameters.Add("@PageSize", query.PageSize);
             parameters.Add("@Offset", (query.Page - 1) * query.PageSize);
 
-            var volonteers = await connection.QueryAsync<VolonteerDto, string, string, VolonteerDto>(
-                sql,
-                (volonteer, jsonSN, jsonDD) =>
-                {
-                    var sn = JsonSerializer.Deserialize<SocialNetworkDto[]>(jsonSN) ?? [];
-                    var dd = JsonSerializer.Deserialize<DonationDetailsDto[]>(jsonDD) ?? [];
-                    volonteer.DonationDetails = dd;
-                    volonteer.SocialNetworks = sn;
+            var rawResult = await connection.QueryAsync<(
+                Guid id, 
+                string email, 
+                string full_name, 
+                string description, 
+                string phone_number, 
+                int experience_in_years, 
+                string donation_details, 
+                string social_networks)>(
+            sql,
+            parameters);
 
-                    return volonteer;
-                },
-                splitOn: "donation_details, social_networks",
-                param: parameters);
+            var volonteers = rawResult.Select(v => new VolonteerDto
+            {
+                Id = v.id,
+                Email = v.email,
+                FullName = v.full_name,
+                Description = v.description,
+                PhoneNumber = v.phone_number,
+                ExperienceInYears = v.experience_in_years,
+                DonationDetails = JsonSerializer.Deserialize <DonationDetailsDto[]>(v.donation_details) ?? [],
+                SocialNetworks = JsonSerializer.Deserialize<SocialNetworkDto[]>(v.social_networks) ?? []
+            });
 
             return new PagedList<VolonteerDto>
             {
