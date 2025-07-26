@@ -9,5 +9,7 @@ namespace PetFamily.Application.Species
             Guid speciesId, 
             Guid breedId, 
             CancellationToken cancellationToken = default);
+
+        Task<UnitResult<Error>> RemoveSpecies(Guid speciesId);
     }
 }

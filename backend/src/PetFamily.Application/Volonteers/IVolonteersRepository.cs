@@ -6,6 +6,7 @@ namespace PetFamily.Application.Volonteers
 {
     public interface IVolonteersRepository
     {
+        Task<IEnumerable<Pet>> GetAllPets();
         Task<Guid> Add(Volonteer volonteer, CancellationToken cancellationToken = default);
 
         Task<Result<Volonteer, Error>> GetById(Guid id, CancellationToken cancellationToken = default);

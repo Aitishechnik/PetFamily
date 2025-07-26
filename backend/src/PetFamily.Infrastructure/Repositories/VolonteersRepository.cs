@@ -14,6 +14,13 @@ namespace PetFamily.Infrastructure.Repositories
         {
             _appDbContext = appDbContext;
         }
+        
+        public async Task<IEnumerable<Pet>> GetAllPets()
+        {
+            return await _appDbContext.Volonteers
+                .SelectMany(v => v.Pets)
+                .ToListAsync();
+        }
 
         public async Task<Guid> Add(Volonteer volonteer, CancellationToken cancellationToken = default)
         {

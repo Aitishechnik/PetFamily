@@ -9,6 +9,11 @@ namespace PetFamily.Infrastructure.DbContexts
     public class ReadDbContext(IConfiguration configuration) : DbContext, IReadDbContext
     {
         public IQueryable<VolonteerDto> Volonteers => Set<VolonteerDto>();
+
+        public IQueryable<SpeciesDto> Species => Set<SpeciesDto>();
+
+        public IQueryable<BreedDto> Breeds => Set<BreedDto>();
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseNpgsql(configuration.GetConnectionString(DbConstants.DATABASE));
