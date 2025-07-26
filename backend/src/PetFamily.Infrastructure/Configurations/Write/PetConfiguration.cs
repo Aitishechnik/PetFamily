@@ -102,11 +102,11 @@ namespace PetFamily.Infrastructure.Configurations.Write
 
             builder.ComplexProperty(pet => pet.PetType, ptb =>
             {
-                ptb.Property(p => p.SpeciesID)
+                ptb.Property(p => p.SpeciesId)
                     .HasColumnName("species_id")
                     .IsRequired();
 
-                ptb.Property(p => p.BreedID)
+                ptb.Property(p => p.BreedId)
                     .HasColumnName("breed_id")
                     .IsRequired();
             });

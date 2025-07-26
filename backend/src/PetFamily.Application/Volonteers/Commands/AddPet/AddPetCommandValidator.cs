@@ -40,8 +40,8 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
 
             RuleFor(a => a.PetTypeDTO)
                 .MustBeValueObject(x => PetType.Create(
-                    x.SpeciesID,
-                    x.BreedID));
+                    x.SpeciesId,
+                    x.BreedId));
         }
     }
 }

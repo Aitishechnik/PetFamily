@@ -57,14 +57,13 @@ namespace PetFamily.Infrastructure.Configurations.Write
 
             builder.Property(v => v.SocialNetworks)
                 .ValueObjectsCollectionJsonConversion(
-                sn => new SocialNetworkDTO(sn.Name, sn.Link)/* { Name = sn.Name, Link = sn.Link }*/,
+                sn => new SocialNetworkDTO(sn.Name, sn.Link),
                 dto => SocialNetwork.Create(dto.Name, dto.Link).Value)
                 .HasColumnName("social_networks");
 
             builder.Property(v => v.DonationDetails)
                 .ValueObjectsCollectionJsonConversion(
-                sn => new DonationDetailsDTO(sn.Name, sn.Description)
-                /*{ Name = sn.Name, Description = sn.Description }*/,
+                sn => new DonationDetailsDTO(sn.Name, sn.Description),
                 dto => DonationDetails.Create(dto.Name, dto.Description).Value)
                 .HasColumnName("donation_details");
 

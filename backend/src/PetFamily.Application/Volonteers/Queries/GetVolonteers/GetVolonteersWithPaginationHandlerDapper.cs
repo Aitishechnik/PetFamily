@@ -19,7 +19,7 @@ namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
             GetVolonteersWithPaginationQueryDapper query,
             CancellationToken cancellationToken)
         {
-            var connection = _sqlConnectionFactory.Create();
+            using var connection = _sqlConnectionFactory.Create();
 
             var totalCount = await connection.ExecuteScalarAsync<int>(
                 "SELECT COUNT(*) FROM volonteers");
