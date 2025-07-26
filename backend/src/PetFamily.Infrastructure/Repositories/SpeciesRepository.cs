@@ -15,36 +15,58 @@ namespace PetFamily.Infrastructure.Repositories
         {
             _dbContext = appDbContext;
         }
-        public async Task<UnitResult<Error>> IsSpeciesAndBreedExists(
+        public async Task<Result<Species, Error>> GetSpeciesById(
             Guid speciesId, 
-            Guid breedId, 
             CancellationToken cancellationToken = default)
         {
-            var speciesExists = await _dbContext.Species
-                .AnyAsync(s => s.Id == speciesId, cancellationToken);
-
-            if(speciesExists == false)
-                return Errors.General.NotFound(speciesId);
-
-            var breedExists = await _dbContext.Species
-                .AnyAsync(s => s.Id == speciesId && 
-                s.Breeds.Any(b => b.Id == breedId), 
+            var result = await _dbContext.Species.FindAsync(
+                speciesId,
                 cancellationToken);
-
-            if(breedExists == false)
-                return Errors.General.ValueIsInvalid("breed");
-
-            return UnitResult.Success<Error>();
+            if(result is null)
+                return Errors.General.NotFound(speciesId);
+            return result;
         }
 
-        public async Task<UnitResult<Error>> RemoveSpecies(Guid speciesId)
+        public async Task<UnitResult<Error>> RemoveSpecies(
+            Guid speciesId,
+            CancellationToken cancellationToken = default)
         {
-            var species = await _dbContext.Species.FindAsync(speciesId);
+            var species = await _dbContext.Species.FindAsync(
+                speciesId, 
+                cancellationToken);
 
             if (species is null)
                 return Errors.General.NotFound(speciesId);
 
             _dbContext.Remove(species);
+
+            return Result.Success<Error>();
+        }
+
+        public async Task<Result<Breed, Error>> GetBreedById(
+            Guid breedId,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _dbContext.Species
+                .SelectMany(s => s.Breeds)
+                .FirstAsync(b => b.Id == breedId, cancellationToken);
+            if (result is null)
+                return Errors.General.NotFound(breedId);
+
+            return result;
+        }
+
+        public async Task<UnitResult<Error>> RemoveBreed(
+            Guid breedId,
+            CancellationToken cancellationToken = default)
+        {
+            var breed = await _dbContext.Species
+                .SelectMany(s => s.Breeds)
+                .FirstOrDefaultAsync(b => b.Id == breedId, cancellationToken);
+            if (breed is null)
+                return Errors.General.NotFound(breedId);
+
+            _dbContext.Remove(breed);
 
             return Result.Success<Error>();
         }

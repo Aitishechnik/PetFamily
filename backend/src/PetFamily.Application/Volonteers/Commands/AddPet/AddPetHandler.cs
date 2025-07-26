@@ -1,9 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstraction;
+using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Application.Species;
+using PetFamily.Domain.Models.Species;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
@@ -13,6 +16,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
     {
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly ISpeciesRepository _speciesRepository;
+        private readonly IReadDbContext _readDbContext;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<AddPetCommand> _validator;
         private readonly ILogger<AddPetHandler> _logger;
@@ -20,12 +24,14 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
         public AddPetHandler(
             IVolonteersRepository volonteersRepository,
             ISpeciesRepository speciesRepository,
+            IReadDbContext readDbContext,
             IUnitOfWork unitOfWork,
             IValidator<AddPetCommand> validator,
             ILogger<AddPetHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
             _speciesRepository = speciesRepository;
+            _readDbContext = readDbContext;
             _unitOfWork = unitOfWork;
             _validator = validator;
             _logger = logger;
@@ -41,14 +47,15 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
             if (validationResult.IsValid == false)
                 return validationResult.ToErrorList();
 
-            var speciesAndBreedResult = await _speciesRepository.IsSpeciesAndBreedExists(
-                command.PetTypeDTO.SpeciesID,
-                command.PetTypeDTO.BreedID);
+            var isSpeciesAndBreedExists = await _readDbContext.Breeds.FirstOrDefaultAsync(
+                b => b.Id == command.PetTypeDTO.BreedId &&
+                     b.SpeciesId == command.PetTypeDTO.SpeciesId);
 
-            if (speciesAndBreedResult.IsFailure)
+            if (isSpeciesAndBreedExists is null)
             {
-                _logger.LogError(speciesAndBreedResult.Error.Message);
-                return speciesAndBreedResult.Error.ToErrorList();
+                _logger.LogError("Specied or Breed was not found");
+                return Errors.General.ValueIsInvalid(
+                    "Species or Breed was not found").ToErrorList();
             }
 
             var volonteerResult = await _volonteersRepository.GetById(
@@ -84,8 +91,8 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
                     command.PetHealthInfoDTO.IsVaccinated).Value,
                 donationDetailsCollection,
                 PetType.Create(
-                    command.PetTypeDTO.SpeciesID,
-                    command.PetTypeDTO.BreedID).Value);
+                    command.PetTypeDTO.SpeciesId,
+                    command.PetTypeDTO.BreedId).Value);
 
             using var transaction = await _unitOfWork.BeginTransactionAsync();
 

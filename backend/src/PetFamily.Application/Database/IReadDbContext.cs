@@ -7,5 +7,6 @@ namespace PetFamily.Application.Database
         IQueryable<VolonteerDto> Volonteers { get; }
         IQueryable<SpeciesDto> Species { get; }
         IQueryable<BreedDto> Breeds { get; }
+        IQueryable<PetDto> Pets { get; }
     }
 }
