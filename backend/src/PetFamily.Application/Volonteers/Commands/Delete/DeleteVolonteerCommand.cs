@@ -2,5 +2,5 @@
 
 namespace PetFamily.Application.Volonteers.Commands.Delete
 {
-    public record DeleteVolonteerCommand(Guid VolonteerId) : ICommand;
+    public abstract record DeleteVolonteerCommand(Guid VolonteerId) : ICommand;
 }

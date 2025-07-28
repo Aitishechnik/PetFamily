@@ -24,5 +24,6 @@ namespace PetFamily.Application.Dtos
         public int SerialNumber { get; set; }
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletionDate { get; private set; } = null;
+        public string? MainPhoto { get; set; }
     }
 }

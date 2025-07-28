@@ -14,14 +14,14 @@ namespace PetFamily.Domain.Models.Volonteer
         public Guid SpeciesId { get; }
         public Guid BreedId { get; }
 
-        public static Result<PetType, Error> Create(Guid speciesID, Guid breedID)
+        public static Result<PetType, Error> Create(Guid speciesId, Guid breedId)
         {
-            if (speciesID == Guid.Empty)
-                return Errors.General.ValueIsInvalid("SpeciedID");
-            if (breedID == Guid.Empty)
-                return Errors.General.ValueIsInvalid("BreedID");
+            if (speciesId == Guid.Empty)
+                return Errors.General.ValueIsInvalid("SpeciedId");
+            if (breedId == Guid.Empty)
+                return Errors.General.ValueIsInvalid("BreedId");
 
-            return new PetType(speciesID, breedID);
+            return new PetType(speciesId, breedId);
         }
     }
 }

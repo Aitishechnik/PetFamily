@@ -97,6 +97,10 @@ namespace PetFamily.Infrastructure.Configurations.Read
                 .HasConversion(
                     v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Local) : null);
+
+            builder.Property(p => p.MainPhoto)
+                .HasColumnName("main_photo")
+                .IsRequired(false);
         }
     }
 }

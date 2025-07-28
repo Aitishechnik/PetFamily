@@ -77,7 +77,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
 
                 await _unitOfWork.SaveChangesAsync();
 
-                var fileDTOsResult = GenerateLileDTOList(
+                var fileDTOsResult = GenerateFileDTOList(
                     command.Content,
                     filePathList);
 
@@ -134,7 +134,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
             return result;
         }
 
-        private Result<List<FileDTO>, Error> GenerateLileDTOList(
+        private Result<List<FileDTO>, Error> GenerateFileDTOList(
             IEnumerable<Stream> content,
             IEnumerable<FilePath> filePaths)
         {

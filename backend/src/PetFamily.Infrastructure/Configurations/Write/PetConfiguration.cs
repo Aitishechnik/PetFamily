@@ -121,14 +121,22 @@ namespace PetFamily.Infrastructure.Configurations.Write
                 .HasColumnName("volonteer_id")
                 .IsRequired();
 
-            builder.Property(v => v.IsDeleted)
+            builder.Property(p => p.IsDeleted)
                 .HasColumnName("deleted");
 
-            builder.Property(v => v.DeletionDate)
+            builder.Property(p => p.DeletionDate)
                 .HasColumnName("deletion_date")
                 .HasConversion(
-                    v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Local) : null);
+                    p => p.HasValue ? p.Value.ToUniversalTime() : (DateTime?)null,
+                    p => p.HasValue ? DateTime.SpecifyKind(p.Value, DateTimeKind.Local) : null);
+
+            builder.OwnsOne(p => p.MainPhoto, mpb =>
+            {
+                mpb.Property(mp => mp.Path)
+                    .HasColumnName("main_photo")
+                    .HasMaxLength(Constants.MAX_LINK_LENGTH)
+                    .IsRequired(false);
+            });
         }
     }
 }

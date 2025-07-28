@@ -13,6 +13,4 @@ namespace PetFamily.Application.Volonteers.Commands.Delete
                 .WithMessage(Errors.General.ValueIsInvalid().Message);
         }
     }
-
-
 }

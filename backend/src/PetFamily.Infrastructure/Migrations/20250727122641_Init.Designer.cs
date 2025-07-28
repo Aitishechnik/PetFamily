@@ -13,7 +13,7 @@ using PetFamily.Infrastructure.DbContexts;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20250720174427_Init")]
+    [Migration("20250727122641_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -179,11 +179,11 @@ namespace PetFamily.Infrastructure.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<Guid>("BreedID")
+                            b1.Property<Guid>("BreedId")
                                 .HasColumnType("uuid")
                                 .HasColumnName("breed_id");
 
-                            b1.Property<Guid>("SpeciesID")
+                            b1.Property<Guid>("SpeciesId")
                                 .HasColumnType("uuid")
                                 .HasColumnName("species_id");
                         });

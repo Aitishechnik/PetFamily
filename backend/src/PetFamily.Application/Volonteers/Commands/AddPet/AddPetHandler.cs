@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstraction;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
-using PetFamily.Application.Species;
-using PetFamily.Domain.Models.Species;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 
@@ -15,7 +13,6 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
     public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
     {
         private readonly IVolonteersRepository _volonteersRepository;
-        private readonly ISpeciesRepository _speciesRepository;
         private readonly IReadDbContext _readDbContext;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<AddPetCommand> _validator;
@@ -23,14 +20,12 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
 
         public AddPetHandler(
             IVolonteersRepository volonteersRepository,
-            ISpeciesRepository speciesRepository,
             IReadDbContext readDbContext,
             IUnitOfWork unitOfWork,
             IValidator<AddPetCommand> validator,
             ILogger<AddPetHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
-            _speciesRepository = speciesRepository;
             _readDbContext = readDbContext;
             _unitOfWork = unitOfWork;
             _validator = validator;
@@ -59,7 +54,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
             }
 
             var volonteerResult = await _volonteersRepository.GetById(
-                command.VolonteerID, cancellationToken);
+                command.VolonteerId, cancellationToken);
 
             if(volonteerResult.IsFailure)
                 return volonteerResult.Error.ToErrorList();
@@ -86,7 +81,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
                     command.PetCharacteristicsDTO.Weight,
                     command.PetCharacteristicsDTO.Height).Value,
                 PetHealthInfo.Create(
-                    command.PetHealthInfoDTO.HelthInfo,
+                    command.PetHealthInfoDTO.HealthInfo,
                     command.PetHealthInfoDTO.IsNeutered,
                     command.PetHealthInfoDTO.IsVaccinated).Value,
                 donationDetailsCollection,

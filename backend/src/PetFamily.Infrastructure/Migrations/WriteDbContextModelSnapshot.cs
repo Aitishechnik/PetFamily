@@ -291,6 +291,26 @@ namespace PetFamily.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_pets_volonteers_volonteer_id");
 
+                    b.OwnsOne("PetFamily.Domain.Shared.FilePath", "MainPhoto", b1 =>
+                        {
+                            b1.Property<Guid>("PetId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("Path")
+                                .HasMaxLength(750)
+                                .HasColumnType("character varying(750)")
+                                .HasColumnName("main_photo");
+
+                            b1.HasKey("PetId");
+
+                            b1.ToTable("pets");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PetId")
+                                .HasConstraintName("fk_pets_pets_id");
+                        });
+
                     b.OwnsMany("PetFamily.Domain.Shared.FilePath", "PetPhotos", b1 =>
                         {
                             b1.Property<Guid>("PetId")
@@ -316,6 +336,8 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasForeignKey("PetId")
                                 .HasConstraintName("fk_pets_pets_pet_id");
                         });
+
+                    b.Navigation("MainPhoto");
 
                     b.Navigation("PetPhotos");
                 });

@@ -161,5 +161,98 @@ namespace PetFamily.Domain.Models.Volonteer
 
             return Result.Success<Error>();
         }
+
+        public UnitResult<Error> UpdatePetInfo(
+            Guid petId,
+            int serialNumber,
+            string name,
+            string description,
+            string address,
+            string ownerPhoneNumber,
+            DateTime dateOfBirth,
+            HelpStatus HelpStatus,
+            string color,
+            double weight,
+            double height,
+            string healthInfo,
+            bool isNeutered,
+            bool isVaccinated,
+            Guid speciesId,
+            Guid breedId,
+            IEnumerable<DonationDetails> donationDetails)
+        {
+            var petResult = GetPetById(petId);
+            if (petResult.IsFailure)
+                return petResult.Error;
+
+            var updateResult = petResult.Value.UpdateInfo(
+                name,
+                description,
+                address,
+                ownerPhoneNumber,
+                dateOfBirth,
+                HelpStatus,
+                color,
+                weight,
+                height,
+                healthInfo,
+                isNeutered,
+                isVaccinated,
+                speciesId,
+                breedId,
+                donationDetails);
+            if (updateResult.IsFailure)
+                return updateResult.Error;
+
+            if(serialNumber != petResult.Value.SerialNumber.Value)
+            {
+                var moveResult = MovePet(
+                    petResult.Value.SerialNumber,
+                    SerialNumber.Create(serialNumber).Value);
+                if (moveResult.IsFailure)
+                    return moveResult.Error;
+            }
+
+            return Result.Success<Error>();
+        }
+
+        public UnitResult<Error> ChangePetStatus(
+            Guid petId,
+            HelpStatus helpStatus)
+        {
+            var petResult = GetPetById(petId);
+            if (petResult.IsFailure)
+                return petResult.Error;
+
+            if(helpStatus != HelpStatus.NeedsHelp &&
+                helpStatus != HelpStatus.LookingForHome)
+                return Errors.General.ValueIsInvalid("help status");
+
+            petResult.Value.ChangeHelpStatus(helpStatus);
+
+            return Result.Success<Error>();
+        }
+
+        public UnitResult<Error> PetSoftDelete(Guid petId)
+        {
+            var petResult = GetPetById(petId);
+            if(petResult.IsFailure)
+                return petResult.Error;
+
+            var petDeleteResult = petResult.Value.SoftDelete();
+            if (petDeleteResult.IsFailure)
+                return petDeleteResult.Error;
+
+            return Result.Success<Error>();
+        }
+
+        public UnitResult<Error> PetDelete(Guid petId)
+        {
+            var petResult = GetPetById(petId);
+            if (petResult.IsFailure)
+                return petResult.Error;
+            Pets.Remove(petResult.Value);
+            return Result.Success<Error>();
+        }
     }
 }
