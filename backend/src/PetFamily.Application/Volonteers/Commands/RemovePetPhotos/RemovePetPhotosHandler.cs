@@ -39,8 +39,9 @@ namespace PetFamily.Application.Volonteers.Commands.RemovePetPhotos
             if (validationResult.IsValid == false)
                 return validationResult.ToErrorList();
 
-
-            var volonteerResult = await _volonteersRepository.GetById(command.VolonteerId, cancellationToken);
+            var volonteerResult = await _volonteersRepository.GetById(
+                command.VolonteerId, 
+                cancellationToken);
             if(volonteerResult.IsFailure)
                 return volonteerResult.Error.ToErrorList();
 

@@ -1,7 +1,7 @@
 ﻿namespace PetFamily.Contracts
 {
     public record PetHealthInfoDTO(
-        string HelthInfo,
+        string HealthInfo,
         bool IsNeutered,
         bool IsVaccinated);
 }

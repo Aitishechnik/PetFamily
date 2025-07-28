@@ -4,7 +4,7 @@ using PetFamily.Contracts;
 namespace PetFamily.Application.Volonteers.Commands.AddPet
 {
     public record AddPetCommand(
-        Guid VolonteerID,
+        Guid VolonteerId,
         PetGeneralInfoDTO PetGeneralInfoDTO,
         PetCharacteristicsDTO PetCharacteristicsDTO,
         PetHealthInfoDTO PetHealthInfoDTO,

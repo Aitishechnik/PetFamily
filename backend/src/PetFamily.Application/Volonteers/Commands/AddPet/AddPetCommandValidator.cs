@@ -8,7 +8,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
     {
         public AddPetCommandValidator()
         {
-            RuleFor(a => a.VolonteerID)
+            RuleFor(a => a.VolonteerId)
                 .NotNull()
                 .Must(a => a != Guid.Empty);
 
@@ -29,7 +29,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
 
             RuleFor(a => a.PetHealthInfoDTO)
                 .MustBeValueObject(x => PetHealthInfo.Create(
-                    x.HelthInfo,
+                    x.HealthInfo,
                     x.IsNeutered,
                     x.IsVaccinated));
 

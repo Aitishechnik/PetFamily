@@ -10,9 +10,8 @@ namespace PetFamily.Application.Volonteers.Commands.UpdateDonationDetails
         public UpdateDonationDetailCommandsValidator()
         {
             RuleFor(x => x.VolonteerId)
-                .NotEmpty()
-                .WithErrorCode(Errors.General.ValueIsRequired().Code)
-                .WithMessage(Errors.General.ValueIsInvalid().Message);
+                .NotEmpty();
+
             RuleForEach(x => x.DonationDetails)
                 .MustBeValueObject(u => DonationDetails.Create(u.Name, u.Description));
         }
