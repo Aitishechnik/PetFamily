@@ -78,7 +78,7 @@ namespace PetFamily.Domain.UnitTests
         }
 
         [Fact]
-        public void Move_Pet_Return_Seccess_Result()
+        public void Move_Pet_Return_Success_Result()
         {
             // arrange
             var volonteer = new Volonteer(
@@ -97,7 +97,7 @@ namespace PetFamily.Domain.UnitTests
                 PetType.Create(Guid.NewGuid(), Guid.NewGuid()).Value));
 
             var petToMove = new Pet(
-                PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
+                PetGeneralInfo.Create("Tuzik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
                 new List<DonationDetails>(),
@@ -107,15 +107,16 @@ namespace PetFamily.Domain.UnitTests
                 volonteer.AddPet(pet);
 
             volonteer.AddPet(petToMove);
+            volonteer.MovePet(petToMove.SerialNumber, SerialNumber.Create(2).Value);
 
             // act
-            var result = volonteer.MovePet(petToMove.SerialNumber, SerialNumber.Create(2).Value);
+            var result = volonteer.MovePet(petToMove.SerialNumber, SerialNumber.Create(6).Value);
 
             // assert
             Assert.True(result.IsSuccess);
             Assert.Equal(6, volonteer.Pets.Count);
             Assert.Equal(SerialNumber.First, volonteer.Pets[0].SerialNumber);
-            Assert.Equal(2, petToMove.SerialNumber.Value);
+            Assert.Equal(6, petToMove.SerialNumber.Value);
         }
     }
 }
