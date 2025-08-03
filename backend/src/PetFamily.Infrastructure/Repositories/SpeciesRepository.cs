@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
+using PetFamily.Application.Database;
 using PetFamily.Application.Species;
 using PetFamily.Domain.Models.Species;
 using PetFamily.Domain.Shared;
@@ -69,6 +70,13 @@ namespace PetFamily.Infrastructure.Repositories
             _dbContext.Remove(breed);
 
             return Result.Success<Error>();
+        }
+
+        public async Task AddSpecies(
+            Species species, 
+            CancellationToken cancellationToken = default)
+        {
+            await _dbContext.Species.AddAsync(species);
         }
     }
 }

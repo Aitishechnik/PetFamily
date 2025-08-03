@@ -9,7 +9,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.Commands.PetDelete.Hard
 {
-    public class HardDeletePetHandler : ICommandHandler<DeletePetCommand>
+    public class HardDeletePetHandler : ICommandHandler<HardDeletePetCommand>
     {
         private readonly IVolonteersRepository _volonteersRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -35,7 +35,7 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Hard
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            DeletePetCommand command, 
+            HardDeletePetCommand command, 
             CancellationToken cancellationToken = default)
         {
             var validationResult = _validator.Validate(command);

@@ -3,16 +3,17 @@ using PetFamily.Domain.Models.Volonteer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Models.Species;
+using PetFamily.Application.Database;
 
 namespace PetFamily.Infrastructure.DbContexts
 {
-    public class WriteDbContext(IConfiguration configuration) : DbContext
+    public class WriteDbContext(string connectionString) : DbContext
     {
         public DbSet<Species> Species => Set<Species>();
         public DbSet<Volonteer> Volonteers => Set<Volonteer>();
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(configuration.GetConnectionString(DbConstants.DATABASE));
+            optionsBuilder.UseNpgsql(connectionString);
             optionsBuilder.UseSnakeCaseNamingConvention();
             optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
             optionsBuilder.EnableSensitiveDataLogging();

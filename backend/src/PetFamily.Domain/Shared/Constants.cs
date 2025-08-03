@@ -16,6 +16,8 @@
         public const int MAX_FILE_SIZE = 30 * 1024 * 1024; // 30 MB
         public const string PHOTO_FILE_EXTENSION = ".jpg";
 
+        public const string DATABASE = "Database";
+
         public const string REGEX_FULLNAME_PATTERN =
             @"^(?:(?:[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?\s){1,2}[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?|(?:[A-Z][a-z]+(?:-[A-Z][a-z]+)?\s){1,2}[A-Z][a-z]+(?:-[A-Z][a-z]+)?)$";
 

@@ -5,9 +5,8 @@ namespace PetFamily.Domain.Models.Species
     public class Breed : Entity<Guid>
     {
         protected Breed() { }
-        public Breed(Guid id, string name)
+        public Breed(string name)
         {
-            Id = id;
             Name = name;
         }
         public string Name { get; private set; } = default!;

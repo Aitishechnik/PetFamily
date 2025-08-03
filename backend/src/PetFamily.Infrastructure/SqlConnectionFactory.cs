@@ -5,7 +5,7 @@ using PetFamily.Application.Database;
 
 namespace PetFamily.Infrastructure
 {
-    internal class SqlConnectionFactory : ISqlConnectionFactory
+    public class SqlConnectionFactory : ISqlConnectionFactory
     {
         private readonly IConfiguration _configuration;
 
@@ -18,5 +18,10 @@ namespace PetFamily.Infrastructure
             new NpgsqlConnection(
                 _configuration
                 .GetConnectionString("Database"));
+    }
+
+    public class SqlConnectionFactoryTest(string connectionString) : ISqlConnectionFactory
+    {
+        public IDbConnection Create() => new NpgsqlConnection(connectionString);
     }
 }
