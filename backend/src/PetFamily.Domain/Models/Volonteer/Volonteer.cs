@@ -150,7 +150,9 @@ namespace PetFamily.Domain.Models.Volonteer
             Pets.RemoveAt(oldIndex);
             Pets.Insert(targetIndex, pet);
 
-            for (int i = oldIndex; i < Pets.Count; i++)
+            int startIndex = oldIndex < targetIndex ? oldIndex : targetIndex;
+
+            for (int i = startIndex ; i < Pets.Count; i++)
             {
                 var serialResult = SerialNumber.Create(i + 1);
                 if (serialResult.IsFailure)

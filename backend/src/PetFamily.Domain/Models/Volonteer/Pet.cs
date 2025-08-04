@@ -118,6 +118,8 @@ namespace PetFamily.Domain.Models.Volonteer
             if (newPetHealthInfo.IsFailure)
                 return newPetHealthInfo.Error;
 
+            PetHealthInfo = newPetHealthInfo.Value;
+
             _donationDetails = donationDetails.ToList();
 
             var newPetType = PetType.Create(speciesId, breedId);

@@ -15,7 +15,9 @@ namespace PetFamily.Application.Species
         Task<UnitResult<Error>> RemoveBreed(
             Guid breedId,
             CancellationToken cancellationToken = default);
-
+        Task AddSpecies(
+            Domain.Models.Species.Species species,
+            CancellationToken cancellationToken = default);
 
     }
 }

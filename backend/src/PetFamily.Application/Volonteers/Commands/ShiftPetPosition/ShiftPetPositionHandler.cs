@@ -35,7 +35,7 @@ namespace PetFamily.Application.Volonteers.Commands.ShiftPetPosition
             if (validationResult.IsValid == false)
                 return validationResult.ToErrorList();
 
-            var volonteerResult = await _volonteersRepository.GetById(command.VoloteerId);
+            var volonteerResult = await _volonteersRepository.GetById(command.VolonteerId);
             if (volonteerResult.IsFailure)
                 return volonteerResult.Error.ToErrorList();
 

@@ -7,7 +7,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.Commands.PetDelete.Soft
 {
-    public class SoftDeletePetHandler : ICommandHandler<DeletePetCommand>
+    public class SoftDeletePetHandler : ICommandHandler<SoftDeletePetCommand>
     {
         private readonly IVolonteersRepository _volonteerRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -27,7 +27,7 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Soft
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            DeletePetCommand command, 
+            SoftDeletePetCommand command, 
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command);

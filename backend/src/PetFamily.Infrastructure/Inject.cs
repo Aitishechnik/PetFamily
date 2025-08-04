@@ -7,6 +7,7 @@ using PetFamily.Application.FileManagement.Providers;
 using PetFamily.Application.Messaging;
 using PetFamily.Application.Species;
 using PetFamily.Application.Volonteers;
+using PetFamily.Domain.Shared;
 using PetFamily.Infrastructure.BackgroundServices;
 using PetFamily.Infrastructure.DbContexts;
 using PetFamily.Infrastructure.MessageQueues;
@@ -25,7 +26,7 @@ namespace PetFamily.Infrastructure
             IConfiguration configuration)
         {
             services
-                .AddDbContexts()
+                .AddDbContexts(configuration)
                 .AddMinioCustom(configuration)
                 .AddRepositories()
                 .AddDatabase()
@@ -47,10 +48,12 @@ namespace PetFamily.Infrastructure
         }
 
         private static IServiceCollection AddDbContexts(
-            this IServiceCollection services)
+            this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<WriteDbContext>();
-            services.AddScoped<IReadDbContext, ReadDbContext>();
+            services.AddScoped<WriteDbContext>(_ =>
+            new WriteDbContext(configuration.GetConnectionString(Constants.DATABASE)!));
+            services.AddScoped<IReadDbContext, ReadDbContext>(_ =>
+            new ReadDbContext(configuration.GetConnectionString(Constants.DATABASE)!));
 
             return services;
         }

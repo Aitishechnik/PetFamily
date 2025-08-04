@@ -6,7 +6,7 @@ namespace PetFamily.Application.Volonteers.Commands.ShiftPetPosition
     {
         public ShiftPetPositionCommandValidator()
         {
-            RuleFor(c => c.VoloteerId)
+            RuleFor(c => c.VolonteerId)
                 .NotEmpty();
 
             RuleFor(c => c.PetId)

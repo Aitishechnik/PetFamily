@@ -1,10 +1,9 @@
-﻿
-using PetFamily.Application.Abstraction;
+﻿using PetFamily.Application.Abstraction;
 
 namespace PetFamily.Application.Volonteers.Commands.ShiftPetPosition
 {
     public record ShiftPetPositionCommand(
-        Guid VoloteerId, 
+        Guid VolonteerId, 
         Guid PetId, 
         int NewPosition) : ICommand;
 }
