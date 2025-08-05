@@ -1,34 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PetFamily.API.Extensions;
-using PetFamily.API.Response;
-using PetFamily.API.Processors;
-using PetFamily.Domain.Shared;
-using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Controllers.Volonteers.Requests;
-using PetFamily.Application.Volonteers.Commands.AddPet;
-using PetFamily.Application.Volonteers.Commands.ShiftPetPosition;
-using PetFamily.Application.Volonteers.Commands.UpdateDonationDetails;
-using PetFamily.Application.Volonteers.Commands.AddPetPhotos;
-using PetFamily.Application.Volonteers.Commands.RemovePetPhotos;
-using PetFamily.Application.Volonteers.Commands.UpdateSocialNetworks;
-using PetFamily.Application.Volonteers.Commands.UpdateMainInfo;
-using PetFamily.Application.Volonteers.Commands.Create;
+using PetFamily.API.Extensions;
+using PetFamily.API.Processors;
+using PetFamily.API.Response;
 using PetFamily.Application.Abstraction;
-using PetFamily.Application.Models;
 using PetFamily.Application.Dtos;
-using PetFamily.Application.Volonteers.Queries.GetVolonteers;
-using PetFamily.Application.Volonteers.GetById;
-using PetFamily.Application.Volonteers.Commands.UpdatePetInfo;
+using PetFamily.Application.Extensions;
+using PetFamily.Application.Models;
+using PetFamily.Application.Volonteers.Commands.AddPet;
+using PetFamily.Application.Volonteers.Commands.AddPetPhotos;
 using PetFamily.Application.Volonteers.Commands.ChangePetStatus;
-using PetFamily.Application.Volonteers.Commands.PetDelete;
+using PetFamily.Application.Volonteers.Commands.Create;
 using PetFamily.Application.Volonteers.Commands.Delete.Hard;
 using PetFamily.Application.Volonteers.Commands.Delete.Soft;
-using PetFamily.Application.Volonteers.Commands.PetDelete.Soft;
+using PetFamily.Application.Volonteers.Commands.PetDelete;
 using PetFamily.Application.Volonteers.Commands.PetDelete.Hard;
+using PetFamily.Application.Volonteers.Commands.PetDelete.Soft;
+using PetFamily.Application.Volonteers.Commands.RemovePetPhotos;
 using PetFamily.Application.Volonteers.Commands.SetPetMainPhoto;
+using PetFamily.Application.Volonteers.Commands.ShiftPetPosition;
+using PetFamily.Application.Volonteers.Commands.UpdateDonationDetails;
+using PetFamily.Application.Volonteers.Commands.UpdateMainInfo;
+using PetFamily.Application.Volonteers.Commands.UpdatePetInfo;
+using PetFamily.Application.Volonteers.Commands.UpdateSocialNetworks;
+using PetFamily.Application.Volonteers.GetById;
 using PetFamily.Application.Volonteers.Queries.GetAllPets;
-using FluentValidation;
-using PetFamily.Application.Extensions;
+using PetFamily.Application.Volonteers.Queries.GetPetById;
+using PetFamily.Application.Volonteers.Queries.GetVolonteers;
+using PetFamily.Domain.Shared;
+using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 
 namespace PetFamily.API.Controllers.Volonteers
 {
@@ -345,6 +346,19 @@ namespace PetFamily.API.Controllers.Volonteers
                 return validationResult.ToErrorList().ToResponse();
             var result = await handler.Handle(request.ToQuery(), cancellationToken);
             return Ok(result);
+        }
+
+        [HttpGet("{petId:guid}pet")]
+        public async Task<IActionResult> GetPetById(
+            [FromRoute] Guid petId,
+            [FromServices] IQueryHandler<PartialPetDto, GetPetByIdQuery> handler,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await handler.Handle(
+                new GetPetByIdQuery(petId), 
+                cancellationToken);
+
+            return Ok(Envelope.Ok(result));
         }
     }
 }

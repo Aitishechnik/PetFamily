@@ -32,7 +32,7 @@ namespace PetFamily.Application.Volonteers.Queries.GetAllPets
             GetAllPetsWithPaginationQuery query,
             CancellationToken cancellationToken = default)
         {
-            var connection = _connectionFactory.Create();
+            using var connection = _connectionFactory.Create();
 
             var totalCount = await connection.ExecuteScalarAsync<int>(
                 "SELECT COUNT(*) FROM volonteers");
