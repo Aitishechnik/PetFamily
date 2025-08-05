@@ -2,13 +2,13 @@
 
 namespace PetFamily.Application.Dtos
 {
-    public class PetDto
+    public class PartialPetDto
     {
         public Guid Id { get; set; }
         public Guid VolonteerId { get; set; }
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public string Address { get;set; } = default!;
+        public string Address { get; set; } = default!;
         public string OwnerPhoneNumber { get; set; } = default!;
         public DateTime DateOfBirth { get; set; }
         public HelpStatus HelpStatus { get; set; }
@@ -19,11 +19,8 @@ namespace PetFamily.Application.Dtos
         public bool IsNeutered { get; set; }
         public bool IsVaccinated { get; set; }
         public DonationDetailsDto[] DonationDetails { get; set; } = [];
-        public Guid SpeciesId { get; set; }
-        public Guid BreedId { get; set; }
+        public string Species { get; set; } = default!;
+        public string Breed { get; set; } = default!;
         public int SerialNumber { get; set; }
-        public bool IsDeleted { get; private set; } = false;
-        public DateTime? DeletionDate { get; private set; } = null;
-        public string? MainPhoto { get; set; }
     }
 }

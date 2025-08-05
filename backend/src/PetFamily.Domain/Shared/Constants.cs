@@ -7,6 +7,7 @@
         public const int MAX_PHONE_NUMBER_LENGTH = 20;
         public const int MAX_LINK_LENGTH = 750;
         public const int MAX_EMAIL_LENGTH = 320;
+        public const int MAX_ADDRESS_LENGTH = 300;
         public const int MAX_YEARS_OF_EXPERIENCE = 100;
         public const int MAX_DOMASTIC_PET_AGE = 25;
         public const int MAX_DOMASTIC_PET_WEIGHT_KG = 150;

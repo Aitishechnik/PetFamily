@@ -26,6 +26,9 @@ using PetFamily.Application.Volonteers.Commands.Delete.Soft;
 using PetFamily.Application.Volonteers.Commands.PetDelete.Soft;
 using PetFamily.Application.Volonteers.Commands.PetDelete.Hard;
 using PetFamily.Application.Volonteers.Commands.SetPetMainPhoto;
+using PetFamily.Application.Volonteers.Queries.GetAllPets;
+using FluentValidation;
+using PetFamily.Application.Extensions;
 
 namespace PetFamily.API.Controllers.Volonteers
 {
@@ -326,6 +329,22 @@ namespace PetFamily.API.Controllers.Volonteers
                 return result.Error.ToResponse();
             }
             return Ok(Envelope.Ok());
+        }
+
+        [HttpGet("pets")]
+        public async Task<IActionResult> GetPetsWithPagination(
+            [FromQuery] GetAllPetsWithPaginationRequest request,
+            [FromServices] IQueryHandler<PagedList<PartialPetDto>,
+                GetAllPetsWithPaginationQuery> handler,
+            [FromServices] IValidator<GetAllPetsWithPaginationQuery> validator,
+            CancellationToken cancellationToken = default)
+        {
+            var query = request.ToQuery();
+            var validationResult = await validator.ValidateAsync(query, cancellationToken);
+            if(validationResult.IsValid == false)
+                return validationResult.ToErrorList().ToResponse();
+            var result = await handler.Handle(request.ToQuery(), cancellationToken);
+            return Ok(result);
         }
     }
 }
