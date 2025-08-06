@@ -42,7 +42,7 @@ namespace PetFamily.Infrastructure.Configurations.Read
                 .IsRequired()
                 .HasConversion(
                     helpStatus => helpStatus.ToString(),
-                    value => Utilities.ParseHelpStatus(value));
+                    value => Utilities.Parse(value));
 
             builder.Property(pc => pc.Weight)
                     .HasColumnName("weight")

@@ -44,7 +44,7 @@ namespace PetFamily.Infrastructure.Configurations.Write
                     .IsRequired()
                     .HasConversion(
                         helpStatus => helpStatus.ToString(),
-                        value => Utilities.ParseHelpStatus(value));
+                        value => Utilities.Parse(value));
             });
 
             builder.ComplexProperty(pet => pet.PetCharacteristics, pcb =>
