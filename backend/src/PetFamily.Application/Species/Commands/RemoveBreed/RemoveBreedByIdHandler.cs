@@ -32,7 +32,7 @@ namespace PetFamily.Application.Species.Commands.RemoveBreed
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            RemoveBreedByIdCommand command, 
+            RemoveBreedByIdCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -50,7 +50,7 @@ namespace PetFamily.Application.Species.Commands.RemoveBreed
             }
 
             var isPetWithBreed = await _readDbContext.Pets.AnyAsync(
-                p => p.BreedId == command.BreedId, 
+                p => p.BreedId == command.BreedId,
                 cancellationToken);
 
             if (isPetWithBreed)
@@ -65,7 +65,7 @@ namespace PetFamily.Application.Species.Commands.RemoveBreed
             try
             {
                 var result = await _speciesRepository.RemoveBreed(
-                    command.BreedId, 
+                    command.BreedId,
                     cancellationToken);
 
                 if (result.IsFailure)
@@ -80,7 +80,7 @@ namespace PetFamily.Application.Species.Commands.RemoveBreed
 
                 return UnitResult.Success<ErrorList>();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError("Error occurred while removing breed");
                 transaction.Rollback();

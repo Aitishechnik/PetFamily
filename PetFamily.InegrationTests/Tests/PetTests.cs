@@ -2,20 +2,21 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstraction;
-using PetFamily.Application.Volonteers.Commands.AddPet;
-using PetFamily.Application.Volonteers.Commands.AddPetPhotos;
-using PetFamily.Application.Volonteers.Commands.ChangePetStatus;
-using PetFamily.Application.Volonteers.Commands.PetDelete.Hard;
-using PetFamily.Application.Volonteers.Commands.PetDelete.Soft;
-using PetFamily.Application.Volonteers.Commands.RemovePetPhotos;
-using PetFamily.Application.Volonteers.Commands.SetPetMainPhoto;
-using PetFamily.Application.Volonteers.Commands.ShiftPetPosition;
-using PetFamily.Application.Volonteers.Commands.UpdatePetInfo;
-using PetFamily.Domain.Models.Volonteer;
-using PetFamily.Domain.Shared;
-using PetFamily.Infrastructure.DbContexts;
-using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Dtos.Enums;
+using PetFamily.Core.FileManagment.Files;
+using PetFamily.SharedKernal;
+using PetFamily.Species.Infrastructure.DbContexts;
+using PetFamily.Volonteers.Application.Commands.AddPet;
+using PetFamily.Volonteers.Application.Commands.AddPetPhotos;
+using PetFamily.Volonteers.Application.Commands.ChangePetStatus;
+using PetFamily.Volonteers.Application.Commands.PetDelete.Hard;
+using PetFamily.Volonteers.Application.Commands.PetDelete.Soft;
+using PetFamily.Volonteers.Application.Commands.RemovePetPhotos;
+using PetFamily.Volonteers.Application.Commands.SetPetMainPhoto;
+using PetFamily.Volonteers.Application.Commands.ShiftPetPosition;
+using PetFamily.Volonteers.Application.Commands.UpdatePetInfo;
+using PetFamily.Volonteers.Infrastructure.DbContexts;
 
 namespace PetFamily.InegrationTests.Tests
 {
@@ -23,18 +24,19 @@ namespace PetFamily.InegrationTests.Tests
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Register<FilePath>(() =>
+            fixture.Register(() =>
                 FilePath.Create(fixture.Create<string>()).Value);
 
-            fixture.Register<FileInfo>(() =>
-                new FileInfo(fixture.Create<string>(), fixture.Create<FilePath>()));
+            fixture.Register(() =>
+                new FileInfoPath(fixture.Create<string>(), fixture.Create<FilePath>()));
         }
     }
     public class PetTests : IClassFixture<IntegrationTestsWebFactory>, IAsyncLifetime
     {
         private readonly IntegrationTestsWebFactory _factory;
         private readonly Fixture _fixture;
-        private readonly WriteDbContext _writeDbContext;
+        private readonly VolonteerWriteDbContext _volonteerWriteDbContext;
+        private readonly SpeciesWriteDbContext _speciesWriteDbContext;
         private readonly IServiceScope _scope;
 
         public PetTests(IntegrationTestsWebFactory factory)
@@ -43,7 +45,8 @@ namespace PetFamily.InegrationTests.Tests
             _fixture = new Fixture();
             _fixture.Customize(new DomainValueObjectsCustomization());
             _scope = _factory.Services.CreateScope();
-            _writeDbContext = _scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+            _volonteerWriteDbContext = _scope.ServiceProvider.GetRequiredService<VolonteerWriteDbContext>();
+            _speciesWriteDbContext = _scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
         }
 
         public Task InitializeAsync() => Task.CompletedTask;
@@ -58,9 +61,9 @@ namespace PetFamily.InegrationTests.Tests
         public async Task AddPet_toSeededVolonteer_AddedToDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
             var command = _fixture.CreateAddPetCommand(volonteerId, speciesId, breedId);
             var sut = _scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, AddPetCommand>>();
 
@@ -70,7 +73,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext.Volonteers.FirstOrDefaultAsync(v => v.Id == volonteerId);
+            var volonteer = await _volonteerWriteDbContext.Volonteers.FirstOrDefaultAsync(v => v.Id == volonteerId);
             volonteer?.Pets.Should().NotBeNull();
             volonteer?.Pets.Should().NotBeEmpty();
             volonteer?.Pets[0].Id.Should().Be(result.Value);
@@ -80,10 +83,10 @@ namespace PetFamily.InegrationTests.Tests
         public async Task AddPetPhoto_ToSeededPetWithEmptyPhotoList_PlacedToFileServerAndDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
-            var petId = await _factory.SeedPet(_writeDbContext, volonteerId, speciesId, breedId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
+            var petId = await _factory.SeedPet(_volonteerWriteDbContext, volonteerId, speciesId, breedId);
             var command = _fixture.CreateAddPetPhotoCommand(volonteerId, petId);
             var sut = _scope.ServiceProvider.GetRequiredService<ICommandHandler<IReadOnlyList<FilePath>, AddPetPhotosCommand>>();
 
@@ -102,14 +105,14 @@ namespace PetFamily.InegrationTests.Tests
         public async Task ChangePetStatus_FromNeedsHelpToLookingForHome_AddedToDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
             var petId = await _factory.SeedPet
-                (_writeDbContext, volonteerId, speciesId, breedId);
+                (_volonteerWriteDbContext, volonteerId, speciesId, breedId);
             var command = _fixture.CreateChangePetStatusHandler(
-                volonteerId, 
-                petId, 
+                volonteerId,
+                petId,
                 HelpStatus.LookingForHome);
             var sut = _scope.ServiceProvider.GetRequiredService<ICommandHandler<ChangePetStatusCommand>>();
 
@@ -119,7 +122,7 @@ namespace PetFamily.InegrationTests.Tests
             //Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(v => v.Id == volonteerId);
 
@@ -132,11 +135,11 @@ namespace PetFamily.InegrationTests.Tests
         public async Task SoftPetDelete_SeededPet_ChangesAddedToDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
             var petId = await _factory.SeedPet
-                (_writeDbContext, volonteerId, speciesId, breedId);
+                (_volonteerWriteDbContext, volonteerId, speciesId, breedId);
             var command = _fixture.CreateSoftDeletePetCommand(volonteerId, petId);
             var sut = _scope.ServiceProvider
                 .GetRequiredService<ICommandHandler<SoftDeletePetCommand>>();
@@ -147,7 +150,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(v => v.Id == volonteerId);
 
@@ -162,11 +165,11 @@ namespace PetFamily.InegrationTests.Tests
         public async Task HardPetDelete_SeededPet_RemovedFromDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
             var petId = await _factory.SeedPet
-                (_writeDbContext, volonteerId, speciesId, breedId);
+                (_volonteerWriteDbContext, volonteerId, speciesId, breedId);
             var command = _fixture.CreateHardDeletePetCommand(volonteerId, petId);
             var sut = _scope.ServiceProvider
                 .GetRequiredService<ICommandHandler<HardDeletePetCommand>>();
@@ -177,7 +180,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(v => v.Id == volonteerId);
 
@@ -190,18 +193,18 @@ namespace PetFamily.InegrationTests.Tests
         public async Task RemovePetPhoto_FromSeededPetAndPhotos_RemoveFromFileServerAndDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
-            var petId = await _factory.SeedPet(_writeDbContext, volonteerId, speciesId, breedId);
-            var filePaths = await _factory.SeedPetPhotos(_writeDbContext, volonteerId, petId);
-            var fileInfo = filePaths.Select(fp => 
-                new FileInfo(
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
+            var petId = await _factory.SeedPet(_volonteerWriteDbContext, volonteerId, speciesId, breedId);
+            var filePaths = await _factory.SeedPetPhotos(_volonteerWriteDbContext, volonteerId, petId);
+            var fileInfo = filePaths.Select(fp =>
+                new FileInfoPath(
                     "photos",
                     FilePath.Create(fp).Value));
             var command = _fixture.CreateRemovePetPhotoCommand(
-                volonteerId, 
-                petId, 
+                volonteerId,
+                petId,
                 fileInfo);
             var sut = _scope.ServiceProvider
                 .GetRequiredService<ICommandHandler<RemovePetPhotosCommand>>();
@@ -210,7 +213,7 @@ namespace PetFamily.InegrationTests.Tests
             var result = await sut.Handle(command, CancellationToken.None);
 
             // Assert
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(v => v.Id == volonteerId);
 
@@ -224,11 +227,11 @@ namespace PetFamily.InegrationTests.Tests
         public async Task SetPetMainPhoto_SeededPetAndPhotos_MainPhotoAddedToDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
-            var petId = await _factory.SeedPet(_writeDbContext, volonteerId, speciesId, breedId);
-            var filePaths = await _factory.SeedPetPhotos(_writeDbContext, volonteerId, petId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
+            var petId = await _factory.SeedPet(_volonteerWriteDbContext, volonteerId, speciesId, breedId);
+            var filePaths = await _factory.SeedPetPhotos(_volonteerWriteDbContext, volonteerId, petId);
             var command = _fixture
                 .CreateSetPetMainPhotoCommand(
                     volonteerId, petId, filePaths[^1]);
@@ -241,7 +244,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(v => v.Id == volonteerId);
 
@@ -254,22 +257,22 @@ namespace PetFamily.InegrationTests.Tests
         public async Task ShiftPetPosition_OfSeededPet_AddedChangesToDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
-            var pet1Id = await _factory.SeedPet(_writeDbContext, volonteerId, speciesId, breedId);
-            var pet2Id = await _factory.SeedPet(_writeDbContext, volonteerId, speciesId, breedId);
-            var pet3Id = await _factory.SeedPet(_writeDbContext, volonteerId, speciesId, breedId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
+            var pet1Id = await _factory.SeedPet(_volonteerWriteDbContext, volonteerId, speciesId, breedId);
+            var pet2Id = await _factory.SeedPet(_volonteerWriteDbContext, volonteerId, speciesId, breedId);
+            var pet3Id = await _factory.SeedPet(_volonteerWriteDbContext, volonteerId, speciesId, breedId);
             var command = _fixture.CreateShiftPetPositionCommand(volonteerId, pet3Id, 1);
             var sut = _scope.ServiceProvider.GetRequiredService<ICommandHandler<ShiftPetPositionCommand>>();
 
             // Act
             var result = await sut.Handle(command, CancellationToken.None);
-            
+
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(v => v.Id == volonteerId);
 
@@ -287,10 +290,10 @@ namespace PetFamily.InegrationTests.Tests
         public async Task UpdatePetInfo_OfSeededPet_AddedChangesToDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
-            var speciesId = await _factory.SeedSpecies(_writeDbContext);
-            var breedId = await _factory.SeedBreed(_writeDbContext, speciesId);
-            var petId = await _factory.SeedPet(_writeDbContext, volonteerId, speciesId, breedId);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
+            var speciesId = await _factory.SeedSpecies(_speciesWriteDbContext);
+            var breedId = await _factory.SeedBreed(_speciesWriteDbContext, speciesId);
+            var petId = await _factory.SeedPet(_volonteerWriteDbContext, volonteerId, speciesId, breedId);
             var command = _fixture.CreateUpdatePetInfoCommand(volonteerId, petId, speciesId, breedId);
             var sut = _scope.ServiceProvider.GetRequiredService<ICommandHandler<UpdatePetInfoCommand>>();
 
@@ -300,7 +303,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(v => v.Id == volonteerId);
 

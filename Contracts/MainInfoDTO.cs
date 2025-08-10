@@ -1,6 +1,6 @@
 ﻿namespace PetFamily.Contracts
 {
     public record MainInfoDTO(
-        PersonalDataDTO PersonalDataDTO, 
+        PersonalDataDTO PersonalDataDTO,
         ProfessionalDataDTO ProfessionalDataDTO);
 }

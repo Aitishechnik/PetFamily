@@ -1,13 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
-using Microsoft.Extensions.Logging;
-using Minio.DataModel.Args;
-using Minio;
-using PetFamily.Application.FileManagement.Providers;
-using PetFamily.Domain.Shared;
 using Microsoft.Extensions.Configuration;
-using PetFamily.Infrastructure.Options;
+using Microsoft.Extensions.Logging;
+using Minio;
+using Minio.DataModel.Args;
+using PetFamily.Application.FileManagement.Providers;
 using PetFamily.Contracts;
-using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
+using PetFamily.Domain.Shared;
+using PetFamily.Infrastructure.Options;
+using FileInfoPath = PetFamily.Application.FileManagment.Files.FileInfoPath;
 
 namespace PetFamily.Infrastructure.Providers
 {
@@ -27,7 +27,7 @@ namespace PetFamily.Infrastructure.Providers
         }
 
         public async Task<UnitResult<Error>> DeleteFiles(
-            IEnumerable<FileInfo> filesInfo, CancellationToken cancellationToken = default)
+            IEnumerable<FileInfoPath> filesInfo, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -41,11 +41,11 @@ namespace PetFamily.Infrastructure.Providers
                     return Error.Failure("file.delete", "Bucket does not exist");
                 }
 
-                var tasksResult = filesInfo.Select(async fileInfo=>
+                var tasksResult = filesInfo.Select(async fileInfo =>
                 {
                     return await RemoveObject(
-                        fileInfo.Bucket, 
-                        fileInfo.FilePath.Path, 
+                        fileInfo.Bucket,
+                        fileInfo.FilePath.Path,
                         semaphoreSlim, cancellationToken);
                 });
 
@@ -111,7 +111,7 @@ namespace PetFamily.Infrastructure.Providers
                 var pathsResult = await Task.WhenAll(tasks);
 
                 var failResult = pathsResult.Where(p => p.IsFailure);
-                if(failResult.Count() > 0)
+                if (failResult.Count() > 0)
                     return failResult.First().Error;
 
                 return pathsResult.Select(p => p.Value).ToList();
@@ -124,7 +124,7 @@ namespace PetFamily.Infrastructure.Providers
         }
 
         private async Task CreateBucketIfNotExists(
-            string bucketName, 
+            string bucketName,
             CancellationToken cancellationToken)
         {
             if (!await IsBucketExist(bucketName, cancellationToken))

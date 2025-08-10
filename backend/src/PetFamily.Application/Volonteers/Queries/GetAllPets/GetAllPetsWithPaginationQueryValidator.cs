@@ -75,7 +75,7 @@ namespace PetFamily.Application.Volonteers.Queries.GetAllPets
 
             RuleFor(q => q.SerialNumber)
                 .GreaterThan(0)
-                .When (q => q.SerialNumber.HasValue);
+                .When(q => q.SerialNumber.HasValue);
         }
     }
 }

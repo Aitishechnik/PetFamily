@@ -16,7 +16,7 @@ namespace PetFamily.Application.Volonteers.Commands.ShiftPetPosition
         private readonly ILogger<ShiftPetPositionHandler> _logger;
 
         public ShiftPetPositionHandler(
-            IUnitOfWork unitOfWork, 
+            IUnitOfWork unitOfWork,
             IVolonteersRepository volonteersRepository,
             IValidator<ShiftPetPositionCommand> validator,
             ILogger<ShiftPetPositionHandler> logger)
@@ -52,7 +52,7 @@ namespace PetFamily.Application.Volonteers.Commands.ShiftPetPosition
             try
             {
                 var result = volonteerResult.Value.MovePet(
-                    petResult.Value.SerialNumber, 
+                    petResult.Value.SerialNumber,
                     newPositionResult.Value);
 
                 if (result.IsFailure)
@@ -67,7 +67,7 @@ namespace PetFamily.Application.Volonteers.Commands.ShiftPetPosition
             {
                 transaction.Rollback();
                 _logger.LogError(
-                    ex, 
+                    ex,
                     "Error occurred while changing pet position");
                 return Errors.General
                     .ValueIsInvalid(ex.Message)

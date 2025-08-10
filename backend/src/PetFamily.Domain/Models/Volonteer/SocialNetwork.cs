@@ -16,7 +16,7 @@ namespace PetFamily.Domain.Models.Volonteer
 
         public static Result<SocialNetwork, Error> Create(string name, string link)
         {
-            if (string.IsNullOrWhiteSpace(name) || 
+            if (string.IsNullOrWhiteSpace(name) ||
                 name.Length > Constants.MAX_NAME_LENGTH)
                 return Errors.General.ValueIsInvalid("Name");
             if (string.IsNullOrWhiteSpace(link) || link.Length > Constants.MAX_LINK_LENGTH)

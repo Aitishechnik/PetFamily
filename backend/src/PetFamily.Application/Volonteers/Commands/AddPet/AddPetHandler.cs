@@ -56,7 +56,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
             var volonteerResult = await _volonteersRepository.GetById(
                 command.VolonteerId, cancellationToken);
 
-            if(volonteerResult.IsFailure)
+            if (volonteerResult.IsFailure)
                 return volonteerResult.Error.ToErrorList();
 
             var volonteer = volonteerResult.Value;
@@ -92,13 +92,13 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
             using var transaction = await _unitOfWork.BeginTransactionAsync();
 
             try
-            {               
+            {
                 volonteer.AddPet(pet);
 
                 await _unitOfWork.SaveChangesAsync();
 
                 transaction.Commit();
-                
+
                 return pet.Id;
             }
             catch (Exception ex)

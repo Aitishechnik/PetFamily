@@ -14,7 +14,7 @@ using PetFamily.Infrastructure.MessageQueues;
 using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
 using static PetFamily.Infrastructure.Files.FilesCleanerBackgroundService;
-using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
+using FileInfoPath = PetFamily.Application.FileManagment.Files.FileInfoPath;
 using MinioOptions = PetFamily.Infrastructure.Options.MinioOptions;
 
 namespace PetFamily.Infrastructure
@@ -22,7 +22,7 @@ namespace PetFamily.Infrastructure
     public static class Inject
     {
         public static IServiceCollection AddInfrastructure(
-            this IServiceCollection services, 
+            this IServiceCollection services,
             IConfiguration configuration)
         {
             services
@@ -42,7 +42,7 @@ namespace PetFamily.Infrastructure
         private static IServiceCollection AddMessageQueues(
             this IServiceCollection services)
         {
-            services.AddSingleton<IMessageQueue<IEnumerable<FileInfo>>, MemoryMessageQueue<IEnumerable<FileInfo>>>();
+            services.AddSingleton<IMessageQueue<IEnumerable<FileInfoPath>>, MemoryMessageQueue<IEnumerable<FileInfoPath>>>();
 
             return services;
         }

@@ -14,10 +14,10 @@ namespace PetFamily.Application.Volonteers.Commands.AddPet
 
             RuleFor(a => a.PetGeneralInfoDTO)
                 .MustBeValueObject(x => PetGeneralInfo.Create(
-                    x.Name, 
-                    x.Description, 
-                    x.Address, 
-                    x.OwnerPhoneNumber, 
+                    x.Name,
+                    x.Description,
+                    x.Address,
+                    x.OwnerPhoneNumber,
                     x.DateOfBirth,
                     x.HelpStatus));
 

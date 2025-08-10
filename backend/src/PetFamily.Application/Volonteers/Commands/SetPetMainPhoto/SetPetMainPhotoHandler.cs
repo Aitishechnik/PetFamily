@@ -27,13 +27,13 @@ namespace PetFamily.Application.Volonteers.Commands.SetPetMainPhoto
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            SetPetMainPhotoCommand command, 
+            SetPetMainPhotoCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for command: {Command}. Errors: {Errors}", 
+                _logger.LogWarning("Validation failed for command: {Command}. Errors: {Errors}",
                     command, validationResult.Errors);
                 return validationResult.ToErrorList();
             }
@@ -51,7 +51,7 @@ namespace PetFamily.Application.Volonteers.Commands.SetPetMainPhoto
             var petResult = volonteer.GetPetById(command.PetId);
             if (petResult.IsFailure)
             {
-                _logger.LogError("Pet with ID {PetId} not found for Volonteer {VolonteerId}.", 
+                _logger.LogError("Pet with ID {PetId} not found for Volonteer {VolonteerId}.",
                     command.PetId, command.VolonteerId);
                 return petResult.Error.ToErrorList();
             }
@@ -66,7 +66,7 @@ namespace PetFamily.Application.Volonteers.Commands.SetPetMainPhoto
                     .SetMainPhoto(FilePath.Create(command.MainPhotoPath).Value);
                 if (setMainPhotoResult.IsFailure)
                 {
-                    _logger.LogError("Failed to set main photo for pet with ID {PetId}. Error: {ErrorMessage}", 
+                    _logger.LogError("Failed to set main photo for pet with ID {PetId}. Error: {ErrorMessage}",
                         command.PetId, setMainPhotoResult.Error.Message);
                     return setMainPhotoResult.Error.ToErrorList();
                 }
@@ -79,7 +79,7 @@ namespace PetFamily.Application.Volonteers.Commands.SetPetMainPhoto
 
                 return UnitResult.Success<ErrorList>();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while setting the main photo for pet with ID {PetId}.", command.PetId);
                 return Errors.General

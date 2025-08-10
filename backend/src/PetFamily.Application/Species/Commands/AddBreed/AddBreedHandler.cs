@@ -28,7 +28,7 @@ namespace PetFamily.Application.Species.Commands.AddBreed
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            AddBreedCommand command, 
+            AddBreedCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(
@@ -40,7 +40,7 @@ namespace PetFamily.Application.Species.Commands.AddBreed
             }
 
             var speciesResult = await _speciesRepository.GetSpeciesById(command.speciesId, cancellationToken);
-            if(speciesResult.IsFailure)
+            if (speciesResult.IsFailure)
             {
                 _logger.LogWarning(
                     "Species with ID {SpeciesId} not found",
@@ -61,7 +61,7 @@ namespace PetFamily.Application.Species.Commands.AddBreed
 
                 _logger.LogInformation(
                     "Breed '{BreedName}' added to species with ID {SpeciesId}",
-                    command.Name, 
+                    command.Name,
                     command.speciesId);
 
                 var breedId = speciesResult.Value.Breeds
@@ -69,13 +69,13 @@ namespace PetFamily.Application.Species.Commands.AddBreed
 
                 return breedId;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 transaction.Rollback();
                 _logger.LogError(
                     ex,
                     "An error occurred while adding breed '{BreedName}' to species with ID {SpeciesId}",
-                    command.Name, 
+                    command.Name,
                     command.speciesId);
                 return Error.Failure("internal.error", "An unexpected error occurred while adding the breed").ToErrorList();
             }

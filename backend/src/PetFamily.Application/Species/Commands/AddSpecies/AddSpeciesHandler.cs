@@ -27,7 +27,7 @@ namespace PetFamily.Application.Species.Commands.AddSpecies
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            AddSpeciesCommand command, 
+            AddSpeciesCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command);

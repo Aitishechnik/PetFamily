@@ -8,7 +8,7 @@ namespace PetFamily.Domain.Shared
 
         public ErrorList(IEnumerable<Error> errors)
         {
-            _errors = [..errors];
+            _errors = [.. errors];
         }
 
         public IEnumerator<Error> GetEnumerator()

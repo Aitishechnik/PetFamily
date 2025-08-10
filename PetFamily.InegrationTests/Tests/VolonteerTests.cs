@@ -2,23 +2,22 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstraction;
-using PetFamily.Application.Volonteers.Commands.Create;
-using PetFamily.Application.Volonteers.Commands.Delete.Hard;
-using PetFamily.Application.Volonteers.Commands.Delete.Soft;
-using PetFamily.Application.Volonteers.Commands.UpdateDonationDetails;
-using PetFamily.Application.Volonteers.Commands.UpdateMainInfo;
-using PetFamily.Application.Volonteers.Commands.UpdateSocialNetworks;
-using PetFamily.Infrastructure.DbContexts;
+using PetFamily.Core.Abstractions;
+using PetFamily.Volonteers.Application.Commands.Create;
+using PetFamily.Volonteers.Application.Commands.Delete.Hard;
+using PetFamily.Volonteers.Application.Commands.Delete.Soft;
+using PetFamily.Volonteers.Application.Commands.UpdateDonationDetails;
+using PetFamily.Volonteers.Application.Commands.UpdateMainInfo;
+using PetFamily.Volonteers.Application.Commands.UpdateSocialNetworks;
+using PetFamily.Volonteers.Infrastructure.DbContexts;
 
 namespace PetFamily.InegrationTests.Tests
-
 {
     public class VolonteerTests : IClassFixture<IntegrationTestsWebFactory>, IAsyncLifetime
     {
         private readonly IntegrationTestsWebFactory _factory;
         private readonly Fixture _fixture;
-        private readonly WriteDbContext _writeDbContext;
+        private readonly VolonteerWriteDbContext _volonteerWriteDbContext;
         private readonly IServiceScope _scope;
 
         public VolonteerTests(IntegrationTestsWebFactory factory)
@@ -26,7 +25,7 @@ namespace PetFamily.InegrationTests.Tests
             _factory = factory;
             _fixture = new Fixture();
             _scope = _factory.Services.CreateScope();
-            _writeDbContext = _scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+            _volonteerWriteDbContext = _scope.ServiceProvider.GetRequiredService<VolonteerWriteDbContext>();
         }
 
         public Task InitializeAsync() => Task.CompletedTask;
@@ -51,7 +50,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volunteer = await _writeDbContext
+            var volunteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync();
 
@@ -63,7 +62,7 @@ namespace PetFamily.InegrationTests.Tests
         public async Task SoftRemoveVolonteer_SeededVoonteer_ChangesAddedToDb()
         {
             // Arrange
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
             var command = _fixture.CreateSoftDeleteVolonteerComand(
                 volonteerId);
             var sut = _scope.ServiceProvider
@@ -75,7 +74,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FindAsync(volonteerId);
 
@@ -88,7 +87,7 @@ namespace PetFamily.InegrationTests.Tests
         public async Task HardRemoveVolonteer_SeededVoonteer_RemovedFromDb()
         {
             //Arrane
-            var volonteerId = await _factory.SeedVolonteer(_writeDbContext);
+            var volonteerId = await _factory.SeedVolonteer(_volonteerWriteDbContext);
             var command = _fixture.CreateHardDeleteVolonteerComand(volonteerId);
             var sut = _scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, HardDeleteVolonteerCommand>>();
 
@@ -97,7 +96,7 @@ namespace PetFamily.InegrationTests.Tests
 
             // Assert
             Assert.True(result.IsSuccess);
-            var volonteer = await _writeDbContext.Volonteers.FindAsync(volonteerId);
+            var volonteer = await _volonteerWriteDbContext.Volonteers.FindAsync(volonteerId);
             volonteer.Should().BeNull();
         }
 
@@ -106,7 +105,7 @@ namespace PetFamily.InegrationTests.Tests
         {
             // Arrange
             var volonteerId = await _factory
-                .SeedVolonteer(_writeDbContext);
+                .SeedVolonteer(_volonteerWriteDbContext);
             var command = _fixture
                 .CreateUpdateDonationDetailsCommand(volonteerId);
             var sut = _scope.ServiceProvider
@@ -118,7 +117,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(
                 v => v.Id == volonteerId);
@@ -133,7 +132,7 @@ namespace PetFamily.InegrationTests.Tests
         {
             // Arrange
             var volonteerId = await _factory
-                .SeedVolonteer(_writeDbContext);
+                .SeedVolonteer(_volonteerWriteDbContext);
             var command = _fixture
                 .CreateUpdateSocialNetworksCommand(volonteerId);
             var sut = _scope.ServiceProvider
@@ -145,7 +144,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(
                 v => v.Id == volonteerId);
@@ -160,7 +159,7 @@ namespace PetFamily.InegrationTests.Tests
         {
             // Arrange
             var volonteerId = await _factory
-                .SeedVolonteer(_writeDbContext);
+                .SeedVolonteer(_volonteerWriteDbContext);
             var command = _fixture
                 .CreateUpdateMainInfoCommand(volonteerId);
             var sut = _scope.ServiceProvider
@@ -172,7 +171,7 @@ namespace PetFamily.InegrationTests.Tests
             // Assert
             Assert.True(result.IsSuccess);
 
-            var volonteer = await _writeDbContext
+            var volonteer = await _volonteerWriteDbContext
                 .Volonteers
                 .FirstOrDefaultAsync(
                 v => v.Id == volonteerId);

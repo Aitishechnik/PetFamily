@@ -27,11 +27,11 @@ namespace PetFamily.Application.Volonteers.Commands.ChangePetStatus
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            ChangePetStatusCommand command, 
+            ChangePetStatusCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(
-                command, 
+                command,
                 cancellationToken);
             if (!validationResult.IsValid)
             {
@@ -54,11 +54,11 @@ namespace PetFamily.Application.Volonteers.Commands.ChangePetStatus
             try
             {
                 var result = volonteer.ChangePetStatus(
-                    command.PetId, 
+                    command.PetId,
                     command.NewPetStatus);
                 if (result.IsFailure)
                 {
-                    _logger.LogError("Failed to change pet status for PetId {PetId} by VolonteerId {VolonteerId}: {ErrorMessage}", 
+                    _logger.LogError("Failed to change pet status for PetId {PetId} by VolonteerId {VolonteerId}: {ErrorMessage}",
                         command.PetId, command.VolonteerId, result.Error.Message);
                     return result.Error.ToErrorList();
                 }
@@ -67,7 +67,7 @@ namespace PetFamily.Application.Volonteers.Commands.ChangePetStatus
 
                 transaction.Commit();
 
-                _logger.LogInformation("Successfully changed pet status for PetId {PetId} by VolonteerId {VolonteerId}", 
+                _logger.LogInformation("Successfully changed pet status for PetId {PetId} by VolonteerId {VolonteerId}",
                     command.PetId, command.VolonteerId);
 
                 return UnitResult.Success<ErrorList>();
@@ -76,7 +76,7 @@ namespace PetFamily.Application.Volonteers.Commands.ChangePetStatus
             catch (Exception ex)
             {
                 transaction.Rollback();
-                _logger.LogError(ex, "Error changing pet status for PetId {PetId} by VolonteerId {VolonteerId}", 
+                _logger.LogError(ex, "Error changing pet status for PetId {PetId} by VolonteerId {VolonteerId}",
                     command.PetId, command.VolonteerId);
                 return Error.Failure("internal.error", "Error changing pet status")
                     .ToErrorList();

@@ -1,10 +1,10 @@
-﻿using System.Text.Json;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Dapper;
 using PetFamily.Application.Abstraction;
 using PetFamily.Application.Database;
 using PetFamily.Application.Dtos;
 using PetFamily.Application.Models;
+using System.Text.Json;
 
 namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
 {
@@ -37,13 +37,13 @@ namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
             parameters.Add("@Offset", (query.Page - 1) * query.PageSize);
 
             var rawResult = await connection.QueryAsync<(
-                Guid id, 
-                string email, 
-                string full_name, 
-                string description, 
-                string phone_number, 
-                int experience_in_years, 
-                string donation_details, 
+                Guid id,
+                string email,
+                string full_name,
+                string description,
+                string phone_number,
+                int experience_in_years,
+                string donation_details,
                 string social_networks)>(
             sql,
             parameters);
@@ -56,7 +56,7 @@ namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
                 Description = v.description,
                 PhoneNumber = v.phone_number,
                 ExperienceInYears = v.experience_in_years,
-                DonationDetails = JsonSerializer.Deserialize <DonationDetailsDto[]>(v.donation_details) ?? [],
+                DonationDetails = JsonSerializer.Deserialize<DonationDetailsDto[]>(v.donation_details) ?? [],
                 SocialNetworks = JsonSerializer.Deserialize<SocialNetworkDto[]>(v.social_networks) ?? []
             });
 

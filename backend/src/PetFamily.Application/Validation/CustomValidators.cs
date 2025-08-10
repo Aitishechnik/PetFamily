@@ -4,7 +4,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Validation
 {
-    public static class CustomValidators 
+    public static class CustomValidators
     {
         public static IRuleBuilderOptionsConditions<T, TElement> MustBeValueObject<T, TElement, TValueObject>(
             this IRuleBuilder<T, TElement> ruleBuilder,

@@ -32,7 +32,7 @@ namespace PetFamily.Application.Species.Commands.RemoveSpecies
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            RemoveSpeciesByIdCommand command, 
+            RemoveSpeciesByIdCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -51,7 +51,7 @@ namespace PetFamily.Application.Species.Commands.RemoveSpecies
             }
 
             var isPetWithSpecies = await _readDbContext.Pets.AnyAsync(
-                p => p.SpeciesId == command.SpeciesId, 
+                p => p.SpeciesId == command.SpeciesId,
                 cancellationToken);
 
             if (isPetWithSpecies)

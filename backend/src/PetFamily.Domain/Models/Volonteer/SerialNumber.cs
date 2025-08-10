@@ -5,7 +5,7 @@ namespace PetFamily.Domain.Models.Volonteer
 {
     public record SerialNumber
     {
-        public static SerialNumber First => new (1);
+        public static SerialNumber First => new(1);
         public int Value { get; }
         private SerialNumber(int value)
         {

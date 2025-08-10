@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.Contracts;
 using PetFamily.Domain.Models.Volonteer;
 using PetFamily.Domain.Shared;
 using PetFamily.Infrastructure.Extensions;
-using PetFamily.Application.Dtos;
-using PetFamily.Contracts;
 
 namespace PetFamily.Infrastructure.Configurations.Write
 {

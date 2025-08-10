@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using PetFamily.Application.FileManagement.Providers;
 using PetFamily.Application.Messaging;
-using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
+using FileInfoPath = PetFamily.Application.FileManagment.Files.FileInfoPath;
 
 namespace PetFamily.Infrastructure.Files
 {
@@ -11,11 +11,11 @@ namespace PetFamily.Infrastructure.Files
         {
             private readonly ILogger _logger;
             private readonly IFileProvider _fileProvider;
-            private readonly IMessageQueue<IEnumerable<FileInfo>> _messageQueue;
+            private readonly IMessageQueue<IEnumerable<FileInfoPath>> _messageQueue;
             public FilesCleanerService(
                 IFileProvider fileProvider,
                 ILogger<FilesCleanerService> logger,
-                IMessageQueue<IEnumerable<FileInfo>> messageQueue)
+                IMessageQueue<IEnumerable<FileInfoPath>> messageQueue)
             {
                 _logger = logger;
                 _fileProvider = fileProvider;

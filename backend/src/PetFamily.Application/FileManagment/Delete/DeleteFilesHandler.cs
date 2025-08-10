@@ -11,7 +11,7 @@ namespace PetFamily.Application.FileManagement.Delete
         private readonly IFileProvider _fileProvider;
         private readonly ILogger<DeleteFilesHandler> _logger;
         public DeleteFilesHandler(
-            IFileProvider fileProvider, 
+            IFileProvider fileProvider,
             ILogger<DeleteFilesHandler> logger)
         {
             _fileProvider = fileProvider;
@@ -19,7 +19,7 @@ namespace PetFamily.Application.FileManagement.Delete
         }
 
         public async Task<UnitResult<Error>> Handle(
-            DeleteFilesCommand command, 
+            DeleteFilesCommand command,
             CancellationToken cancellationToken = default)
         {
             var result = await _fileProvider

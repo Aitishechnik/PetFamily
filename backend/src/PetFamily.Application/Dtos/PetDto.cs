@@ -8,7 +8,7 @@ namespace PetFamily.Application.Dtos
         public Guid VolonteerId { get; set; }
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public string Address { get;set; } = default!;
+        public string Address { get; set; } = default!;
         public string OwnerPhoneNumber { get; set; } = default!;
         public DateTime DateOfBirth { get; set; }
         public HelpStatus HelpStatus { get; set; }
