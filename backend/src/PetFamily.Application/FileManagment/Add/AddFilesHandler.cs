@@ -11,14 +11,14 @@ namespace PetFamily.Application.FileManagement.Add
         private readonly IFileProvider _fileProvider;
         private readonly ILogger<AddFilesHandler> _logger;
         public AddFilesHandler(
-            IFileProvider fileProvider, 
+            IFileProvider fileProvider,
             ILogger<AddFilesHandler> logger)
         {
             _fileProvider = fileProvider;
             _logger = logger;
         }
         public async Task<Result<IReadOnlyList<FilePath>, Error>> Handle(
-            AddFilesCommand command, 
+            AddFilesCommand command,
             CancellationToken cancellationToken = default)
         {
             return await _fileProvider

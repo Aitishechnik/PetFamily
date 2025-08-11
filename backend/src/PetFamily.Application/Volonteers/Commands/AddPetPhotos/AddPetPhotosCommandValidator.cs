@@ -17,10 +17,10 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
 
             RuleFor(a => a.VolonteerId).
                 Must(x => x != Guid.Empty);
-            
+
             RuleFor(a => a.PetId).
                 Must(x => x != Guid.Empty);
-                
+
         }
     }
 }

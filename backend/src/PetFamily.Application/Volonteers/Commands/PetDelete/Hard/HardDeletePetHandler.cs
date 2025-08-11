@@ -35,13 +35,13 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Hard
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            HardDeletePetCommand command, 
+            HardDeletePetCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = _validator.Validate(command);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for command: {Command}. Errors: {Errors}", 
+                _logger.LogWarning("Validation failed for command: {Command}. Errors: {Errors}",
                     command, validationResult.Errors);
                 return validationResult.ToErrorList();
             }
@@ -59,7 +59,7 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Hard
             var petResult = volonteer.GetPetById(command.PetId);
             if (petResult.IsFailure)
             {
-                _logger.LogError("Pet with ID {PetId} not found in volonteer {VolonteerId}.", 
+                _logger.LogError("Pet with ID {PetId} not found in volonteer {VolonteerId}.",
                     command.PetId, command.VolonteerId);
                 return petResult.Error.ToErrorList();
             }
@@ -76,7 +76,7 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Hard
 
             try
             {
-                if(pet.PetPhotos.Count > 0)
+                if (pet.PetPhotos.Count > 0)
                 {
                     var bucketName = _configuration["MinioBuckets:Photos"];
                     if (string.IsNullOrEmpty(bucketName))
@@ -87,7 +87,7 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Hard
                     }
 
                     var deleteFilesRequest = new DeleteFilesCommand(
-                        pet.PetPhotos.Select(photo => new FileManagment.Files.FileInfo(bucketName, photo)));
+                        pet.PetPhotos.Select(photo => new FileManagment.Files.FileInfoPath(bucketName, photo)));
 
                     var deletionResult = await _deleteFilesHandler.Handle(deleteFilesRequest, cancellationToken);
                     if (deletionResult.IsFailure)
@@ -105,14 +105,14 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Hard
                 transaction.Commit();
 
                 _logger.LogInformation(
-                    "Successfully hard deleted pet with ID {PetId} for volonteer {VolonteerId}.", 
+                    "Successfully hard deleted pet with ID {PetId} for volonteer {VolonteerId}.",
                     command.PetId, command.VolonteerId);
                 return Result.Success<ErrorList>();
             }
             catch (Exception ex)
             {
                 transaction.Rollback();
-                _logger.LogError(ex, "An error occurred while hard deleting pet with ID {PetId} for volonteer {VolonteerId}.", 
+                _logger.LogError(ex, "An error occurred while hard deleting pet with ID {PetId} for volonteer {VolonteerId}.",
                     command.PetId, command.VolonteerId);
                 return Error.Failure("internal.error", "An error occurred while hard deleting pet").ToErrorList();
             }

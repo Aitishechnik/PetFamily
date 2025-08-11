@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\backend\src\PetFamily.API\PetFamily.API.csproj" />
+    <ProjectReference Include="..\backend\src\Shared\PetFamily.Core\PetFamily.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

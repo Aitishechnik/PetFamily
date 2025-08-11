@@ -40,9 +40,9 @@ namespace PetFamily.Application.Volonteers.Commands.RemovePetPhotos
                 return validationResult.ToErrorList();
 
             var volonteerResult = await _volonteersRepository.GetById(
-                command.VolonteerId, 
+                command.VolonteerId,
                 cancellationToken);
-            if(volonteerResult.IsFailure)
+            if (volonteerResult.IsFailure)
                 return volonteerResult.Error.ToErrorList();
 
             var volonteer = volonteerResult.Value;
@@ -55,7 +55,7 @@ namespace PetFamily.Application.Volonteers.Commands.RemovePetPhotos
 
             var paths = command.FileInfo.Select(fileInfo => fileInfo.FilePath);
 
-            foreach(var path in paths)
+            foreach (var path in paths)
             {
                 if (pet.PetPhotos.Any(p => p == path) == false)
                     return Errors.General
@@ -83,13 +83,13 @@ namespace PetFamily.Application.Volonteers.Commands.RemovePetPhotos
                 }
 
                 transaction.Commit();
-                
+
                 return Result.Success<ErrorList>();
             }
             catch
             {
                 transaction.Rollback();
-                
+
                 return Errors.General
                     .ValueIsInvalid("Failed to remove pet photos")
                     .ToErrorList();

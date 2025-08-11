@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Text.Json;
 
 namespace PetFamily.Infrastructure.Extensions
 {
@@ -19,7 +19,7 @@ namespace PetFamily.Infrastructure.Extensions
                 json => DeserializeDtoCollection(json, toValueObjectSelector),
                 CreateCollectionValueComparer<TValueObject>())
                 .HasColumnType("jsonb");
-        } 
+        }
 
         private static string SerializeValueObjectsCollection<TValueObject, TDto>(
             IReadOnlyList<TValueObject> valueObjects,

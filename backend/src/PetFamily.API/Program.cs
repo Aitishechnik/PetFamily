@@ -1,9 +1,10 @@
-using System.Text.Json.Serialization;
 using PetFamily.API.Middlewares;
-using PetFamily.Application;
-using PetFamily.Infrastructure;
+using PetFamily.Core;
+using PetFamily.Species.Presentation;
+using PetFamily.Volonteers.Presentation;
 using Serilog;
 using Serilog.Events;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,8 +28,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSerilog();
 
 builder.Services
-    .AddInfrastructure(builder.Configuration)
-    .AddApplication();
+    .AddVolunteersModule(builder.Configuration)
+    .AddSpeciesModule(builder.Configuration)
+    .AddFilesApplication();
 
 var app = builder.Build();
 

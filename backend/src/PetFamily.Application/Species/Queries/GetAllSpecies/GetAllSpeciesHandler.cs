@@ -13,7 +13,7 @@ namespace PetFamily.Application.Species.Queries.GetAllSpecies
             _sqlConnectionFactory = sqlConnectionFactory;
         }
         public async Task<IEnumerable<SpeciesDto>> Handle(
-            GetAllSpeciesQuery query, 
+            GetAllSpeciesQuery query,
             CancellationToken cancellationToken = default)
         {
             using var connection = _sqlConnectionFactory.Create();

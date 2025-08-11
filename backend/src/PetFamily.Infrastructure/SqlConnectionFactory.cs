@@ -1,7 +1,7 @@
-﻿using System.Data;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Npgsql;
 using PetFamily.Application.Database;
+using System.Data;
 
 namespace PetFamily.Infrastructure
 {
@@ -14,7 +14,7 @@ namespace PetFamily.Infrastructure
             _configuration = configuration;
         }
 
-        public IDbConnection Create() => 
+        public IDbConnection Create() =>
             new NpgsqlConnection(
                 _configuration
                 .GetConnectionString("Database"));

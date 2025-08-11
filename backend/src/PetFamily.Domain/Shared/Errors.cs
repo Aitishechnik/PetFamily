@@ -30,7 +30,7 @@
 
         public static class Volonteer
         {
-            public static Error AlreadyExists() => 
+            public static Error AlreadyExists() =>
                 Error.Validation("record.already.exists", "Volonteer already exists");
         }
     }

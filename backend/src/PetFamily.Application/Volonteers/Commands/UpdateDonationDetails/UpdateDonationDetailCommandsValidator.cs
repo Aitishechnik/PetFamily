@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using PetFamily.Application.Validation;
 using PetFamily.Domain.Models.Volonteer;
-using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volonteers.Commands.UpdateDonationDetails
 {

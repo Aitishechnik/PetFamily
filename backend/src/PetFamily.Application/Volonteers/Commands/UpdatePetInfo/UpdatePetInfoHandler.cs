@@ -33,11 +33,11 @@ namespace PetFamily.Application.Volonteers.Commands.UpdatePetInfo
             _logger = logger;
         }
         public async Task<UnitResult<ErrorList>> Handle(
-            UpdatePetInfoCommand command, 
+            UpdatePetInfoCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(
-                command, 
+                command,
                 cancellationToken);
             if (!validationResult.IsValid)
                 return validationResult.ToErrorList();
@@ -102,16 +102,16 @@ namespace PetFamily.Application.Volonteers.Commands.UpdatePetInfo
                 transaction.Commit();
 
                 _logger.LogInformation(
-                    "Volonteer with id {Id} has been updated with new pet info", 
+                    "Volonteer with id {Id} has been updated with new pet info",
                     volonteer.Id);
 
                 return UnitResult.Success<ErrorList>();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 transaction.Rollback();
                 _logger.LogError(
-                    ex, 
+                    ex,
                     "Error occurred while updating pet info for volonteer with id {VolonteerId}", command.VolonteerId);
                 return Error.Failure(
                     "internal.error", "Faild to update pet")

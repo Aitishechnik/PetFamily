@@ -35,7 +35,7 @@ namespace PetFamily.Domain.Models.Volonteer
             DateTime dateOfBirth,
             HelpStatus helpStatus)
         {
-            if(string.IsNullOrWhiteSpace(description) ||
+            if (string.IsNullOrWhiteSpace(description) ||
                 description.Length > Constants.MAX_TEXT_DESCRIPTION_LENGTH)
                 return Errors.General.ValueIsInvalid("Description");
 
@@ -55,7 +55,7 @@ namespace PetFamily.Domain.Models.Volonteer
                 dateOfBirth < DateTime.Now.AddYears(-Constants.MAX_DOMASTIC_PET_AGE))
                 return Errors.General.ValueIsInvalid("DateOfBirth");
 
-            if(helpStatus == HelpStatus.Undefined)
+            if (helpStatus == HelpStatus.Undefined)
                 return Errors.General.ValueIsInvalid("HelpStatus");
 
             return new PetGeneralInfo(name, description, address, ownerPhoneNumber, dateOfBirth, helpStatus);

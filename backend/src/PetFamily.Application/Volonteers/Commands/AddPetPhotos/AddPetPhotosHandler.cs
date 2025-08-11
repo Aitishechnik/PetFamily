@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstraction;
 using PetFamily.Application.Extensions;
 using PetFamily.Application.FileManagement.Add;
+using PetFamily.Application.FileManagment.Files;
 using PetFamily.Application.Messaging;
 using PetFamily.Contracts;
 using PetFamily.Domain.Shared;
-using FileInfo = PetFamily.Application.FileManagment.Files.FileInfo;
 
 namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
 {
@@ -17,7 +17,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
         private readonly IUnitOfWork _unitOfWork;
         private readonly AddFilesHandler _addFilesHandler;
         private readonly IValidator<AddPetPhotosCommand> _validator;
-        private readonly IMessageQueue<IEnumerable<FileInfo>> _messageQueue;
+        private readonly IMessageQueue<IEnumerable<FileInfoPath>> _messageQueue;
         private readonly ILogger<AddPetPhotosHandler> _logger;
 
         public AddPetPhotosHandler(
@@ -25,7 +25,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
             IUnitOfWork unitOfWork,
             AddFilesHandler addFilesHandler,
             IValidator<AddPetPhotosCommand> validator,
-            IMessageQueue<IEnumerable<FileInfo>> messageQueue,
+            IMessageQueue<IEnumerable<FileInfoPath>> messageQueue,
             ILogger<AddPetPhotosHandler> logger)
         {
             _volonteersRepository = volonteersRepository;
@@ -61,7 +61,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
             var filePathList = GenerateFilePathList(
                 volonteer.Id,
                 pet.Id,
-                pet.GetLastPhotoIndex()+1,
+                pet.GetLastPhotoIndex() + 1,
                 command.Content.Count(),
                 Constants.PHOTO_FILE_EXTENSION);
 
@@ -81,7 +81,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
                     command.Content,
                     filePathList);
 
-                if(fileDTOsResult.IsFailure)
+                if (fileDTOsResult.IsFailure)
                     return fileDTOsResult.Error.ToErrorList();
 
                 var result = await _addFilesHandler.Handle(
@@ -92,7 +92,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
                 {
                     await _messageQueue.WriteAsync(
                         fileDTOsResult.Value.Select(
-                            dto => new FileInfo(
+                            dto => new FileInfoPath(
                                 command.Bucket, FilePath.Create(
                                     dto.FileName).Value)));
 
@@ -119,7 +119,7 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
         {
             var result = new List<FilePath>();
 
-            for (int i = startCountIndex; i < startCountIndex+filesCount; i++)
+            for (int i = startCountIndex; i < startCountIndex + filesCount; i++)
             {
                 var fileName = $"{volunteerId}/{petId}/{i}{extension}";
                 var filePath = FilePath.Create(fileName);
@@ -138,12 +138,12 @@ namespace PetFamily.Application.Volonteers.Commands.AddPetPhotos
             IEnumerable<Stream> content,
             IEnumerable<FilePath> filePaths)
         {
-            if(content.Count() != filePaths.Count())
+            if (content.Count() != filePaths.Count())
                 return Errors.General.ValueIsInvalid("Content and file paths count mismatch.");
 
             var fileDTOs = new List<FileDTO>();
 
-            for(int i = 0; i < content.Count(); i++)
+            for (int i = 0; i < content.Count(); i++)
             {
                 var fileDTO = new FileDTO(content.ElementAt(i), filePaths.ElementAt(i).Path);
                 fileDTOs.Add(fileDTO);

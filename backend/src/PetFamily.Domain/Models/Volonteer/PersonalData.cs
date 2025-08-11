@@ -1,6 +1,6 @@
-﻿using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
+using System.Text.RegularExpressions;
 
 namespace PetFamily.Domain.Models.Volonteer
 {
@@ -21,7 +21,7 @@ namespace PetFamily.Domain.Models.Volonteer
 
         public static Result<PersonalData, Error> Create(string fullName, string email, string phoneNumber)
         {
-            if (fullName is null || 
+            if (fullName is null ||
                 fullName.Length > Constants.MAX_NAME_LENGTH ||
                 !Regex.IsMatch(fullName, Constants.REGEX_FULLNAME_PATTERN))
                 return Errors.General.ValueIsInvalid("FullName");
@@ -31,7 +31,7 @@ namespace PetFamily.Domain.Models.Volonteer
                 !Regex.IsMatch(email, Constants.REGEX_EMAIL_PATTERN))
                 return Errors.General.ValueIsInvalid("Email");
 
-            if (phoneNumber is null || 
+            if (phoneNumber is null ||
                 phoneNumber.Length > Constants.MAX_PHONE_NUMBER_LENGTH ||
                 !Regex.IsMatch(phoneNumber, Constants.REGEX_PHONE_NUMBER_PATTERN))
                 return Errors.General.ValueIsInvalid("PhoneNumber");

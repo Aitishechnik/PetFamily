@@ -32,7 +32,7 @@ namespace PetFamily.Infrastructure.BackgroundServices
                 await fileCleanerService.Process(stoppingToken);
             }
 
-            await Task.CompletedTask;   
+            await Task.CompletedTask;
         }
     }
 }

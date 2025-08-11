@@ -1,8 +1,7 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Application.Dtos;
-using PetFamily.Contracts;
+using System.Text.Json;
 
 namespace PetFamily.Infrastructure.Configurations.Read
 {
@@ -42,7 +41,7 @@ namespace PetFamily.Infrastructure.Configurations.Read
             builder.Property(i => i.DonationDetails)
                 .HasConversion(
                 dd => JsonSerializer.Serialize(string.Empty, JsonSerializerOptions.Default),
-                json => JsonSerializer.Deserialize <DonationDetailsDto[]>(json, JsonSerializerOptions.Default)!);
+                json => JsonSerializer.Deserialize<DonationDetailsDto[]>(json, JsonSerializerOptions.Default)!);
         }
     }
 }

@@ -23,8 +23,8 @@ namespace PetFamily.Application.Volonteers.Queries.GetVolonteers
 
             return await volonteersQuery
                 .ToPagedList(
-                query.Page, 
-                query.PageSize, 
+                query.Page,
+                query.PageSize,
                 cancellationToken);
         }
     }

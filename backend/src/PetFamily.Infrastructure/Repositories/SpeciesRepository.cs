@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Database;
 using PetFamily.Application.Species;
 using PetFamily.Domain.Models.Species;
 using PetFamily.Domain.Shared;
@@ -17,13 +16,13 @@ namespace PetFamily.Infrastructure.Repositories
             _dbContext = appDbContext;
         }
         public async Task<Result<Species, Error>> GetSpeciesById(
-            Guid speciesId, 
+            Guid speciesId,
             CancellationToken cancellationToken = default)
         {
             var result = await _dbContext.Species.FindAsync(
                 speciesId,
                 cancellationToken);
-            if(result is null)
+            if (result is null)
                 return Errors.General.NotFound(speciesId);
             return result;
         }
@@ -33,7 +32,7 @@ namespace PetFamily.Infrastructure.Repositories
             CancellationToken cancellationToken = default)
         {
             var species = await _dbContext.Species.FindAsync(
-                speciesId, 
+                speciesId,
                 cancellationToken);
 
             if (species is null)
@@ -73,7 +72,7 @@ namespace PetFamily.Infrastructure.Repositories
         }
 
         public async Task AddSpecies(
-            Species species, 
+            Species species,
             CancellationToken cancellationToken = default)
         {
             await _dbContext.Species.AddAsync(species);

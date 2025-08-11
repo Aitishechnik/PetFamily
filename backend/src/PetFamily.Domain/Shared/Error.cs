@@ -8,11 +8,11 @@
         public string Message { get; }
 
         public ErrorType Type { get; }
-        public string InvalidField { get; } 
+        public string InvalidField { get; }
 
         private Error(
-            string code, 
-            string message, 
+            string code,
+            string message,
             ErrorType errorType,
             string? invalidField = default)
         {

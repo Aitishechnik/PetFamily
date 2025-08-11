@@ -7,17 +7,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using NSubstitute;
-using PetFamily.Application.Database;
-using PetFamily.Contracts;
-using PetFamily.Domain.Models.Species;
-using PetFamily.Domain.Models.Volonteer;
-using PetFamily.Domain.Shared;
-using PetFamily.Infrastructure;
-using PetFamily.Infrastructure.DbContexts;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Dtos;
+using PetFamily.SharedKernal;
+using PetFamily.Species.Infrastructure;
+using PetFamily.Species.Infrastructure.DbContexts;
+using PetFamily.Volonteers.Infrastructure.DbContexts;
 using Respawn;
 using System.Data.Common;
 using Testcontainers.PostgreSql;
-using IFileProvider = PetFamily.Application.FileManagement.Providers.IFileProvider;
+using PetFamily.Core.FileManagement.Providers;
+using PetFamily.Volonteers.Domain.Entities;
+using PetFamily.Volonteers.Domain.ValueObjects;
+using PetFamily.Core.Dtos.Enums;
+using PetFamily.Species.Domain.Entities;
 
 namespace PetFamily.InegrationTests
 {
@@ -45,27 +48,35 @@ namespace PetFamily.InegrationTests
 
         protected virtual void ConfigureDefaultServices(IServiceCollection services)
         {
-            services.RemoveAll<WriteDbContext>();
-            services.RemoveAll<ReadDbContext>();
+            services.RemoveAll<VolonteerWriteDbContext>();
+            services.RemoveAll<SpeciesWriteDbContext>();
+            services.RemoveAll<IVolonteerReadDbContext>();
+            services.RemoveAll<ISpeciesReadDbContext>();
             services.RemoveAll<ISqlConnectionFactory>();
             services.RemoveAll<IFileProvider>();
 
-            services.AddScoped<WriteDbContext>(_ =>
-            new WriteDbContext(_dbContainer.GetConnectionString()));
+            services.AddScoped(_ =>
+            new VolonteerWriteDbContext(_dbContainer.GetConnectionString()));
 
-            services.AddScoped<IReadDbContext, ReadDbContext>(_ =>
-            new ReadDbContext(_dbContainer.GetConnectionString()));
+            services.AddScoped(_ =>
+            new SpeciesWriteDbContext(_dbContainer.GetConnectionString()));
+
+            services.AddScoped<IVolonteerReadDbContext>(_ =>
+            new VolonteerReadDbContext(_dbContainer.GetConnectionString()));
+
+            services.AddScoped<ISpeciesReadDbContext>(_ =>
+            new SpeciesReadDbContext(_dbContainer.GetConnectionString()));
 
             services.AddScoped<ISqlConnectionFactory>(_ =>
             new SqlConnectionFactoryTest(_dbContainer.GetConnectionString()));
 
-            services.AddTransient<IFileProvider>(_ => _fileProviderMock);
+            services.AddTransient(_ => _fileProviderMock);
         }
 
         public void SetupSuccessFileProviderMock(FilePath[] filePath)
         {
             _fileProviderMock
-                .UploadFiles(Arg.Any<IReadOnlyList<FileDTO>>(), Arg.Any<CancellationToken>())
+                .UploadFiles(Arg.Any<IReadOnlyList<FileDto>>(), Arg.Any<CancellationToken>())
                 .Returns(Result.Success<IReadOnlyList<FilePath>, Error>(filePath));
         }
 
@@ -74,9 +85,11 @@ namespace PetFamily.InegrationTests
             await _dbContainer.StartAsync();
 
             using var scope = Services.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
-            await dbContext.Database.EnsureDeletedAsync();
-            await dbContext.Database.EnsureCreatedAsync();
+            var volonteerDbContext = scope.ServiceProvider.GetRequiredService<VolonteerWriteDbContext>();
+            var speciesDbContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
+
+            await volonteerDbContext.Database.MigrateAsync();
+            await speciesDbContext.Database.MigrateAsync();
 
             _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
             await InitializeRespawner();
@@ -88,7 +101,7 @@ namespace PetFamily.InegrationTests
             _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
             {
                 DbAdapter = DbAdapter.Postgres,
-                SchemasToInclude = ["public"]
+                SchemasToInclude = ["public", "volonteers", "species"]
             });
         }
 
@@ -104,10 +117,9 @@ namespace PetFamily.InegrationTests
         }
 
         public async Task<Guid> SeedVolonteer(
-            WriteDbContext _writeDbContext)
+            VolonteerWriteDbContext _writeDbContext)
         {
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Test Name", "test@test.test", "+123456789").Value,
                 ProfessionalData.Create("Test description", 15).Value,
                 new List<Pet>(),
@@ -122,7 +134,7 @@ namespace PetFamily.InegrationTests
         }
 
         public async Task<Guid> SeedPet(
-            WriteDbContext _writeDbContext,
+            VolonteerWriteDbContext _writeDbContext,
             Guid volonteerId,
             Guid speciesId,
             Guid breedId)
@@ -166,9 +178,9 @@ namespace PetFamily.InegrationTests
         }
 
         public async Task<Guid> SeedSpecies(
-            WriteDbContext _writeDbContext)
+            SpeciesWriteDbContext _writeDbContext)
         {
-            var species = new Species("Test Species");
+            var species = new Species.Domain.Entities.Species("Test Species");
 
             await _writeDbContext.Species.AddAsync(species);
 
@@ -178,7 +190,7 @@ namespace PetFamily.InegrationTests
         }
 
         public async Task<Guid> SeedBreed(
-            WriteDbContext _writeDbContext,
+            SpeciesWriteDbContext _writeDbContext,
             Guid speciesId)
         {
             var breed = new Breed("Test Breed");
@@ -195,7 +207,7 @@ namespace PetFamily.InegrationTests
         }
 
         public async Task<string[]> SeedPetPhotos(
-            WriteDbContext _writeDbContext,
+            VolonteerWriteDbContext _writeDbContext,
             Guid volonteerId,
             Guid petId)
         {

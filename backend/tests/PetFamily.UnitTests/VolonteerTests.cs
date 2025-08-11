@@ -1,5 +1,7 @@
 using CSharpFunctionalExtensions;
-using PetFamily.Domain.Models.Volonteer;
+using PetFamily.Core.Dtos.Enums;
+using PetFamily.Volonteers.Domain.Entities;
+using PetFamily.Volonteers.Domain.ValueObjects;
 
 namespace PetFamily.Domain.UnitTests
 {
@@ -9,9 +11,8 @@ namespace PetFamily.Domain.UnitTests
         public void Add_Pet_First_In_List_Return_Success_Result()
         {
             // arrange
-            
+
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),
@@ -42,14 +43,13 @@ namespace PetFamily.Domain.UnitTests
         {
             // arrange
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),
                 new List<SocialNetwork>(),
                 new List<DonationDetails>());
 
-            var pets = Enumerable.Range(1,5).Select(_ =>new Pet(
+            var pets = Enumerable.Range(1, 5).Select(_ => new Pet(
                 PetGeneralInfo.Create("Bobik", "test", "test", "+79998887766", DateTime.Now, HelpStatus.LookingForHome).Value,
                 PetCharacteristics.Create("test", 10, 10).Value,
                 PetHealthInfo.Create("test", true, true).Value,
@@ -82,7 +82,6 @@ namespace PetFamily.Domain.UnitTests
         {
             // arrange
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),

@@ -1,5 +1,4 @@
 ﻿using PetFamily.Application.Abstraction;
-using PetFamily.Domain.Models.Volonteer;
 
 namespace PetFamily.Application.Volonteers.Queries.GetAllPets
 {

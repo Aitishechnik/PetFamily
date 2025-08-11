@@ -1,6 +1,5 @@
 ﻿using PetFamily.Application.Abstraction;
 using PetFamily.Contracts;
-using PetFamily.Domain.Models.Volonteer;
 
 namespace PetFamily.Application.Volonteers.Commands.UpdatePetInfo
 {

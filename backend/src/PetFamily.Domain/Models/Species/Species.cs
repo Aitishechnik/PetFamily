@@ -16,7 +16,7 @@ namespace PetFamily.Domain.Models.Species
 
         public UnitResult<Error> AddBreeds(IEnumerable<Breed> breeds)
         {
-            if(breeds.Distinct().Count() != breeds.Count())
+            if (breeds.Distinct().Count() != breeds.Count())
                 return Error.Validation("not.unique.elemets", "Breeds must be unique");
 
             foreach (var breed in breeds)

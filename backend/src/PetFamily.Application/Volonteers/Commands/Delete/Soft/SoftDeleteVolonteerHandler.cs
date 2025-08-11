@@ -27,7 +27,7 @@ namespace PetFamily.Application.Volonteers.Commands.Delete.Soft
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            
+
             SoftDeleteVolonteerCommand command,
             CancellationToken cancellationToken = default)
         {
@@ -38,7 +38,7 @@ namespace PetFamily.Application.Volonteers.Commands.Delete.Soft
                 return validationResult.ToErrorList();
 
             var result = await _volonteersRepository.GetById(command.VolonteerId);
-            if(result.IsFailure)
+            if (result.IsFailure)
                 return result.Error.ToErrorList();
 
             if (result.Value.IsDeleted)
@@ -64,13 +64,13 @@ namespace PetFamily.Application.Volonteers.Commands.Delete.Soft
             {
                 transaction.Rollback();
                 _logger.LogError(
-                    ex, 
+                    ex,
                     "Error occurred while soft deleting volonteer with id {request.VolonteerId}"
                     , command.VolonteerId);
                 return Errors.General
                     .ValueIsInvalid("volonteer soft deletion")
                     .ToErrorList();
             }
-        }        
+        }
     }
 }

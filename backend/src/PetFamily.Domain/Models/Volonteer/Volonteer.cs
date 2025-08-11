@@ -60,19 +60,19 @@ namespace PetFamily.Domain.Models.Volonteer
 
         public void UpdateSocialNetworks(IEnumerable<SocialNetwork> socialNetworks)
         {
-            _socialNetworks = [..socialNetworks];
+            _socialNetworks = [.. socialNetworks];
         }
 
         public void UpdateDonationDetails(IEnumerable<DonationDetails> donationDetails)
         {
-            _donationDetails = [..donationDetails];
+            _donationDetails = [.. donationDetails];
         }
 
         public void Delete()
         {
             IsDeleted = true;
 
-            foreach(var pet in Pets)
+            foreach (var pet in Pets)
                 pet.Delete();
 
             DeletionDate = DateTime.Now;
@@ -103,7 +103,7 @@ namespace PetFamily.Domain.Models.Volonteer
 
         public Result<Pet, Error> GetPetById(Guid petId)
         {
-            if(petId == Guid.Empty)
+            if (petId == Guid.Empty)
                 return Errors.General.ValueIsInvalid(petId.ToString());
 
             var result = Pets.FirstOrDefault(p => p.Id == petId);
@@ -116,7 +116,7 @@ namespace PetFamily.Domain.Models.Volonteer
 
         public UnitResult<Error> AddPetPhotos(Guid petId, IEnumerable<FilePath> petPhotos)
         {
-            if(petPhotos is null || petPhotos.ToList().Count == 0)
+            if (petPhotos is null || petPhotos.ToList().Count == 0)
                 return Errors.General.ValueIsInvalid("pet photos collection");
 
             if (petId == Guid.Empty)
@@ -126,7 +126,7 @@ namespace PetFamily.Domain.Models.Volonteer
 
             if (pet is null)
                 return Errors.General.ValueIsInvalid("pet is not in volunteer's list");
-            
+
             pet.AddPhotos(petPhotos);
 
             return Result.Success<Error>();
@@ -135,7 +135,7 @@ namespace PetFamily.Domain.Models.Volonteer
         public UnitResult<Error> MovePet(SerialNumber current, SerialNumber target)
         {
             var pet = Pets.FirstOrDefault(p => p.SerialNumber == current);
-            if(pet is null)
+            if (pet is null)
                 return Errors.General.ValueIsInvalid("serial number");
 
             if (target.Value <= 0 || target.Value > Pets.Count)
@@ -152,7 +152,7 @@ namespace PetFamily.Domain.Models.Volonteer
 
             int startIndex = oldIndex < targetIndex ? oldIndex : targetIndex;
 
-            for (int i = startIndex ; i < Pets.Count; i++)
+            for (int i = startIndex; i < Pets.Count; i++)
             {
                 var serialResult = SerialNumber.Create(i + 1);
                 if (serialResult.IsFailure)
@@ -206,7 +206,7 @@ namespace PetFamily.Domain.Models.Volonteer
             if (updateResult.IsFailure)
                 return updateResult.Error;
 
-            if(serialNumber != petResult.Value.SerialNumber.Value)
+            if (serialNumber != petResult.Value.SerialNumber.Value)
             {
                 var moveResult = MovePet(
                     petResult.Value.SerialNumber,
@@ -226,7 +226,7 @@ namespace PetFamily.Domain.Models.Volonteer
             if (petResult.IsFailure)
                 return petResult.Error;
 
-            if(helpStatus != HelpStatus.NeedsHelp &&
+            if (helpStatus != HelpStatus.NeedsHelp &&
                 helpStatus != HelpStatus.LookingForHome)
                 return Errors.General.ValueIsInvalid("help status");
 
@@ -238,7 +238,7 @@ namespace PetFamily.Domain.Models.Volonteer
         public UnitResult<Error> PetSoftDelete(Guid petId)
         {
             var petResult = GetPetById(petId);
-            if(petResult.IsFailure)
+            if (petResult.IsFailure)
                 return petResult.Error;
 
             var petDeleteResult = petResult.Value.SoftDelete();

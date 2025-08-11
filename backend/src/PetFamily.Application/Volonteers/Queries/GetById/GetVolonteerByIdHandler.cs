@@ -21,7 +21,7 @@ public class GetVolonteerByIdHandler : IQueryHandler<VolonteerDto, GetVolonteerB
     {
         var volonteersQuery = _readDbContext.Volonteers.AsQueryable();
 
-        if(volonteersQuery.Count() < 1)
+        if (volonteersQuery.Count() < 1)
             return new VolonteerDto();
 
         var result = await volonteersQuery.Where(v => v.Id == query.VolonteerId).ToListAsync();

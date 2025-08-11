@@ -1,5 +1,5 @@
-﻿using System.Threading.Channels;
-using PetFamily.Application.Messaging;
+﻿using PetFamily.Application.Messaging;
+using System.Threading.Channels;
 
 namespace PetFamily.Infrastructure.MessageQueues
 {
@@ -8,7 +8,7 @@ namespace PetFamily.Infrastructure.MessageQueues
         private readonly Channel<TMassage> _channel
             = Channel.CreateUnbounded<TMassage>();
         public async Task WriteAsync(
-            TMassage message, 
+            TMassage message,
             CancellationToken cancellationToken = default)
         {
             await _channel.Writer.WriteAsync(message, cancellationToken);

@@ -27,17 +27,17 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Soft
         }
 
         public async Task<UnitResult<ErrorList>> Handle(
-            SoftDeletePetCommand command, 
+            SoftDeletePetCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
-                _logger.LogWarning("Validation failed for command: {Command}. Errors: {Errors}", 
+                _logger.LogWarning("Validation failed for command: {Command}. Errors: {Errors}",
                     command, validationResult.Errors);
                 return validationResult.ToErrorList();
             }
-            
+
             var volonteerResult = await _volonteerRepository.GetById(
                 command.VolonteerId, cancellationToken);
             if (volonteerResult.IsFailure)
@@ -49,7 +49,7 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Soft
             var petResult = volonteerResult.Value.GetPetById(command.PetId);
             if (petResult.IsFailure)
             {
-                _logger.LogError("Pet with ID {PetId} not found in volonteer {VolonteerId}.", 
+                _logger.LogError("Pet with ID {PetId} not found in volonteer {VolonteerId}.",
                     command.PetId, command.VolonteerId);
                 return petResult.Error.ToErrorList();
             }
@@ -64,14 +64,14 @@ namespace PetFamily.Application.Volonteers.Commands.PetDelete.Soft
 
                 transaction.Commit();
 
-                _logger.LogInformation("Successfully soft deleted pet with ID {PetId} for volonteer {VolonteerId}.", 
+                _logger.LogInformation("Successfully soft deleted pet with ID {PetId} for volonteer {VolonteerId}.",
                     command.PetId, command.VolonteerId);
 
                 return Result.Success<ErrorList>();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while soft deleting pet with ID {PetId} for volonteer {VolonteerId}.", 
+                _logger.LogError(ex, "An error occurred while soft deleting pet with ID {PetId} for volonteer {VolonteerId}.",
                     command.PetId, command.VolonteerId);
                 return Error.Failure("internal.error", "An error occurred while soft deleting pet").ToErrorList();
             }

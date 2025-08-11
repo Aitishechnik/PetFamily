@@ -28,7 +28,7 @@ namespace PetFamily.Application.Volonteers.Commands.Create
         }
 
         public async Task<Result<Guid, ErrorList>> Handle(
-            CreateVolonteerCommand command, 
+            CreateVolonteerCommand command,
             CancellationToken cancellationToken = default)
         {
             var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -75,7 +75,7 @@ namespace PetFamily.Application.Volonteers.Commands.Create
             using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try
-            {              
+            {
                 await _volonteersRepository.Add(volonteer);
 
                 transaction.Commit();
