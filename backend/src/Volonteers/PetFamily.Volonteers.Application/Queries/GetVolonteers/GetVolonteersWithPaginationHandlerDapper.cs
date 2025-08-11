@@ -22,13 +22,13 @@ namespace PetFamily.Volonteers.Application.Queries.GetVolonteers
             using var connection = _sqlConnectionFactory.Create();
 
             var totalCount = await connection.ExecuteScalarAsync<int>(
-                "SELECT COUNT(*) FROM volonteers");
+                "SELECT COUNT(*) FROM volonteers.volonteers");
 
             var parameters = new DynamicParameters();
 
             var sql = """
                 SELECT id, email, full_name, description, phone_number, experience_in_years, donation_details, social_networks 
-                FROM volonteers
+                FROM volonteers.volonteers
                 LIMIT @PageSize OFFSET @Offset
                 """;
 

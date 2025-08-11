@@ -20,7 +20,7 @@ namespace PetFamily.Application.Species.Queries.GetBreedById
             parameters.Add("@Breed_id", query.BreedId);
             var sql = """
                 SELECT id, name, species_id
-                FROM breeds
+                FROM species.breeds
                 WHERE id = @Breed_id AND species_id = @Species_id
                 """;
             var result = await connection.QuerySingleAsync<BreedDto>(sql, parameters);

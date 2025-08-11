@@ -34,7 +34,7 @@ namespace PetFamily.Volonteers.Application.Queries.GetAllPets
             using var connection = _connectionFactory.Create();
 
             var totalCount = await connection.ExecuteScalarAsync<int>(
-                "SELECT COUNT(*) FROM volonteers");
+                "SELECT COUNT(*) FROM volonteers.volonteers");
 
             var sql = """
                       SELECT 
@@ -56,9 +56,9 @@ namespace PetFamily.Volonteers.Application.Queries.GetAllPets
                           s.name as species_name,
                           b.name as breed_name,
                           p.serial_number
-                      FROM pets p 
-                      JOIN species s ON p.species_id = s.id
-                      JOIN breeds b ON p.breed_id = b.id
+                      FROM volonteers.pets p 
+                      JOIN species.species s ON p.species_id = s.id
+                      JOIN species.breeds b ON p.breed_id = b.id
                       WHERE 
                           (@VolonteerId IS NULL OR p.volonteer_id = @VolonteerId)
                           AND (@Name IS NULL OR p.name LIKE CONCAT('%', @Name, '%'))

@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Extensions;
 using PetFamily.SharedKernal;
@@ -18,7 +20,7 @@ namespace PetFamily.Volonteers.Application.Commands.Create
 
         public CreateVolonteerHandler(
             IVolonteersRepository volonteersRepository,
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Volonteers)] IUnitOfWork unitOfWork,
             IValidator<CreateVolonteerCommand> validator,
             ILogger<CreateVolonteerHandler> logger)
         {
@@ -37,7 +39,7 @@ namespace PetFamily.Volonteers.Application.Commands.Create
             if (!validationResult.IsValid)
                 return validationResult.ToErrorList();
 
-            var volonteerId = Guid.NewGuid();
+            //var volonteerId = Guid.NewGuid();
 
             var personalData = PersonalData.Create(
                 command.PersonalDataDTO.FullName,
@@ -66,7 +68,7 @@ namespace PetFamily.Volonteers.Application.Commands.Create
             foreach (var dd in command.DonationDetails)
                 donationDetails.Add(DonationDetails.Create(dd.Name, dd.Description).Value);
 
-            var volonteer = new Volonteer(volonteerId,
+            var volonteer = new Volonteer(/*volonteerId,*/
                 personalData,
                 professionalData,
                 new List<Pet>(),
@@ -81,9 +83,9 @@ namespace PetFamily.Volonteers.Application.Commands.Create
 
                 transaction.Commit();
 
-                _logger.LogInformation("Added volonteer {volonteer} with id {volonteerId}", volonteer, volonteerId);
+                _logger.LogInformation("Added volonteer {volonteer} with id {volonteerId}", volonteer, volonteer.Id);
 
-                return volonteerId;
+                return volonteer.Id;
             }
             catch (Exception ex)
             {

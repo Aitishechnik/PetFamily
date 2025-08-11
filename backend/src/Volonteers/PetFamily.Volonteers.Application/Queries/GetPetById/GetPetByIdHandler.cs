@@ -41,9 +41,9 @@ namespace PetFamily.Volonteers.Application.Queries.GetPetById
                           s.name as species_name,
                           b.name as breed_name,
                           p.serial_number
-                      FROM pets p 
-                      JOIN species s ON p.species_id = s.id
-                      JOIN breeds b ON p.breed_id = b.id
+                      FROM volonteers.pets p 
+                      JOIN species.species s ON p.species_id = s.id
+                      JOIN species.breeds b ON p.breed_id = b.id
                       WHERE p.id = @PetId
                       """;
 

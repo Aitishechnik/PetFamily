@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Extensions;
 using PetFamily.SharedKernal;
@@ -19,7 +21,7 @@ namespace PetFamily.Volonteers.Application.Commands.UpdatePetInfo
         private readonly ILogger<UpdatePetInfoHandler> _logger;
 
         public UpdatePetInfoHandler(
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Volonteers)] IUnitOfWork unitOfWork,
             IVolonteersRepository volonteerRepository,
             ISpeciesContract speciesContract,
             IValidator<UpdatePetInfoCommand> validator,

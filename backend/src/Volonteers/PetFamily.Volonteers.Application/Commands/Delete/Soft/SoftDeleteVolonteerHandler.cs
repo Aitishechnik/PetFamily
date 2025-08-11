@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Extensions;
 using PetFamily.SharedKernal;
@@ -16,7 +18,7 @@ namespace PetFamily.Volonteers.Application.Commands.Delete.Soft
 
         public SoftDeleteVolonteerHandler(
             IVolonteersRepository volonteersRepository,
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Volonteers)] IUnitOfWork unitOfWork,
             IValidator<DeleteVolonteerCommand> validator,
             ILogger<SoftDeleteVolonteerHandler> logger)
         {

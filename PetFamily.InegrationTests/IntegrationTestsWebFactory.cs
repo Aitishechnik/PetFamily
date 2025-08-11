@@ -50,8 +50,8 @@ namespace PetFamily.InegrationTests
         {
             services.RemoveAll<VolonteerWriteDbContext>();
             services.RemoveAll<SpeciesWriteDbContext>();
-            services.RemoveAll<VolonteerReadDbContext>();
-            services.RemoveAll<SpeciesReadDbContext>();
+            services.RemoveAll<IVolonteerReadDbContext>();
+            services.RemoveAll<ISpeciesReadDbContext>();
             services.RemoveAll<ISqlConnectionFactory>();
             services.RemoveAll<IFileProvider>();
 
@@ -61,10 +61,10 @@ namespace PetFamily.InegrationTests
             services.AddScoped(_ =>
             new SpeciesWriteDbContext(_dbContainer.GetConnectionString()));
 
-            services.AddScoped<IVolonteerReadDbContext, VolonteerReadDbContext>(_ =>
+            services.AddScoped<IVolonteerReadDbContext>(_ =>
             new VolonteerReadDbContext(_dbContainer.GetConnectionString()));
 
-            services.AddScoped<ISpeciesReadDbContext, SpeciesReadDbContext>(_ =>
+            services.AddScoped<ISpeciesReadDbContext>(_ =>
             new SpeciesReadDbContext(_dbContainer.GetConnectionString()));
 
             services.AddScoped<ISqlConnectionFactory>(_ =>
@@ -86,12 +86,10 @@ namespace PetFamily.InegrationTests
 
             using var scope = Services.CreateScope();
             var volonteerDbContext = scope.ServiceProvider.GetRequiredService<VolonteerWriteDbContext>();
-            await volonteerDbContext.Database.EnsureDeletedAsync();
-            await volonteerDbContext.Database.EnsureCreatedAsync();
-
             var speciesDbContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
-            await speciesDbContext.Database.EnsureDeletedAsync();
-            await speciesDbContext.Database.EnsureCreatedAsync();
+
+            await volonteerDbContext.Database.MigrateAsync();
+            await speciesDbContext.Database.MigrateAsync();
 
             _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
             await InitializeRespawner();
@@ -103,7 +101,7 @@ namespace PetFamily.InegrationTests
             _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
             {
                 DbAdapter = DbAdapter.Postgres,
-                SchemasToInclude = ["public"]
+                SchemasToInclude = ["public", "volonteers", "species"]
             });
         }
 
@@ -122,7 +120,6 @@ namespace PetFamily.InegrationTests
             VolonteerWriteDbContext _writeDbContext)
         {
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Test Name", "test@test.test", "+123456789").Value,
                 ProfessionalData.Create("Test description", 15).Value,
                 new List<Pet>(),

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.SharedKernal;
 using PetFamily.Species.Application;
@@ -46,7 +47,7 @@ namespace PetFamily.Species.Infrastructure
         private static IServiceCollection AddDatabase(
             this IServiceCollection services)
         {
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddKeyedScoped<IUnitOfWork, UnitOfWork>(Modules.Species);
             services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
             return services;

@@ -1,7 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Extensions;
 using PetFamily.SharedKernal;
@@ -19,7 +21,7 @@ namespace PetFamily.Species.Application.Commands.RemoveSpecies
         private readonly ILogger<RemoveSpeciesByIdHandler> _logger;
 
         public RemoveSpeciesByIdHandler(
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Species)] IUnitOfWork unitOfWork,
             ISpeciesRepository speciesRepository,
             IVolonteerContract volonteerContract,
             IValidator<RemoveSpeciesByIdCommand> validator,

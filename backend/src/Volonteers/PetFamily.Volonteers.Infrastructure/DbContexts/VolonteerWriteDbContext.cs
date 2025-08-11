@@ -17,6 +17,8 @@ namespace PetFamily.Volonteers.Infrastructure.DbContexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("volonteers");
+
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(VolonteerWriteDbContext).Assembly,
                 type => type.FullName?.Contains("Configurations.Write") ?? false);
         }

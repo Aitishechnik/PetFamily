@@ -13,7 +13,6 @@ namespace PetFamily.Domain.UnitTests
             // arrange
 
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),
@@ -44,7 +43,6 @@ namespace PetFamily.Domain.UnitTests
         {
             // arrange
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),
@@ -84,7 +82,6 @@ namespace PetFamily.Domain.UnitTests
         {
             // arrange
             var volonteer = new Volonteer(
-                Guid.NewGuid(),
                 PersonalData.Create("Ivan Ivanov", "test@test.com", "+79998887766").Value,
                 ProfessionalData.Create("descrition", 10).Value,
                 new List<Pet>(),

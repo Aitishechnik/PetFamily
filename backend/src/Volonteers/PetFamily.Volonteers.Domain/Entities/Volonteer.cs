@@ -9,14 +9,14 @@ namespace PetFamily.Volonteers.Domain.Entities
     {
         protected Volonteer() { }
         public Volonteer(
-            Guid id,
+            //Guid id,
             PersonalData personalData,
             ProfessionalData professionalData,
             List<Pet> pets,
             IEnumerable<SocialNetwork> socialNetwokrs,
             IEnumerable<DonationDetails> donationDetails)
         {
-            Id = id;
+            //Id = id;
             PersonalData = personalData;
             ProfessionalData = professionalData;
             Pets = pets;

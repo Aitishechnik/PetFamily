@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using Minio.AspNetCore;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.FileManagement.Providers;
 using PetFamily.Core.FileManagment.Files;
@@ -82,7 +83,7 @@ namespace PetFamily.Volonteers.Infrastructure
         private static IServiceCollection AddDatabase(
             this IServiceCollection services)
         {
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddKeyedScoped<IUnitOfWork, UnitOfWork>(Modules.Volonteers);
             services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
             return services;

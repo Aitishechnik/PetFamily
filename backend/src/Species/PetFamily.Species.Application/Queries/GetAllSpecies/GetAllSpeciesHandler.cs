@@ -19,7 +19,7 @@ namespace PetFamily.Species.Application.Queries.GetAllSpecies
 
             var sql = """
                 SELECT id, name
-                FROM species
+                FROM species.species
                 """;
 
             var result = await connection.QueryAsync<SpeciesDto>(sql);

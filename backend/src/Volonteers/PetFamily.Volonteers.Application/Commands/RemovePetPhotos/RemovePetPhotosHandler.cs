@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Extensions;
 using PetFamily.Core.FileManagement.Delete;
@@ -17,7 +19,7 @@ namespace PetFamily.Volonteers.Application.Commands.RemovePetPhotos
         private readonly ILogger<RemovePetPhotosHandler> _logger;
 
         public RemovePetPhotosHandler(
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Volonteers)] IUnitOfWork unitOfWork,
             IVolonteersRepository volonteersRepository,
             DeleteFilesHandler deleteFilesHandler,
             IValidator<RemovePetPhotosCommand> validator,

@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Extensions;
 using PetFamily.SharedKernal;
@@ -16,7 +18,7 @@ namespace PetFamily.Species.Application.Commands.AddSpecies
 
         public AddSpeciesHandler(
             ISpeciesRepository speciesRepository,
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Species)] IUnitOfWork unitOfWork,
             IValidator<AddSpeciesCommand> validator,
             ILogger<AddSpeciesHandler> logger)
         {

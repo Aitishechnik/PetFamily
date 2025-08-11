@@ -1,6 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Dtos;
 using PetFamily.Core.Extensions;
@@ -23,7 +25,7 @@ namespace PetFamily.Volonteers.Application.Commands.AddPetPhotos
 
         public AddPetPhotosHandler(
             IVolonteersRepository volonteersRepository,
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Volonteers)] IUnitOfWork unitOfWork,
             AddFilesHandler addFilesHandler,
             IValidator<AddPetPhotosCommand> validator,
             IMessageQueue<IEnumerable<FileInfoPath>> messageQueue,

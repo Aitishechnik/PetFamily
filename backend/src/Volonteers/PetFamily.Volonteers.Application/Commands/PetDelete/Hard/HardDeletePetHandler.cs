@@ -1,12 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PetFamily.Core;
 using PetFamily.Core.Abstractions;
 using PetFamily.Core.Extensions;
 using PetFamily.Core.FileManagement.Delete;
-using PetFamily.SharedKernal;
 using PetFamily.Core.FileManagment.Files;
+using PetFamily.SharedKernal;
 
 namespace PetFamily.Volonteers.Application.Commands.PetDelete.Hard
 {
@@ -21,7 +23,7 @@ namespace PetFamily.Volonteers.Application.Commands.PetDelete.Hard
 
         public HardDeletePetHandler(
             IVolonteersRepository volonteersRepository,
-            IUnitOfWork unitOfWork,
+            [FromKeyedServices(Modules.Volonteers)] IUnitOfWork unitOfWork,
             DeleteFilesHandler deleteFilesHandler,
             IConfiguration configuration,
             IValidator<DeletePetCommand> validator,
